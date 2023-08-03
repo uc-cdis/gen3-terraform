@@ -13,10 +13,10 @@ terraform {
 }
 
 locals{
-  db_fence_address = var.deploy_aurora ? module.aurora[0].aws_rds_cluster.postgresql.endpoint : var.deploy_fence_db && var.deploy_rds ? aws_db_instance.db_fence[0].address : ""
-  db_indexd_address = var.deploy_aurora ? module.aurora[0].aws_rds_cluster.postgresql.endpoint : var.deploy_indexd_db && var.deploy_rds ? aws_db_instance.db_indexd[0].address : ""
-  db_sheepdog_address = var.deploy_aurora ? module.aurora[0].aws_rds_cluster.postgresql.endpoint : var.deploy_sheepdog_db && var.deploy_rds ? aws_db_instance.db_sheepdog[0].address : ""
-  db_peregrine_address = var.deploy_aurora ? module.aurora[0].aws_rds_cluster.postgresql.endpoint : var.deploy_sheepdog_db && var.deploy_rds ? aws_db_instance.db_sheepdog[0].address : ""
+  db_fence_address = var.deploy_aurora ? module.aurora[0].aurora_cluster_writer_endpoint : var.deploy_fence_db && var.deploy_rds ? aws_db_instance.db_fence[0].address : ""
+  db_indexd_address = var.deploy_aurora ? module.aurora[0].aurora_cluster_writer_endpoint : var.deploy_indexd_db && var.deploy_rds ? aws_db_instance.db_indexd[0].address : ""
+  db_sheepdog_address = var.deploy_aurora ? module.aurora[0].aurora_cluster_writer_endpoint : var.deploy_sheepdog_db && var.deploy_rds ? aws_db_instance.db_sheepdog[0].address : ""
+  db_peregrine_address = var.deploy_aurora ? module.aurora[0].aurora_cluster_writer_endpoint : var.deploy_sheepdog_db && var.deploy_rds ? aws_db_instance.db_sheepdog[0].address : ""
 }
 
 module "cdis_vpc" {
