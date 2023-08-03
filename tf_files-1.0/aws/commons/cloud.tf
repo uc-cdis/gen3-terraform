@@ -67,24 +67,24 @@ module "config_files" {
   source                        = "../../shared/modules/k8s_configs"
   vpc_name                      = var.vpc_name
   db_fence_address              = local.db_fence_address
-  db_fence_password             = var.db_password_fence
+  db_fence_password             = var.db_password_fence != "" ? var.db_password_fence : random_password.fence_password.result
   db_fence_name                 = var.fence_database_name
   db_sheepdog_address           = local.db_sheepdog_address
   db_sheepdog_username          = var.sheepdog_db_username
-  db_sheepdog_password          = var.db_password_sheepdog
+  db_sheepdog_password          = var.db_password_sheepdog != "" ? var.db_password_sheepdog : random_password.sheepdog_password.result
   db_sheepdog_name              = var.sheepdog_database_name
   db_peregrine_address          = local.db_peregrine_address
-  db_peregrine_password         = var.db_password_peregrine
+  db_peregrine_password         = var.db_password_peregrine != "" ? var.db_password_peregrine : random_password.peregrine_password.result
   db_indexd_address             = local.db_indexd_address
   db_indexd_username            = var.indexd_db_username
-  db_indexd_password            = var.db_password_indexd
+  db_indexd_password            = var.db_password_indexd != "" ? var.db_password_indexd : random_password.indexd_password.result
   db_indexd_name                = var.indexd_database_name
   hostname                      = var.hostname
   google_client_secret          = var.google_client_secret
   google_client_id              = var.google_client_id
-  hmac_encryption_key           = var.hmac_encryption_key
-  sheepdog_secret_key           = var.sheepdog_secret_key
-  sheepdog_indexd_password      = var.sheepdog_indexd_password
+  hmac_encryption_key           = var.hmac_encryption_key != "" ? var.hmac_encryption_key : base64encode(random_password.hmac_encryption_key.result)
+  sheepdog_secret_key           = var.sheepdog_secret_key  != "" ? var.sheepdog_secret_key : random_password.sheepdog_secret_key.result
+  sheepdog_indexd_password      = var.sheepdog_indexd_password != "" ? var.sheepdog_indexd_password : random_password.sheepdog_indexd_password.result
   sheepdog_oauth2_client_id     = var.sheepdog_oauth2_client_id
   sheepdog_oauth2_client_secret = var.sheepdog_oauth2_client_secret
   kube_bucket_name              = aws_s3_bucket.kube_bucket.id

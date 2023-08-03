@@ -42,20 +42,29 @@ variable "indexd_db_size" {
   default = 10
 }
 
-variable "db_password_fence" {}
+variable "db_password_fence" {
+  default = ""
+}
 
 variable "indexd_prefix" {
   default = "dg.XXXX/"
 }
 
-variable "db_password_peregrine" {}
+variable "db_password_peregrine" {
+  default = ""
+}
 
-variable "db_password_sheepdog" {}
+variable "db_password_sheepdog" {
+  default = ""
+}
 
-variable "db_password_indexd" {}
+variable "db_password_indexd" {
+  default = ""
+}
 
 variable "dictionary_url" {
   # ex: dev dictionary is at: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
+  default = ""
 }
 
 variable "portal_app" {
@@ -95,7 +104,9 @@ variable "hostname" {
   default = "dev.bionimbus.org"
 }
 
-variable "kube_ssh_key" {}
+variable "kube_ssh_key" {
+  default = ""
+}
 
 /* A list of ssh keys that will be added to
    kubernete nodes, Example:
@@ -104,17 +115,27 @@ variable "kube_additional_keys" {
   default = ""
 }
 
-variable "google_client_id" {}
+variable "google_client_id" {
+  default = ""
+}
 
-variable "google_client_secret" {}
+variable "google_client_secret" {
+  default = ""
+}
 
 # 32 alphanumeric characters
-variable "hmac_encryption_key" {}
+variable "hmac_encryption_key" {
+  default = ""
+}
 
-variable "sheepdog_secret_key" {}
+variable "sheepdog_secret_key" {
+  default = ""
+}
 
 # password for write access to indexd
-variable "sheepdog_indexd_password" {}
+variable "sheepdog_indexd_password" {
+  default = ""
+}
 
 #
 # DEPRECATED - should no longer be necessary
@@ -126,6 +147,7 @@ variable "sheepdog_oauth2_client_id" {
 
 variable "config_folder" {
   # Object folder of user.yaml file - ex: s3://cdis-gen3-users/${config_folder}/user.yaml
+  default = "dev"
 }
 
 #
@@ -143,7 +165,7 @@ variable "ami_account_id" {
 
 variable "squid_image_search_criteria" {
   description = "Search criteria for squid AMI look up"
-  default     = "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"
+  default     = "ubuntu/images/hvm-ssd/ubuntu-bionic-20.04-amd64-server-*"
 }
 
 variable "peering_vpc_id" {
@@ -721,7 +743,7 @@ variable "preferred_backup_window" {
 variable "password_length" {
   type        = number
   description = "The length of the password string"
-  default     = 12
+  default     = 32
 }
 
 variable "deploy_aurora" {

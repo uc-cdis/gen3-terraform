@@ -14,7 +14,7 @@ resource "aws_db_instance" "db_fence" {
   instance_class              = var.fence_db_instance
   db_name                     = var.fence_database_name
   username                    = var.fence_db_username
-  password                    = var.db_password_fence
+  password                    = var.db_password_fence != "" ? var.db_password_fence : random_password.fence_password.result
   snapshot_identifier         = var.fence_snapshot
   db_subnet_group_name        = aws_db_subnet_group.private_group.id
   vpc_security_group_ids      = [module.cdis_vpc.security_group_local_id]
@@ -51,7 +51,7 @@ resource "aws_db_instance" "db_sheepdog" {
   instance_class              = var.sheepdog_db_instance
   db_name                     = var.sheepdog_database_name
   username                    = var.sheepdog_db_username
-  password                    = var.db_password_sheepdog
+  password                    = var.db_password_sheepdog != "" ? var.db_password_sheepdog : random_password.sheepdog_password.result
   snapshot_identifier         = var.sheepdog_snapshot
   db_subnet_group_name        = aws_db_subnet_group.private_group.id
   vpc_security_group_ids      = [module.cdis_vpc.security_group_local_id]
@@ -88,7 +88,7 @@ resource "aws_db_instance" "db_indexd" {
   instance_class              = var.indexd_db_instance
   db_name                     = var.indexd_database_name
   username                    = var.indexd_db_username
-  password                    = var.db_password_indexd
+  password                    = var.db_password_indexd != "" ? var.db_password_indexd : random_password.indexd_password.result
   snapshot_identifier         = var.indexd_snapshot
   db_subnet_group_name        = aws_db_subnet_group.private_group.id
   vpc_security_group_ids      = [module.cdis_vpc.security_group_local_id]

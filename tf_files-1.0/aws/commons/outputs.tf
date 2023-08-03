@@ -47,10 +47,12 @@ output "data-bucket_name" {
 
 output "kubeconfig" {
   value = module.eks[0].kubeconfig
+  sensitive   = true  
 }
 
 output "config_map_aws_auth" {
   value = module.eks[0].config_map_aws_auth
+  sensitive   = true  
 }
 
 ##
