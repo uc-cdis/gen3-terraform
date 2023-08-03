@@ -105,7 +105,7 @@ variable "kube_ssh_key" {
 variable "kube_additional_keys" {
   default = ""
 }
-
+g
 # 32 alphanumeric characters
 variable "hmac_encryption_key" {
   default = ""
@@ -987,4 +987,8 @@ variable "fence_secret_key" {
 
 variable "upload_bucket" {
   default = ""
+}
+
+variable "namespace" {
+  default = "default"
 }

@@ -6,9 +6,9 @@ module "gen3_deployment" {
   aurora_hostname         = module.aurora.0.aurora_cluster_writer_endpoint
   aurora_username         = module.aurora.0.aurora_cluster_master_username
 
-  cluster_endpoint        = module.eks.cluster_endpoint
-  cluster_ca_cert         = module.eks.cluster_certificate_authority_data
-  cluster_name            = module.eks.cluster_name
+  cluster_endpoint        = module.eks.0.cluster_endpoint
+  cluster_ca_cert         = module.eks.0.cluster_certificate_authority_data
+  cluster_name            = module.eks.0.cluster_name
   ambassador_enabled      = var.ambassador_enabled
   arborist_enabled        = var.arborist_enabled
   argo_enabled            = var.argo_enabled
