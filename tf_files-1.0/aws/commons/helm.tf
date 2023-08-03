@@ -2,9 +2,9 @@ module "gen3_deployment" {
   source = "../../gen3"
   count  = var.deploy_gen3 && var.deploy_aurora ? 1 : 0
 
-  aurora_password         = module.aurora.aurora_cluster_master_password
-  aurora_hostname         = module.aurora.aurora_cluster_writer_endpoint
-  aurora_username         = module.aurora.aurora_cluster_master_username
+  aurora_password         = module.aurora.0.aurora_cluster_master_password
+  aurora_hostname         = module.aurora.0.aurora_cluster_writer_endpoint
+  aurora_username         = module.aurora.0.aurora_cluster_master_username
 
   cluster_endpoint        = module.eks.cluster_endpoint
   cluster_ca_cert         = module.eks.cluster_certificate_authority_data
