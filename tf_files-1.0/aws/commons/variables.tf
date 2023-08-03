@@ -46,10 +46,6 @@ variable "db_password_fence" {
   default = ""
 }
 
-variable "indexd_prefix" {
-  default = "dg.XXXX/"
-}
-
 variable "db_password_peregrine" {
   default = ""
 }
@@ -59,11 +55,6 @@ variable "db_password_sheepdog" {
 }
 
 variable "db_password_indexd" {
-  default = ""
-}
-
-variable "dictionary_url" {
-  # ex: dev dictionary is at: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
   default = ""
 }
 
@@ -112,14 +103,6 @@ variable "kube_ssh_key" {
    kubernete nodes, Example:
    '- ssh-rsa XXXX\n - ssh-rsa XXX' */
 variable "kube_additional_keys" {
-  default = ""
-}
-
-variable "google_client_id" {
-  default = ""
-}
-
-variable "google_client_secret" {
   default = ""
 }
 
@@ -176,18 +159,9 @@ variable "squid-nlb-endpointservice-name" {
   default = "com.amazonaws.vpce.us-east-1.vpce-svc-0ce2261f708539011"
   }
 
-# Path to user.yaml in s3://cdis-gen3-users/CONFIG_FOLDER/user.yaml
-variable "gitops_path" {
-  default = "https://github.com/uc-cdis/cdis-manifest.git"
-}
-
 locals {
   # kube-aws does not like '-' in cluster name
   cluster_name = "${replace(var.vpc_name, "-", "")}"
-}
-
-variable "slack_webhook" {
-  default = ""
 }
 
 variable "secondary_slack_webhook" {
@@ -852,11 +826,6 @@ variable "hatchery_enabled" {
   default     = true
 }
 
-variable "hostname" {
-  description = "hostname of the commons"
-  default = ""
-}
-
 variable "indexd_enabled" {
   description = "Enable indexd"
   type        = bool
@@ -997,7 +966,7 @@ variable "useryaml_path" {
 }
 
 variable "gitops_path" {
-  default = ""
+  default = "https://github.com/uc-cdis/cdis-manifest.git"
 }
 
 variable "google_client_id" {
