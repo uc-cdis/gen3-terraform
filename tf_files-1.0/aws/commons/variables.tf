@@ -44,18 +44,22 @@ variable "indexd_db_size" {
 
 variable "db_password_fence" {
   default = ""
+  sensitive = true
 }
 
 variable "db_password_peregrine" {
   default = ""
+  sensitive = true  
 }
 
 variable "db_password_sheepdog" {
   default = ""
+  sensitive = true
 }
 
 variable "db_password_indexd" {
   default = ""
+  sensitive = true
 }
 
 variable "portal_app" {
@@ -109,15 +113,18 @@ variable "kube_additional_keys" {
 # 32 alphanumeric characters
 variable "hmac_encryption_key" {
   default = ""
+  sensitive = true
 }
 
 variable "sheepdog_secret_key" {
   default = ""
+  sensitive = true
 }
 
 # password for write access to indexd
 variable "sheepdog_indexd_password" {
   default = ""
+  sensitive = true
 }
 
 #
@@ -126,6 +133,7 @@ variable "sheepdog_indexd_password" {
 #
 variable "sheepdog_oauth2_client_id" {
   default = ""
+  sensitive = true
 }
 
 variable "config_folder" {
@@ -139,6 +147,7 @@ variable "config_folder" {
 #
 variable "sheepdog_oauth2_client_secret" {
   default = ""
+  sensitive = true
 }
 
 # id of AWS account that owns the public AMI's
@@ -164,8 +173,14 @@ locals {
   cluster_name = "${replace(var.vpc_name, "-", "")}"
 }
 
+variable "slack_webhook" {
+  default = ""
+  sensitive = true
+}
+
 variable "secondary_slack_webhook" {
   default = ""
+  sensitive = true
 }
 
 variable "alarm_threshold" {
@@ -397,10 +412,12 @@ variable "indexd_max_allocated_storage" {
 
 variable "activation_id" {
   default = ""
+  sensitive = true
 }
 
 variable "customer_id" {
   default = ""
+  sensitive = true
 }
 
 variable "fips" {
@@ -462,7 +479,7 @@ variable "worker_drive_size" {
 }
 
 variable "eks_version" {
-  default = "1.21"
+  default = "1.25"
 }
 
 variable "workers_subnet_size" {
@@ -914,11 +931,6 @@ variable "slack_send_dbgap" {
   default     = false
 }
 
-variable "slack_webhook" {
-  description = "Slack webhook"
-  default     = ""  
-}
-
 variable "ssjdispatcher_enabled" {
   description = "Enable ssjdispatcher"
   type        = bool
@@ -971,18 +983,22 @@ variable "gitops_path" {
 
 variable "google_client_id" {
   default = ""
+  sensitive = true
 }
 
 variable "google_client_secret" {
   default = ""
+  sensitive = true
 }
 
 variable "fence_access_key" {
   default = ""
+  sensitive = true
 }
 
 variable "fence_secret_key" {
   default = ""
+  sensitive = true
 }
 
 variable "upload_bucket" {
