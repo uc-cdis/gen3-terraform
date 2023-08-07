@@ -71,6 +71,16 @@ resource "local_sensitive_file" "aurora_creds" {
   filename = "${path.cwd}/${var.vpc_name}_output/aurora-creds.json"
 }
 
+module "secrets_manager" {
+  count       = var.secrets_manager_enabled ? 1 : 0
+  source      = "../secrets_manager"
+  vpc_name    = var.vpc_name
+  secret      = templatefile("${path.module}/db_setup.tftpl", {
+    password  = aws_rds_cluster.postgresql.master_password
+  })
+  secret_name = "${vpc_name}-aurora-master-password"
+}
+
 # See https://www.postgresql.org/docs/9.6/static/runtime-config-logging.html
 # and https://www.postgresql.org/docs/9.6/static/runtime-config-query.html#RUNTIME-CONFIG-QUERY-ENABLE
 # for detail parameter descriptions

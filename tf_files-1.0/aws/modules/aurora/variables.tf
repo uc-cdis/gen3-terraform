@@ -1,6 +1,10 @@
 
 variable "vpc_name" {}
 
+variable "secrets_manager_enabled" {
+  default = false
+}
+
 variable "cluster_identifier" {
   description = "Cluster Identifier"
   type        = string
