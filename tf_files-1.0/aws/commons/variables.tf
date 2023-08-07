@@ -1008,3 +1008,7 @@ variable "upload_bucket" {
 variable "namespace" {
   default = "default"
 }
+
+variable "secrets_manager_enabled" {
+  default = false
+}
