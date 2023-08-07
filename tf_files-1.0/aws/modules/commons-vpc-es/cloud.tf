@@ -95,7 +95,7 @@ CONFIG
 
   vpc_options {
     security_group_ids = [aws_security_group.private_es.id]
-    subnet_ids         = data.aws_subnet_ids.private.ids
+    subnet_ids         = data.aws_subnet.private.ids
   }
 
   cluster_config {

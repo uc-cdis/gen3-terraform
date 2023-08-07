@@ -21,7 +21,7 @@ data "aws_cloudwatch_log_group" "logs_group" {
   name = var.vpc_name
 }
 
-data "aws_subnet_ids" "private" {
+data "aws_subnet" "private" {
   vpc_id = data.aws_vpc.the_vpc.id
   tags = {
     Name = "private_db_alt"
