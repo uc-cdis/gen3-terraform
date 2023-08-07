@@ -55,4 +55,5 @@ module "eks" {
   fips_ami_kms                     = var.fips_ami_kms
   fips_enabled_ami                 = var.fips_enabled_ami
   availability_zones               = var.availability_zones
+  ci_run                           = var.ci_run
 }

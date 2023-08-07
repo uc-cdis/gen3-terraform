@@ -1012,3 +1012,7 @@ variable "namespace" {
 variable "secrets_manager_enabled" {
   default = false
 }
+
+variable "ci_run" {
+  default = false
+}

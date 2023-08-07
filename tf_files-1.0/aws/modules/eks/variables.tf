@@ -203,3 +203,7 @@ variable "scale_in_protection" {
   description = "set scale-in protection on ASG"
   default     = false
 }
+
+variable "ci_run" {
+  default = false
+}

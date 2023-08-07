@@ -76,7 +76,7 @@ module "secrets_manager" {
   source      = "../secrets_manager"
   vpc_name    = var.vpc_name
   secret      = aws_rds_cluster.postgresql.master_password
-  secret_name = "${var.vpc_name}-aurora-master-password"
+  secret_name = "aurora-master-password"
 }
 
 # See https://www.postgresql.org/docs/9.6/static/runtime-config-logging.html
