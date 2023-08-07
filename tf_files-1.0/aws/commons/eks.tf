@@ -45,5 +45,6 @@ module "eks" {
   minimum_on_demand_nodes          = var.minimum_on_demand_nodes
   enable_spot_instances            = var.enable_spot_instances
   enable_on_demand_instances       = var.enable_on_demand_instances
+  ci_run                           = var.ci_run
   depends_on                       = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id, module.cdis_vpc.squid_auto]
 }
