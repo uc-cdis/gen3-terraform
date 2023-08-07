@@ -69,3 +69,7 @@ output "fence-bot_secret" {
 output "data-bucket_name" {
   value = module.data-bucket.data-bucket_name
 }
+
+output "squid_auto" {
+  value = module.squid-auto.squid_auto-name
+}
