@@ -18,4 +18,5 @@ module "aurora" {
   backup_retention_period		        = var.backup_retention_period
   preferred_backup_window		        = var.preferred_backup_window
   password_length			              = var.password_length
+  depends_on                         = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id]
 }
