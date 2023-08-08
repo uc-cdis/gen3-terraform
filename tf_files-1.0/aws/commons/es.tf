@@ -3,8 +3,6 @@ module "commons_vpc_es" {
   count                   = var.deploy_es ? 1 : 0
   vpc_name                = var.vpc_name
   vpc_id                  = module.cdis_vpc.vpc_id
-  slack_webhook           = var.slack_webhook
-  secondary_slack_webhook = var.secondary_slack_webhook
   instance_type           = var.es_instance_type
   ebs_volume_size_gb      = var.ebs_volume_size_gb
   encryption              = var.encryption
