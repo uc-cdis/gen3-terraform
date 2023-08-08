@@ -558,12 +558,12 @@ resource "aws_security_group" "ssh" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Environment            = var.vpc_name
-    Organization           = var.organization_name
-    Name                   = "ssh_eks_${var.vpc_name}"
-    karpenter.sh/discovery = var.vpc_name
-  }
+  tags = tomap({
+    "Environment": var.vpc_name,
+    "Organization": var.organization_name,
+    "Name": "ssh_eks_${var.vpc_name}",
+    "karpenter.sh/discovery": var.vpc_name,
+  })
 }
 
 

@@ -3,7 +3,7 @@
 ################################################################################
 
 module "karpenter" {
-  count   = var.deploy_karpenter ? 1 : 0
+  count   = var.use_karpenter ? 1 : 0
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
 
   cluster_name           = aws_eks_cluster.eks_cluster.id
@@ -15,7 +15,7 @@ module "karpenter" {
 }
 
 resource "aws_eks_fargate_profile" "karpenter" {
-  count                  = var.deploy_karpenter ? 1 : 0
+  count                  = var.use_karpenter ? 1 : 0
   cluster_name           = aws_eks_cluster.eks_cluster.name
   fargate_profile_name   = "karpenter"
   pod_execution_role_arn = aws_iam_role.karpenter.arn
@@ -27,7 +27,7 @@ resource "aws_eks_fargate_profile" "karpenter" {
 }
 
 resource "aws_iam_role" "karpenter" {
-  count = var.deploy_karpenter ? 1 : 0
+  count = var.use_karpenter ? 1 : 0
   name  = "${var.vpc_name}-karpenter-fargate-role"
 
   assume_role_policy = jsonencode({
@@ -43,13 +43,13 @@ resource "aws_iam_role" "karpenter" {
 }
 
 resource "aws_iam_role_policy_attachment" "karpenter-role-policy" {
-  count      = var.deploy_karpenter ? 1 : 0
+  count      = var.use_karpenter ? 1 : 0
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy"
   role       = aws_iam_role.karpenter.name
 }
 
 resource "helm_release" "karpenter" {
-  count               = var.deploy_karpenter ? 1 : 0
+  count               = var.use_karpenter ? 1 : 0
   namespace           = "karpenter"
   create_namespace    = true
   name                = "karpenter"
@@ -86,7 +86,7 @@ resource "helm_release" "karpenter" {
 }
 
 resource "kubectl_manifest" "karpenter_provisioner" {
-  count   = var.deploy_karpenter ? 1 : 0
+  count   = var.use_karpenter ? 1 : 0
 
   yaml_body = <<-YAML
     ---
@@ -209,7 +209,7 @@ resource "kubectl_manifest" "karpenter_provisioner" {
 }
 
 resource "kubectl_manifest" "karpenter_node_template" {
-  count   = var.deploy_karpenter ? 1 : 0
+  count   = var.use_karpenter ? 1 : 0
 
   yaml_body = <<-YAML
     ---
