@@ -10,6 +10,11 @@ terraform {
       version = "~> 4.0"
     }
   }
+  required_providers {
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+    }
+  }  
 }
 
 provider "kubernetes" {
