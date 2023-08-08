@@ -12,6 +12,46 @@ terraform {
   }
 }
 
+provider "kubernetes" {
+  host                   = module.eks.0.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.0.cluster_certificate_authority_data)
+
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    # This requires the awscli to be installed locally where Terraform is executed
+    args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name]
+  }
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = module.eks.0.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.eks.0.cluster_certificate_authority_data)
+
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "aws"
+      # This requires the awscli to be installed locally where Terraform is executed
+      args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name]
+    }
+  }
+}
+
+provider "kubectl" {
+  apply_retry_count      = 5
+  host                   = module.eks.0.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.0.cluster_certificate_authority_data)
+  load_config_file       = false
+
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    # This requires the awscli to be installed locally where Terraform is executed
+    args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name]
+  }
+}
+
 locals{
   db_fence_address = var.deploy_aurora ? module.aurora[0].aurora_cluster_writer_endpoint : var.deploy_fence_db && var.deploy_rds ? aws_db_instance.db_fence[0].address : ""
   db_indexd_address = var.deploy_aurora ? module.aurora[0].aurora_cluster_writer_endpoint : var.deploy_indexd_db && var.deploy_rds ? aws_db_instance.db_indexd[0].address : ""
@@ -98,21 +138,6 @@ module "config_files" {
   mailgun_api_url               = var.mailgun_api_url
   mailgun_smtp_host             = var.mailgun_smtp_host
 
-}
-
-module "cdis_alarms" {
-  count                       = var.deploy_alarms ? 1 : 0
-  source                      = "../modules/commons-alarms"
-  slack_webhook               = var.slack_webhook
-  secondary_slack_webhook     = var.secondary_slack_webhook
-  vpc_name                    = var.vpc_name
-  alarm_threshold             = var.alarm_threshold
-  db_fence_size               = var.deploy_fence_db ? aws_db_instance.db_fence[0].allocated_storage : 0
-  db_indexd_size              = var.deploy_indexd_db ? aws_db_instance.db_indexd[0].allocated_storage : 0
-  db_sheepdog_size            = var.deploy_sheepdog_db ? aws_db_instance.db_sheepdog[0].allocated_storage: 0
-  db_fence                    = var.deploy_fence_db ? aws_db_instance.db_fence[0].identifier : ""
-  db_indexd                   = var.deploy_indexd_db ? aws_db_instance.db_indexd[0].identifier : ""
-  db_sheepdog                 = var.deploy_sheepdog_db ? aws_db_instance.db_sheepdog[0].identifier : ""
 }
 
 resource "aws_route_table" "private_kube" {
