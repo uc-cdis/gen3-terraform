@@ -259,9 +259,6 @@ resource "aws_security_group" "eks_control_plane_sg" {
   }
 }
 
-
-
-
 resource "aws_route_table_association" "public_kube" {
   count          = random_shuffle.az[0].result_count
   subnet_id      = aws_subnet.eks_public.*.id[count.index]
@@ -272,7 +269,6 @@ resource "aws_route_table_association" "public_kube" {
     #ignore_changes = ["id", "subnet_id"]
   }
 }
-
 
 # The actual EKS cluster
 
@@ -454,6 +450,7 @@ resource "aws_security_group" "eks_nodes_sg" {
   tags = tomap({
      "Name": "${var.vpc_name}-nodes-sg",
      "kubernetes.io/cluster/${var.vpc_name}": "owned",
+     "karpenter.sh/discovery": var.vpc_name,
   })
 }
 
@@ -521,69 +518,6 @@ resource "aws_security_group_rule" "workflow_nodes_interpool_communications" {
   source_security_group_id = module.workflow_pool[0].nodepool_sg
 }
 
-
-## Worker Node AutoScaling Group
-# Now we have everything in place to create and manage EC2 instances that will serve as our worker nodes
-# in the Kubernetes cluster. This setup utilizes an EC2 AutoScaling Group (ASG) rather than manually working with
-# EC2 instances. This offers flexibility to scale up and down the worker nodes on demand when used in conjunction
-# with AutoScaling policies (not implemented here).
-
-
-# EKS currently documents this required userdata for EKS worker nodes to
-# properly configure Kubernetes applications on the EC2 instance.
-# We utilize a Terraform local here to simplify Base64 encoding this
-# information into the AutoScaling Launch Configuration.
-# More information: https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-06-05/amazon-eks-nodegroup.yaml
-
-# See template.tf for more information about the bootstrap script
-
-
-resource "aws_launch_configuration" "eks_launch_configuration" {
-  count                       = var.enable_on_demand_instances ? 1 : 0
-  associate_public_ip_address = false
-  iam_instance_profile        = aws_iam_instance_profile.eks_node_instance_profile.name
-  image_id                    = local.ami
-  instance_type               = var.instance_type
-  name_prefix                 = "eks-${var.vpc_name}"
-  security_groups             = [aws_security_group.eks_nodes_sg.id, aws_security_group.ssh.id]
-  user_data_base64            = sensitive(base64encode(templatefile("${path.module}/../../../../flavors/eks/${var.bootstrap_script}", {eks_ca = aws_eks_cluster.eks_cluster.certificate_authority.0.data, eks_endpoint = aws_eks_cluster.eks_cluster.endpoint, eks_region = data.aws_region.current.name, vpc_name = var.vpc_name, ssh_keys = templatefile("${path.module}/../../../../files/authorized_keys/ops_team", {}), nodepool = "default", lifecycle_type = "ONDEMAND", activation_id = var.activation_id, customer_id = var.customer_id})))
-  key_name                    = var.ec2_keyname
-
-  root_block_device {
-    volume_size = var.worker_drive_size
-  }
-
-  lifecycle {
-    create_before_destroy = true
-    #ignore_changes  = ["user_data_base64"]
-  }
-}
-
-resource "aws_launch_template" "eks_launch_template" {
-  count                                = var.enable_spot_instances ? 1 : 0
-  name                                 = "eks-${var.vpc_name}-launch-configuration"
-  instance_type                        = var.instance_type
-  image_id                             = local.ami
-  key_name                             = var.ec2_keyname
-  #vpc_security_group_ids              = ["${aws_security_group.eks_nodes_sg.id}", "${aws_security_group.ssh.id}"]
-  user_data                            = base64encode(templatefile("${path.module}/../../../../flavors/eks/${var.bootstrap_script}", {eks_ca = aws_eks_cluster.eks_cluster.certificate_authority.0.data, eks_endpoint = aws_eks_cluster.eks_cluster.endpoint, eks_region = data.aws_region.current.name, vpc_name = var.vpc_name, ssh_keys = templatefile("${path.module}/../../../../files/authorized_keys/ops_team", {}), nodepool = "default", lifecycle_type = "SPOT", activation_id = var.activation_id, customer_id = var.customer_id}))
-  instance_initiated_shutdown_behavior = "terminate"
-  block_device_mappings {
-    device_name = "/dev/xvda"
-
-    ebs {
-      volume_size = var.worker_drive_size
-    }
-  }
-  network_interfaces {
-    associate_public_ip_address = false
-    security_groups             = [aws_security_group.eks_nodes_sg.id, aws_security_group.ssh.id]
-  }
-  iam_instance_profile {
-    name = aws_iam_instance_profile.eks_node_instance_profile.name
-  }
-}
-
 # Create a new iam service linked role that we can grant access to KMS keys in other accounts
 # Needed if we need to bring up custom AMI's that have been encrypted using a kms key
 resource "aws_iam_service_linked_role" "autoscaling" {
@@ -603,121 +537,6 @@ resource "aws_kms_grant" "kms" {
   operations        = ["Encrypt", "Decrypt", "ReEncryptFrom", "ReEncryptTo", "GenerateDataKey", "GenerateDataKeyWithoutPlaintext", "DescribeKey", "CreateGrant"]
 }
 
-resource "aws_autoscaling_group" "eks_autoscaling_group" {
-  count                   = var.enable_on_demand_instances ? 1 : 0
-  service_linked_role_arn = aws_iam_service_linked_role.autoscaling.arn
-  desired_capacity        = 2
-  launch_configuration    = aws_launch_configuration.eks_launch_configuration[0].id
-  max_size                = 10
-  min_size                = 2
-  name                    = "eks-worker-node-${var.vpc_name}"
-  vpc_zone_identifier     = flatten([aws_subnet.eks_private.*.id])
-
-  tag {
-    key                 = "Environment"
-    value               = var.vpc_name
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "Name"
-    value               = "eks-${var.vpc_name}"
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "kubernetes.io/cluster/${var.vpc_name}"
-    value               = "owned"
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "k8s.io/cluster-autoscaler/enabled"
-    value               = ""
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "k8s.io/cluster-type/eks"
-    value               = ""
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "k8s.io/nodepool/default"
-    value               = ""
-    propagate_at_launch = true
-  }
-
-# Avoid unnecessary changes for existing commons running on EKS
-  lifecycle {
-    ignore_changes = [desired_capacity, max_size, min_size]
-  }
-}
-
-resource "aws_autoscaling_group" "eks_mixed_autoscaling_group" {
-  count                   = var.enable_spot_instances ? 1 : 0
-  capacity_rebalance      = true
-  service_linked_role_arn = aws_iam_service_linked_role.autoscaling.arn
-  desired_capacity        = 2
-  max_size                = 10
-  min_size                = 2
-  name                    = "eks-mixed-worker-node-${var.vpc_name}"
-  vpc_zone_identifier     = flatten([aws_subnet.eks_private.*.id])
-
-  mixed_instances_policy {
-    instances_distribution {
-      on_demand_base_capacity                  = var.minimum_on_demand_nodes
-      spot_allocation_strategy                 = "lowest-price"
-    }
-
-    launch_template {
-      launch_template_specification {
-        launch_template_id = aws_launch_template.eks_launch_template[0].id
-        version = "$Latest"
-      }
-    }
-  }
-
-  tag {
-    key                 = "Environment"
-    value               = "${var.vpc_name}"
-    propagate_at_launch = true
-  }
-  tag {
-    key                 = "Name"
-    value               = "eks-${var.vpc_name}"
-    propagate_at_launch = true
-  }
-  tag {
-    key                 = "kubernetes.io/cluster/${var.vpc_name}"
-    value               = "owned"
-    propagate_at_launch = true
-  }
-  tag {
-    key                 = "k8s.io/cluster-autoscaler/enabled"
-    value               = ""
-    propagate_at_launch = true
-  }
-  tag {
-    key                 = "k8s.io/cluster-type/eks"
-    value               = ""
-    propagate_at_launch = true
-  }
-  tag {
-    key                 = "k8s.io/nodepool/default"
-    value               = ""
-    propagate_at_launch = true
-  }
-# Avoid unnecessary changes for existing commons running on EKS
-  lifecycle {
-    ignore_changes = [desired_capacity,max_size,min_size]
-  }
-
-  depends_on     = [aws_launch_template.eks_launch_template]
-}
-
-
 # Let's allow ssh just in case
 resource "aws_security_group" "ssh" {
   name        = "ssh_eks_${var.vpc_name}"
@@ -732,9 +551,10 @@ resource "aws_security_group" "ssh" {
   }
 
   tags = {
-    Environment  = var.vpc_name
-    Organization = var.organization_name
-    Name         = "ssh_eks_${var.vpc_name}"
+    Environment            = var.vpc_name
+    Organization           = var.organization_name
+    Name                   = "ssh_eks_${var.vpc_name}"
+    karpenter.sh/discovery = var.vpc_name
   }
 }
 
@@ -834,7 +654,7 @@ resource "null_resource" "config_setup" {
 # let's work towards EKS IAM-ServiceAccount integration
 
 resource "aws_iam_openid_connect_provider" "identity_provider" {
-  count              = "${var.iam-serviceaccount ? var.eks_version == "1.12" ? 0 : 1 : 0}"
+  count           = "${var.iam-serviceaccount ? var.eks_version == "1.12" ? 0 : 1 : 0}"
   url             = "${aws_eks_cluster.eks_cluster.identity.0.oidc.0.issuer}"
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = "${var.oidc_eks_thumbprint}"

@@ -23,11 +23,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "management-logs_b
   }
 }
 
-resource "aws_s3_bucket_acl" "management-logs_bucket" {
-  bucket = aws_s3_bucket.management-logs_bucket.id
-  acl    = "private"
-}
-
 resource "aws_s3_bucket_lifecycle_configuration" "management-logs_bucket" {
   bucket = aws_s3_bucket.management-logs_bucket.id
   rule {

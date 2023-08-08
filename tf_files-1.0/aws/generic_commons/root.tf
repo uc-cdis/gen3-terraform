@@ -489,7 +489,6 @@ module "gen3_deployment" {
   aurora_password         = module.aurora_postgresql_v2.cluster_master_password
   aurora_hostname         = module.aurora_postgresql_v2.cluster_endpoint
   aurora_username         = "postgres"
-
   cluster_endpoint        = module.eks.cluster_endpoint
   cluster_ca_cert         = module.eks.cluster_certificate_authority_data
   cluster_name            = module.eks.cluster_name

@@ -25,7 +25,7 @@ resource "aws_rds_cluster" "postgresql" {
   apply_immediately               = var.apply_immediate
   engine_mode        	            = var.engine_mode
   skip_final_snapshot	            = var.skip_final_snapshot
-  final_snapshot_identifier       = var.final_snapshot_identifier
+  final_snapshot_identifier       = "${var.vpc_name}-${var.final_snapshot_identifier}"
   backup_retention_period         = var.backup_retention_period
   preferred_backup_window         = var.preferred_backup_window
   db_cluster_parameter_group_name =  aws_rds_cluster_parameter_group.aurora_cdis_pg.name
@@ -67,6 +67,7 @@ AURORACREDS
 
 # generating aurora-creds.json
 resource "local_sensitive_file" "aurora_creds" {
+  count    = var.secrets_manager_enabled ? 0 : 1
   content  = local.aurora-creds-template
   filename = "${path.cwd}/${var.vpc_name}_output/aurora-creds.json"
 }

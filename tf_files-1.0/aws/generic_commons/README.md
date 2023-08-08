@@ -7,8 +7,8 @@ This documentation guide will walk you through the process of setting up the req
 Before proceeding, ensure that you have the following prerequisites in place:
 
 1. AWS account credentials (access key and secret key) with necessary permissions to create resources.
-2. Terraform installed on your local machine. You can download it from the official Terraform website (https://www.terraform.io/downloads.html). Note the modules have been written for terraform version 1.2.
-3. Helm installed on your local machine. Refer to the Helm official documentation for installation instructions (https://helm.sh/docs/intro/install/).
+2. Terraform installed on your local machine. You can download it from the official Terraform website (<https://www.terraform.io/downloads.html>). Note the modules have been written for terraform version 1.2.
+3. Helm installed on your local machine. Refer to the Helm official documentation for installation instructions (<https://helm.sh/docs/intro/install/>).
 
 ### Step 1: Download and Configure Terraform Module
 

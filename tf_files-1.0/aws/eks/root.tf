@@ -56,4 +56,7 @@ module "eks" {
   fips_enabled_ami                 = var.fips_enabled_ami
   availability_zones               = var.availability_zones
   ci_run                           = var.ci_run
+  use_asg                          = var.use_asg 
+  use_karpenter                    = var.user_karpenter
+  karpernter_version               = var.karpernter_version
 }

@@ -23,7 +23,6 @@ variable "namespace" {
   default     = "default"
 }
 
-
 #### helm chart values
 
 variable "ambassador_enabled" {

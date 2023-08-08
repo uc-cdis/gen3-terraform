@@ -42,9 +42,9 @@ module "eks" {
   fips_ami_kms                     = var.fips_ami_kms
   fips_enabled_ami                 = var.fips_enabled_ami
   availability_zones               = var.availability_zones
-  minimum_on_demand_nodes          = var.minimum_on_demand_nodes
-  enable_spot_instances            = var.enable_spot_instances
-  enable_on_demand_instances       = var.enable_on_demand_instances
+  use_asg                          = var.use_asg
+  use_karpenter                    = var.use_karpenter
+  karpernter_version               = var.karpernter_version
   ci_run                           = var.ci_run
   depends_on                       = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id, module.cdis_vpc.squid_auto]
 }

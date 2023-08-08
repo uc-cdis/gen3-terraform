@@ -244,8 +244,3 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "transfer-bucket" 
     }
   }
 }
-
-resource "aws_s3_bucket_acl" "data_bucket" {
-  bucket = aws_s3_bucket.transfer-bucket.id
-  acl    = "private"
-}

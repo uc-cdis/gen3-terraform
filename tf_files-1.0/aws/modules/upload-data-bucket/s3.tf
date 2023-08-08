@@ -10,11 +10,6 @@ resource "aws_s3_bucket" "data_bucket" {
   }
 }
 
-#resource "aws_s3_bucket_acl" "data_bucket" {
-#  bucket = aws_s3_bucket.data_bucket.id
-#  acl    = "private"
-#}
-
 resource "aws_s3_bucket_server_side_encryption_configuration" "data_bucket" {
   bucket = aws_s3_bucket.data_bucket.bucket
 
@@ -60,11 +55,6 @@ resource "aws_s3_bucket" "log_bucket" {
     Purpose     = "logs bucket"
   }
 }
-
-#resource "aws_s3_bucket_acl" "log_bucket" {
-#  bucket = aws_s3_bucket.log_bucket.id
-#  acl    = "log-delivery-write"
-#}
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "log_bucket" {
   bucket = aws_s3_bucket.log_bucket.bucket

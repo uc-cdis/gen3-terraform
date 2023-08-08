@@ -5,13 +5,6 @@ variable "vpc_id" {
   default = ""
 }
 
-variable "slack_webhook" {
-  default = ""
-}
-variable "secondary_slack_webhook" {
-  default  = ""
-}
-
 variable "instance_type" {
   default = "m4.large.elasticsearch"
 }

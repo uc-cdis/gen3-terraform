@@ -24,11 +24,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "mybucket" {
   }
 }
 
-#resource "aws_s3_bucket_acl" "mybucket" {
-#  bucket = aws_s3_bucket.mybucket.id
-#  acl    = "private"
-#}
-
 resource "aws_s3_bucket_lifecycle_configuration" "mybucket" {
   bucket = aws_s3_bucket.mybucket.id
   rule {

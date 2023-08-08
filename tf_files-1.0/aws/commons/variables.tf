@@ -745,17 +745,16 @@ variable "deploy_rds" {
   default = true
 }
 
-# The minimum amount of on demand nodes
-variable "minimum_on_demand_nodes" {
-  default = 3
-}
+variable "use_asg" {
+  default = true
+} 
 
-variable "enable_spot_instances" {
+variable "use_karpenter" {
   default = false
 }
 
-variable "enable_on_demand_instances" {
-  default = true
+variable "karpenter_version" {
+  default = "v0.24.0"
 }
 
 variable "deploy_cloud_trail" {

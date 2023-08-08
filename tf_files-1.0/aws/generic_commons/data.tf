@@ -260,7 +260,6 @@ data "aws_iam_policy_document" "aws_load_balancer_controller" {
 
 }
 
-
 data "aws_iam_policy_document" "alb_ingress_controller_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
