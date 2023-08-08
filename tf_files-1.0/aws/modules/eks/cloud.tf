@@ -4,6 +4,14 @@
 #
 #####
 
+terraform {
+  required_providers {
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+    }    
+  }
+}
+
 locals{
   # if AZs are explicitly defined as a variable, use those. Otherwise use all the AZs of the current region
   # NOTE: the syntax should improve with Terraform 12
