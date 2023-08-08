@@ -9,12 +9,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 4.0"
     }
-  }
-  required_providers {
     kubectl = {
       source  = "gavinbunney/kubectl"
-    }
-  }  
+    }    
+  }
 }
 
 provider "kubernetes" {
