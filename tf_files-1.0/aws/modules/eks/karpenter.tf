@@ -18,7 +18,7 @@ resource "aws_eks_fargate_profile" "karpenter" {
   count                  = var.use_karpenter ? 1 : 0
   cluster_name           = aws_eks_cluster.eks_cluster.name
   fargate_profile_name   = "karpenter"
-  pod_execution_role_arn = aws_iam_role.karpenter.arn
+  pod_execution_role_arn = aws_iam_role.karpenter.0.arn
   subnet_ids             = local.eks_priv_subnets
 
   selector {
@@ -45,7 +45,7 @@ resource "aws_iam_role" "karpenter" {
 resource "aws_iam_role_policy_attachment" "karpenter-role-policy" {
   count      = var.use_karpenter ? 1 : 0
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy"
-  role       = aws_iam_role.karpenter.name
+  role       = aws_iam_role.karpenter.0.name
 }
 
 resource "helm_release" "karpenter" {
@@ -71,7 +71,7 @@ resource "helm_release" "karpenter" {
 
   set {
     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = module.karpenter.irsa_arn
+    value = module.karpenter.0.irsa_arn
   }
 
   set {
@@ -81,7 +81,7 @@ resource "helm_release" "karpenter" {
 
   set {
     name  = "settings.aws.interruptionQueueName"
-    value = module.karpenter.queue_name
+    value = module.karpenter.0.queue_name
   }
 }
 
