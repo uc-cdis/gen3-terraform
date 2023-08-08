@@ -44,7 +44,7 @@ module "eks" {
   availability_zones               = var.availability_zones
   use_asg                          = var.use_asg
   use_karpenter                    = var.use_karpenter
-  karpernter_version               = var.karpernter_version
+  karpenter_version                = var.karpenter_version
   ci_run                           = var.ci_run
   depends_on                       = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id, module.cdis_vpc.squid_auto]
 }
