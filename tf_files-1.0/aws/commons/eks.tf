@@ -46,5 +46,5 @@ module "eks" {
   use_karpenter                    = var.use_karpenter
   karpenter_version                = var.karpenter_version
   ci_run                           = var.ci_run
-  #depends_on                       = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id, module.cdis_vpc.squid_auto]
+  depends_on                       = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id, module.cdis_vpc.squid_auto]
 }
