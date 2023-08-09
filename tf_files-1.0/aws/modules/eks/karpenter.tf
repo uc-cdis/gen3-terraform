@@ -19,7 +19,7 @@ module "karpenter" {
   #  AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   #}
 
-  depends_on = [ aws_eks_cluster.eks_cluster, aws_iam_role.eks_node_role ]
+  #depends_on = [ aws_eks_cluster.eks_cluster, aws_iam_role.eks_node_role ]
 
   tags = {
     Environment = var.vpc_name
