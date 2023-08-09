@@ -24,7 +24,7 @@ data "aws_iam_policy_document" "irsa_assume_role" {
 
     principals {
       type        = "Federated"
-      identifiers = [aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer]
+      identifiers = [local.irsa_oidc_provider_url]
     }
 
     condition {
