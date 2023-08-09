@@ -12,7 +12,7 @@ locals {
   irsa_name        = "${var.vpc_name}-karpenter-sa"
   irsa_policy_name = local.irsa_name
 
-  irsa_oidc_provider_url = replace(aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer, "/^(.*provider/)/", "")
+  irsa_oidc_provider_url = replace(aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer, "https://", "")
 }
 
 data "aws_iam_policy_document" "irsa_assume_role" {
