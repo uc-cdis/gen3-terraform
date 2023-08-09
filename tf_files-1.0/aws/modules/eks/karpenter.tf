@@ -14,6 +14,8 @@ module "karpenter" {
   #policies = {
   #  AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   #}
+  
+  depends_on = [ aws_eks_cluster.eks_cluster, aws_iam_role.eks_node_role ]
 }
 
 resource "aws_eks_fargate_profile" "karpenter" {
