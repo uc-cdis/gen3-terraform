@@ -9,9 +9,9 @@ module "karpenter" {
   cluster_name           = aws_eks_cluster.eks_cluster.id
   irsa_oidc_provider_arn = aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
 
-  policies = {
-    AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-  }
+  #policies = {
+  #  AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  #}
 }
 
 resource "aws_eks_fargate_profile" "karpenter" {
