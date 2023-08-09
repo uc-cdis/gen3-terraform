@@ -72,6 +72,7 @@ data "aws_iam_policy_document" "irsa" {
       "ec2:DescribeInstanceTypeOfferings",
       "ec2:DescribeAvailabilityZones",
       "ec2:DescribeSpotPriceHistory",
+      "iam:PassRole",
       "pricing:GetProducts",
     ]
 
@@ -128,11 +129,6 @@ data "aws_iam_policy_document" "irsa" {
   statement {
     actions   = ["eks:DescribeCluster"]
     resources = ["arn:aws:eks:*:${local.account_id}:cluster/${aws_eks_cluster.eks_cluster.id}"]
-  }
-
-  statement {
-    actions   = ["iam:PassRole"]
-    resources = [aws_iam_role.this[0].arn]
   }
 
   statement {
