@@ -90,7 +90,7 @@ data "aws_iam_policy_document" "irsa" {
     condition {
       test     = "StringEquals"
       variable = "ec2:ResourceTag/Name"
-      values   = "*karpenter*"
+      values   = ["*karpenter*"]
     }
   }
 
@@ -103,7 +103,7 @@ data "aws_iam_policy_document" "irsa" {
     condition {
       test     = "StringEquals"
       variable = "ec2:ResourceTag/Name"
-      values   = "*karpenter*"
+      values   = ["*karpenter*"]
     }
   }
 
