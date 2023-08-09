@@ -12,6 +12,9 @@ module "karpenter" {
   cluster_name           = aws_eks_cluster.eks_cluster.id
   irsa_oidc_provider_arn = aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
 
+  iam_role_attach_cni_policy = false
+  create_instance_profile = false
+
   #policies = {
   #  AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   #}
