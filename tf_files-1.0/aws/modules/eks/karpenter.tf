@@ -7,6 +7,7 @@ module "karpenter" {
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
 
   create_iam_role        = false
+  create                 = false
   iam_role_arn           = aws_iam_role.eks_node_role.arn
   cluster_name           = aws_eks_cluster.eks_cluster.id
   irsa_oidc_provider_arn = aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
@@ -14,8 +15,13 @@ module "karpenter" {
   #policies = {
   #  AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   #}
-  
+
   depends_on = [ aws_eks_cluster.eks_cluster, aws_iam_role.eks_node_role ]
+
+  tags = {
+    Environment = var.vpc_name
+    Name        = "${var.vpc_name}-karpenter"
+  }
 }
 
 resource "aws_eks_fargate_profile" "karpenter" {
