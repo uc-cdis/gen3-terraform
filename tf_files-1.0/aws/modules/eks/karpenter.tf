@@ -1,31 +1,275 @@
+locals {
+  account_id = data.aws_caller_identity.current.account_id
+}
+
 ################################################################################
-# Karpenter
+# IAM Role for Service Account (IRSA)
+# This is used by the Karpenter controller
 ################################################################################
 
-module "karpenter" {
-  count   = var.use_karpenter ? 1 : 0
-  source  = "terraform-aws-modules/eks/aws//modules/karpenter"
+locals {
+  create_irsa      = true
+  irsa_name        = "${var.vpc_name}-karpenter-sa"
+  irsa_policy_name = local.irsa_name
 
-  create_iam_role        = false
-  create                 = false
-  iam_role_arn           = aws_iam_role.eks_node_role.arn
-  cluster_name           = aws_eks_cluster.eks_cluster.id
-  irsa_oidc_provider_arn = aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
+  irsa_oidc_provider_url = replace(aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer, "/^(.*provider/)/", "")
+}
 
-  iam_role_attach_cni_policy = false
-  create_instance_profile = false
+data "aws_iam_policy_document" "irsa_assume_role" {
+  count = var.use_karpenter ? 1 : 0
 
-  #policies = {
-  #  AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-  #}
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
 
-  #depends_on = [ aws_eks_cluster.eks_cluster, aws_iam_role.eks_node_role ]
+    principals {
+      type        = "Federated"
+      identifiers = [aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer]
+    }
 
-  tags = {
-    Environment = var.vpc_name
-    Name        = "${var.vpc_name}-karpenter"
+    condition {
+      test     = "StringEquals"
+      variable = "${local.irsa_oidc_provider_url}:sub"
+      values   = ["system:serviceaccount:karpenter:karpenter"]
+    }
+
+    # https://aws.amazon.com/premiumsupport/knowledge-center/eks-troubleshoot-oidc-and-irsa/?nc1=h_ls
+    condition {
+      test     = "StringEquals"
+      variable = "${local.irsa_oidc_provider_url}:aud"
+      values   = ["sts.amazonaws.com"]
+    }
   }
 }
+
+resource "aws_iam_role" "irsa" {
+  count = var.use_karpenter ? 1 : 0
+
+  name        = local.irsa_name
+
+  assume_role_policy    = data.aws_iam_policy_document.irsa_assume_role[0].json
+  force_detach_policies = true
+}
+
+locals {
+  irsa_tag_values = [aws_eks_cluster.eks_cluster.id]
+}
+
+data "aws_iam_policy_document" "irsa" {
+  count = var.use_karpenter ? 1 : 0
+
+  statement {
+    actions = [
+      "ec2:CreateLaunchTemplate",
+      "ec2:CreateFleet",
+      "ec2:CreateTags",
+      "ec2:DescribeLaunchTemplates",
+      "ec2:DescribeImages",
+      "ec2:DescribeInstances",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeInstanceTypes",
+      "ec2:DescribeInstanceTypeOfferings",
+      "ec2:DescribeAvailabilityZones",
+      "ec2:DescribeSpotPriceHistory",
+      "pricing:GetProducts",
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    actions = [
+      "ec2:TerminateInstances",
+      "ec2:DeleteLaunchTemplate",
+    ]
+
+    resources = ["*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:ResourceTag/Name"
+      values   = "*karpenter*"
+    }
+  }
+
+  statement {
+    actions = ["ec2:RunInstances"]
+    resources = [
+      "arn:aws:ec2:*:${local.account_id}:launch-template/*",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:ResourceTag/Name"
+      values   = "*karpenter*"
+    }
+  }
+
+  statement {
+    actions = ["ec2:RunInstances"]
+    resources = [
+      "arn:aws:ec2:*::image/*",
+      "arn:aws:ec2:*::snapshot/*",
+      "arn:aws:ec2:*:${local.account_id}:instance/*",
+      "arn:aws:ec2:*:${local.account_id}:spot-instances-request/*",
+      "arn:aws:ec2:*:${local.account_id}:security-group/*",
+      "arn:aws:ec2:*:${local.account_id}:volume/*",
+      "arn:aws:ec2:*:${local.account_id}:network-interface/*",
+      "arn:aws:ec2:*:${local.account_id}:subnet/*",
+    ]
+  }
+
+  statement {
+    actions   = ["ssm:GetParameter"]
+    resources = ["arn:aws:ssm:*:*:parameter/aws/service/*"]
+  }
+
+  statement {
+    actions   = ["eks:DescribeCluster"]
+    resources = ["arn:aws:eks:*:${local.account_id}:cluster/${aws_eks_cluster.eks_cluster.id}"]
+  }
+
+  statement {
+    actions   = ["iam:PassRole"]
+    resources = [aws_iam_role.this[0].arn]
+  }
+
+  statement {
+      actions = [
+        "sqs:DeleteMessage",
+        "sqs:GetQueueUrl",
+        "sqs:GetQueueAttributes",
+        "sqs:ReceiveMessage",
+      ]
+      resources = [aws_sqs_queue.this[0].arn]
+  }
+}
+
+resource "aws_iam_policy" "irsa" {
+  count = var.use_karpenter ? 1 : 0
+
+  name        = "${local.irsa_policy_name}-policy"
+  policy      = data.aws_iam_policy_document.irsa[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "irsa" {
+  count = var.use_karpenter ? 1 : 0
+
+  role       = aws_iam_role.irsa[0].name
+  policy_arn = aws_iam_policy.irsa[0].arn
+}
+
+
+################################################################################
+# Node Termination Queue
+################################################################################
+
+locals {
+  enable_spot_termination = true
+  queue_name = "${var.vpc_name}-${aws_eks_cluster.eks_cluster.id}"
+}
+
+resource "aws_sqs_queue" "this" {
+  count = var.use_karpenter ? 1 : 0
+
+  name                              = local.queue_name
+  message_retention_seconds         = 300
+}
+
+data "aws_iam_policy_document" "queue" {
+  count = var.use_karpenter ? 1 : 0
+
+  statement {
+    sid       = "SqsWrite"
+    actions   = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.this[0].arn]
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "events.amazonaws.com",
+        "sqs.amazonaws.com",
+      ]
+    }
+
+  }
+}
+
+resource "aws_sqs_queue_policy" "this" {
+  count = var.use_karpenter ? 1 : 0
+
+  queue_url = aws_sqs_queue.this[0].url
+  policy    = data.aws_iam_policy_document.queue[0].json
+}
+
+################################################################################
+# Node Termination Event Rules
+################################################################################
+
+locals {
+  events = {
+    health_event = {
+      name        = "HealthEvent"
+      description = "Karpenter interrupt - AWS health event"
+      event_pattern = {
+        source      = ["aws.health"]
+        detail-type = ["AWS Health Event"]
+      }
+    }
+    spot_interupt = {
+      name        = "SpotInterrupt"
+      description = "Karpenter interrupt - EC2 spot instance interruption warning"
+      event_pattern = {
+        source      = ["aws.ec2"]
+        detail-type = ["EC2 Spot Instance Interruption Warning"]
+      }
+    }
+    instance_rebalance = {
+      name        = "InstanceRebalance"
+      description = "Karpenter interrupt - EC2 instance rebalance recommendation"
+      event_pattern = {
+        source      = ["aws.ec2"]
+        detail-type = ["EC2 Instance Rebalance Recommendation"]
+      }
+    }
+    instance_state_change = {
+      name        = "InstanceStateChange"
+      description = "Karpenter interrupt - EC2 instance state-change notification"
+      event_pattern = {
+        source      = ["aws.ec2"]
+        detail-type = ["EC2 Instance State-change Notification"]
+      }
+    }
+  }
+}
+
+resource "aws_cloudwatch_event_rule" "this" {
+  for_each = { for k, v in local.events : k => v if var.use_karpenter }
+
+  name_prefix   = "${var.vpc_name}-${each.value.name}-"
+  description   = each.value.description
+  event_pattern = jsonencode(each.value.event_pattern)
+
+  tags = { 
+    ClusterName = aws_eks_cluster.eks_cluster.id 
+  }
+}
+
+resource "aws_cloudwatch_event_target" "this" {
+  for_each = { for k, v in local.events : k => v if var.use_karpenter }
+
+  rule      = aws_cloudwatch_event_rule.this[each.key].name
+  target_id = "KarpenterInterruptionQueueTarget"
+  arn       = aws_sqs_queue.this[0].arn
+}
+
+
+
+
+
+
+
 
 resource "aws_eks_fargate_profile" "karpenter" {
   count                  = var.use_karpenter ? 1 : 0
@@ -84,7 +328,7 @@ resource "helm_release" "karpenter" {
 
   set {
     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = module.karpenter.0.irsa_arn
+    value = aws_iam_role.irsa[0].arn
   }
 
   set {
@@ -94,7 +338,7 @@ resource "helm_release" "karpenter" {
 
   set {
     name  = "settings.aws.interruptionQueueName"
-    value = module.karpenter.0.queue_name
+    value = aws_sqs_queue.this[0].name
   }
 }
 
