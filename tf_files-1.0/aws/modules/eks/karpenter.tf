@@ -6,6 +6,8 @@ module "karpenter" {
   count   = var.use_karpenter ? 1 : 0
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
 
+  create_iam_role        = false
+  iam_role_arn           = aws_iam_role.eks_node_role.arn
   cluster_name           = aws_eks_cluster.eks_cluster.id
   irsa_oidc_provider_arn = aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
 
