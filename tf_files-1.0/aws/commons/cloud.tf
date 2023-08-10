@@ -23,7 +23,7 @@ provider "kubernetes" {
     api_version = "client.authentication.k8s.io/v1beta1"
     command     = "aws"
     # This requires the awscli to be installed locally where Terraform is executed
-    args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name, "--role", data.aws_caller_identity.current.arn]
+    args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name, "--role-arn", data.aws_caller_identity.current.arn]
   }
 }
 
@@ -36,7 +36,7 @@ provider "helm" {
       api_version = "client.authentication.k8s.io/v1beta1"
       command     = "aws"
       # This requires the awscli to be installed locally where Terraform is executed
-      args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name, "--role", data.aws_caller_identity.current.arn]
+      args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name, "--role-arn", data.aws_caller_identity.current.arn]
     }
   }
 }
@@ -51,7 +51,7 @@ provider "kubectl" {
     api_version = "client.authentication.k8s.io/v1beta1"
     command     = "aws"
     # This requires the awscli to be installed locally where Terraform is executed
-    args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name, "--role", data.aws_caller_identity.current.arn]
+    args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name, "--role-arn", data.aws_caller_identity.current.arn]
   }
 }
 
