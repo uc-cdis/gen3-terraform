@@ -24,7 +24,7 @@ data "aws_iam_policy_document" "irsa_assume_role" {
 
     principals {
       type        = "Federated"
-      identifiers = [local.irsa_oidc_provider_url]
+      identifiers = ["arn:aws:iam::${local.account_id}:oidc-provider/${local.irsa_oidc_provider_url}"]
     }
 
     condition {
