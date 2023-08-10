@@ -2,6 +2,10 @@ variable "vpc_name" {
   default = "Commons1"
 }
 
+variable "iam_role_name" {
+  default = "csoc_adminvm"
+}
+
 variable "vpc_cidr_block" {
   default = "172.24.17.0/20"
 }
