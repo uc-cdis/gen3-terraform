@@ -17,11 +17,14 @@ users:
   user:
     exec:
       apiVersion: client.authentication.k8s.io/v1beta1
-      command: aws-iam-authenticator
+      command: aws
       args:
-        - "token"
-        - "-i"
-        - "${eks_name}"
+        - --region
+        - us-east-1
+        - eks
+        - get-token
+        - --cluster-name
+        - ${eks_name}
         #- "-r"
         #- "<role ARN>"
       #env:
