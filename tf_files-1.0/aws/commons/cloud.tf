@@ -143,6 +143,19 @@ module "config_files" {
 
 }
 
+module "csoc_peering_connection" {
+  source = "../modules/csoc_peering"
+  count  = var.csoc_managed ? 1 : 0
+
+  vpc_name          = var.vpc_name
+  route_table_name  = var.route_table_name
+  csoc_vpc_id       = var.peering_vpc_id
+  csoc_cidr         = var.peering_cidr
+  organization_name = var.organization_name
+  vpc_cidr_block    = var.vpc_cidr_block
+  pcx_id            = module.cdis_vpc.vpc_peering_id
+}
+
 resource "aws_route_table" "private_kube" {
   vpc_id                      = module.cdis_vpc.vpc_id
 

@@ -769,6 +769,9 @@ variable "send_logs_to_csoc" {
   default = true
 }
 
+variable "route_table_name" {
+  default = "eks_private"
+}
 
 #### helm chart values
 
