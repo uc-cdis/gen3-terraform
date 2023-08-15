@@ -154,6 +154,10 @@ module "csoc_peering_connection" {
   organization_name = var.organization_name
   vpc_cidr_block    = var.vpc_cidr_block
   pcx_id            = module.cdis_vpc.vpc_peering_id
+
+  providers = {
+    aws.csoc = aws.csoc
+  }
 }
 
 resource "aws_route_table" "private_kube" {
