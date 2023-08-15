@@ -156,7 +156,7 @@ module "csoc_peering_connection" {
   pcx_id            = module.cdis_vpc.vpc_peering_id
 
   providers = {
-    aws.csoc = aws.csoc
+    aws = aws.csoc
   }
 }
 
