@@ -19,7 +19,7 @@ resource "aws_vpc_peering_connection_accepter" "vpcpeering" {
 resource "aws_route" "r" {
   route_table_id              = data.aws_route_table.selected.id
   destination_cidr_block      = var.vpc_cidr_block
-  vpc_peering_connection_id   = aws_vpc_peering_connection.vpcpeering.id
-  depends_on                  = [aws_vpc_peering_connection.vpcpeering]
+  vpc_peering_connection_id   = aws_vpc_peering_connection_accepter.vpcpeering.id
+  depends_on                  = [aws_vpc_peering_connection_accepter.vpcpeering]
 }
 
