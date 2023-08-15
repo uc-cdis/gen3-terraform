@@ -1,5 +1,5 @@
 # this is for vpc peering
-resource "aws_vpc_peering_connection" "vpcpeering" {
+resource "aws_vpc_peering_connection_accepter" "vpcpeering" {
   provider = aws.csoc
 
   vpc_peering_connection_id = var.pcx_id
