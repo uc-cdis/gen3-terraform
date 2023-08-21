@@ -182,7 +182,7 @@ resource "aws_subnet" "eks_public" {
 
   lifecycle {
     # allow user to change tags interactively - ex - new kube-aws cluster
-    ignore_changes = [tags, availability_zone]
+    ignore_changes = [tags, availability_zone, cidr_block]
   }  
 
   tags = tomap({
