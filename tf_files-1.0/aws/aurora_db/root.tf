@@ -5,9 +5,12 @@ terraform {
 }
 
 locals {
-  sa_name         = "${var.service}-sa"
-  sa_namespace    = var.namespace
-  eks_oidc_issuer = trimprefix(data.aws_eks_cluster.eks.identity[0].oidc[0].issuer, "https://")
+  sa_name           = "${var.service}-sa"
+  sa_namespace      = var.namespace
+  eks_oidc_issuer   = trimprefix(data.aws_eks_cluster.eks.identity[0].oidc[0].issuer, "https://")
+  database_name     = var.database_name != "" ? var.database_name : "${var.service}_${var.namespace}"
+  database_username = var.username != "" ? var.username : "${var.service}_${var.namespace}"
+  database_password = var.password != "" ? var.password : random_password.db_password[0].result
 }
 
 module "secrets_manager" {
@@ -16,9 +19,9 @@ module "secrets_manager" {
   vpc_name    = var.vpc_name
   secret	    = templatefile("${path.module}/secrets_manager.tftpl", {
     hostname = data.aws_db_instance.database.address
-    database = var.database_name != "" ? var.database_name : "${var.service}_${var.namespace}"
-    username = var.username != "" ? var.username : "${var.service}_${var.namespace}"
-    password = var.password != "" ? var.password : random_password.db_password[0].result
+    database = local.database_name
+    username = local.database_username
+    password = local.database_password
   })
   secret_name = "${var.vpc_name}-${var.service}-creds"
 }
@@ -51,10 +54,10 @@ resource "random_password" "db_password" {
 
 resource "null_resource" "db_setup" {
     provisioner "local-exec" {
-        command = "psql -h ${data.aws_db_instance.database.address} -U ${var.admin_database_username} -d ${var.admin_database_name} -c \"CREATE DATABASE \\\"${var.service}-${var.namespace}\\\";\" -c \"${templatefile("${path.module}/db_setup.tftpl", {
-          service   = var.service
-          namespace = var.namespace
-          password  = var.password != "" ? var.password : random_password.db_password[0].result
+        command = "psql -h ${data.aws_db_instance.database.address} -U ${var.admin_database_username} -d ${var.admin_database_name} -c \"CREATE DATABASE \\\"${local.database_name}\\\";\" -c \"${templatefile("${path.module}/db_setup.tftpl", {
+          username  = local.database_username
+          database  = local.database_name
+          password  = local.database_password
         })}\""
         environment = {
           # for instance, postgres would need the password here:
