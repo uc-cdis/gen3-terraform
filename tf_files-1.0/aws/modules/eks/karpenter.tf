@@ -279,6 +279,12 @@ resource "aws_eks_fargate_profile" "karpenter" {
   }
 }
 
+resource "time_sleep" "wait_60_seconds" {
+  create_duration = "60s"
+
+  depends_on = [aws_eks_fargate_profile.karpenter]
+}
+
 resource "aws_iam_role" "karpenter" {
   count = var.use_karpenter ? 1 : 0
   name  = "${var.vpc_name}-karpenter-fargate-role"
@@ -336,6 +342,8 @@ resource "helm_release" "karpenter" {
     name  = "settings.aws.interruptionQueueName"
     value = aws_sqs_queue.this[0].name
   }
+
+  depends_on = [time_sleep.wait_60_seconds]
 }
 
 resource "kubectl_manifest" "karpenter_provisioner" {

@@ -196,6 +196,10 @@ variable "csoc_managed" {
   default = false
 }
 
+variable "csoc_peering" {
+  default = false
+}
+
 ## Mailgun variable defaults/definitions.
 variable "mailgun_api_key" {
   default = ""

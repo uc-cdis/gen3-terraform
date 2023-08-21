@@ -145,7 +145,7 @@ module "config_files" {
 
 module "csoc_peering_connection" {
   source = "../modules/csoc_peering"
-  count  = var.csoc_managed ? 1 : 0
+  count  = var.csoc_peering ? 1 : 0
 
   vpc_name          = var.vpc_name
   route_table_name  = var.route_table_name
