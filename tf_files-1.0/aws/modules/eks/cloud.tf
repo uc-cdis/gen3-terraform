@@ -138,7 +138,7 @@ resource "aws_subnet" "eks_private" {
 
   lifecycle {
     # allow user to change tags interactively - ex - new kube-aws cluster
-    ignore_changes = [tags, availability_zone]
+    ignore_changes = [tags, availability_zone, cidr_block]
   }  
 
   tags = tomap({
@@ -159,7 +159,7 @@ resource "aws_subnet" "eks_secondary_subnet" {
 
   lifecycle {
     # allow user to change tags interactively - ex - new kube-aws cluster
-    ignore_changes = [tags, availability_zone]
+    ignore_changes = [tags, availability_zone, cidr_block]
   }  
 
   tags = tomap({
