@@ -21,15 +21,15 @@ output "vpc_cidr_block" {
 }
 
 output "indexd_rds_id" {
-  value = aws_db_instance.db_indexd.*.id
+  value = aws_db_instance.db_indexd.*.identifier
 }
 
 output "fence_rds_id" {
-  value = aws_db_instance.db_fence.*.id
+  value = aws_db_instance.db_fence.*.identifier
 }
 
 output "sheepdog_rds_id" {
-  value = aws_db_instance.db_sheepdog.*.id
+  value = aws_db_instance.db_sheepdog.*.identifier
 }
 
 output "fence-bot_user_secret" {
