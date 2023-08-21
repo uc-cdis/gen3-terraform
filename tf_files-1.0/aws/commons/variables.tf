@@ -777,6 +777,10 @@ variable "route_table_name" {
   default = "eks_private"
 }
 
+variable "eks_public_access" {
+  default = "true"
+}
+
 #### helm chart values
 
 variable "deploy_gen3" {

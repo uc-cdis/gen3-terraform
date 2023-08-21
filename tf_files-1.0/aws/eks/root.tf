@@ -59,4 +59,5 @@ module "eks" {
   use_asg                          = var.use_asg 
   use_karpenter                    = var.user_karpenter
   karpernter_version               = var.karpernter_version
+  eks_public_access                = var.eks_public_access
 }

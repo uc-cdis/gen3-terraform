@@ -289,6 +289,7 @@ resource "aws_eks_cluster" "eks_cluster" {
     subnet_ids              = flatten([aws_subnet.eks_private[*].id])
     security_group_ids      = [aws_security_group.eks_control_plane_sg.id]
     endpoint_private_access = "true"
+    endpoint_public_access  = var.eks_public_access
   }
 
   depends_on = [
