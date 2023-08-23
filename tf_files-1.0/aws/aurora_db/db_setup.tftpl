@@ -1,5 +1,5 @@
 DO
-$do$
+\$do\$
 BEGIN
    IF EXISTS (
       SELECT FROM pg_catalog.pg_user
@@ -15,5 +15,5 @@ BEGIN
       END;
    END IF;
 END
-$do$;
+\$do\$;
 GRANT ALL ON DATABASE \"${database}\" TO \"${username}\" WITH GRANT OPTION;
