@@ -56,7 +56,7 @@ resource "random_password" "db_password" {
 
 resource "null_resource" "db_setup" {
     provisioner "local-exec" {
-        command = "psql -h ${data.aws_db_instance.database.address} -U ${var.admin_database_username} -d ${var.admin_database_name} -c \"CREATE DATABASE \\\"${local.database_name}\\\";\""
+        command = "psql -h ${data.aws_db_instance.database.address} -U ${var.admin_database_username} -d ${var.admin_database_name} -c \"CREATE DATABASE \\\"${self.triggers.database}\\\";\""
         environment = {
           # for instance, postgres would need the password here:
           PGPASSWORD = var.admin_database_password != "" ? var.admin_database_password : data.aws_secretsmanager_secret_version.aurora-master-password.secret_string
@@ -66,7 +66,7 @@ resource "null_resource" "db_setup" {
     }
 
     provisioner "local-exec" {
-        command = "psql -h ${data.aws_db_instance.database.address} -U ${var.admin_database_username} -d ${var.admin_database_name} -c \"DROP DATABASE \\\"${local.database_name}\\\";\""
+        command = "psql -h ${data.aws_db_instance.database.address} -U ${var.admin_database_username} -d ${var.admin_database_name} -c \"DROP DATABASE \\\"${self.triggers.database}\\\";\""
         environment = {
           # for instance, postgres would need the password here:
           PGPASSWORD = var.admin_database_password != "" ? var.admin_database_password : data.aws_secretsmanager_secret_version.aurora-master-password.secret_string
