@@ -24,6 +24,8 @@ module "secrets_manager" {
     password = local.database_password
   })
   secret_name = "${var.vpc_name}-${var.service}-creds"
+
+  depends_on = [ null_resource.user_setup ]
 }
 
 resource "aws_iam_policy" "secrets_manager_policy" {
@@ -54,7 +56,22 @@ resource "random_password" "db_password" {
 
 resource "null_resource" "db_setup" {
     provisioner "local-exec" {
-        command = "psql -h ${data.aws_db_instance.database.address} -U ${var.admin_database_username} -d ${var.admin_database_name} -c \"CREATE DATABASE \\\"${local.database_name}\\\";\" -c \"${templatefile("${path.module}/db_setup.tftpl", {
+        command = "psql -h ${data.aws_db_instance.database.address} -U ${var.admin_database_username} -d ${var.admin_database_name} -c \"CREATE DATABASE \\\"${local.database_name}\\\";\""
+        environment = {
+          # for instance, postgres would need the password here:
+          PGPASSWORD = var.admin_database_password != "" ? var.admin_database_password : data.aws_secretsmanager_secret_version.aurora-master-password.secret_string
+        }
+    }
+
+    triggers = {
+        database = local.database_name
+    }
+}
+
+resource "null_resource" "user_setup" {
+
+    provisioner "local-exec" {
+        command = "psql -h ${data.aws_db_instance.database.address} -U ${var.admin_database_username} -d ${var.admin_database_name} -c \"${templatefile("${path.module}/db_setup.tftpl", {
           username  = local.database_username
           database  = local.database_name
           password  = local.database_password
@@ -64,4 +81,12 @@ resource "null_resource" "db_setup" {
           PGPASSWORD = var.admin_database_password != "" ? var.admin_database_password : data.aws_secretsmanager_secret_version.aurora-master-password.secret_string
         }
     }
+
+    triggers = {
+        username = local.database_username
+        database = local.database_name
+        password = local.database_password
+    }
+
+    depends_on = [ null_resource.db_setup ]
 }
