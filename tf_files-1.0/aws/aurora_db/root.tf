@@ -92,7 +92,22 @@ resource "null_resource" "db_restore" {
   count = var.db_restore && var.dump_file_to_restore != "" ? 1 : 0
 
   provisioner "local-exec" {
-        command = "aws s3 cp \"${var.dump_file_to_restore}\" - --quiet | psql -h \"${data.aws_db_instance.database.address}\" -U \"${local.database_username}\" -d \"${local.database_name}\""
+
+      command = <<EOF
+CREDENTIALS=(`aws sts assume-role \
+  --role-arn ${var.db_job_role_arn} \
+  --role-session-name "db-migration-cli" \
+  --query "[Credentials.AccessKeyId,Credentials.SecretAccessKey,Credentials.SessionToken]" \
+  --output text`)
+
+unset AWS_PROFILE
+export AWS_DEFAULT_REGION=us-east-1
+export AWS_ACCESS_KEY_ID="$${CREDENTIALS[0]}"
+export AWS_SECRET_ACCESS_KEY="$${CREDENTIALS[1]}"
+export AWS_SESSION_TOKEN="$${CREDENTIALS[2]}"
+
+aws s3 cp "${var.dump_file_to_restore}" - --quiet | psql -h "${data.aws_db_instance.database.address}" -U "${local.database_username}" -d "${local.database_name}"
+EOF
 
         environment = {
           # for instance, postgres would need the password here:
@@ -113,8 +128,21 @@ resource "null_resource" "db_dump" {
   count = var.db_dump && var.dump_file_storage_location != "" ? 1 : 0
 
   provisioner "local-exec" {
-    command = "pg_dump \"--username=${local.database_username}\" \"--dbname=${local.database_name}\" \"--host=${data.aws_db_instance.database.address}\" --no-password --no-owner --no-privileges >> ./dump.sql && aws s3 cp ./dump.sql ${var.dump_file_storage_location} && rm ./dump.sql"
+    command = <<EOF
+CREDENTIALS=(`aws sts assume-role \
+  --role-arn ${var.db_job_role_arn} \
+  --role-session-name "db-migration-cli" \
+  --query "[Credentials.AccessKeyId,Credentials.SecretAccessKey,Credentials.SessionToken]" \
+  --output text`)
 
+unset AWS_PROFILE
+export AWS_DEFAULT_REGION=us-east-1
+export AWS_ACCESS_KEY_ID="$${CREDENTIALS[0]}"
+export AWS_SECRET_ACCESS_KEY="$${CREDENTIALS[1]}"
+export AWS_SESSION_TOKEN="$${CREDENTIALS[2]}"
+    
+pg_dump --username="${local.database_username}" --dbname="${local.database_name}" --host="${data.aws_db_instance.database.address}" --no-password --no-owner --no-privileges >> ./dump.sql && aws s3 cp ./dump.sql ${var.dump_file_storage_location} && rm ./dump.sql
+EOF
     environment = {
       # for instance, postgres would need the password here:
       PGPASSWORD = local.database_password
