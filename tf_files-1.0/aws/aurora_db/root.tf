@@ -98,13 +98,15 @@ resource "null_resource" "db_restore" {
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command = <<EOF
-CREDENTIALS=(`aws sts assume-role --role-arn ${var.db_job_role_arn} --role-session-name "db-migration-cli" --query "[Credentials.AccessKeyId,Credentials.SecretAccessKey,Credentials.SessionToken]" --output text`)
-
-unset AWS_PROFILE
-export AWS_DEFAULT_REGION=us-east-1
-export AWS_ACCESS_KEY_ID="$${CREDENTIALS[0]}"
-export AWS_SECRET_ACCESS_KEY="$${CREDENTIALS[1]}"
-export AWS_SESSION_TOKEN="$${CREDENTIALS[2]}"
+# If we have a role to assume, then assume it and set the credentials
+if [[ ${var.db_job_role_arn} != "" ]]; then
+  CREDENTIALS=(`aws sts assume-role --role-arn ${var.db_job_role_arn} --role-session-name "db-migration-cli" --query "[Credentials.AccessKeyId,Credentials.SecretAccessKey,Credentials.SessionToken]" --output text`)
+  unset AWS_PROFILE
+  export AWS_DEFAULT_REGION=us-east-1
+  export AWS_ACCESS_KEY_ID="$${CREDENTIALS[0]}"
+  export AWS_SECRET_ACCESS_KEY="$${CREDENTIALS[1]}"
+  export AWS_SESSION_TOKEN="$${CREDENTIALS[2]}"
+fi
 
 aws s3 cp "${var.dump_file_to_restore}" - --quiet | psql -h "${data.aws_db_instance.database.address}" -U "${local.database_username}" -d "${local.database_name}"
 EOF
@@ -130,13 +132,15 @@ resource "null_resource" "db_dump" {
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command = <<EOF
-CREDENTIALS=(`aws sts assume-role --role-arn ${var.db_job_role_arn} --role-session-name "db-migration-cli" --query "[Credentials.AccessKeyId,Credentials.SecretAccessKey,Credentials.SessionToken]" --output text`)
-
-unset AWS_PROFILE
-export AWS_DEFAULT_REGION=us-east-1
-export AWS_ACCESS_KEY_ID="$${CREDENTIALS[0]}"
-export AWS_SECRET_ACCESS_KEY="$${CREDENTIALS[1]}"
-export AWS_SESSION_TOKEN="$${CREDENTIALS[2]}"
+# If we have a role to assume, then assume it and set the credentials
+if [[ ${var.db_job_role_arn} != "" ]]; then
+  CREDENTIALS=(`aws sts assume-role --role-arn ${var.db_job_role_arn} --role-session-name "db-migration-cli" --query "[Credentials.AccessKeyId,Credentials.SecretAccessKey,Credentials.SessionToken]" --output text`)
+  unset AWS_PROFILE
+  export AWS_DEFAULT_REGION=us-east-1
+  export AWS_ACCESS_KEY_ID="$${CREDENTIALS[0]}"
+  export AWS_SECRET_ACCESS_KEY="$${CREDENTIALS[1]}"
+  export AWS_SESSION_TOKEN="$${CREDENTIALS[2]}"
+fi
     
 pg_dump --username="${local.database_username}" --dbname="${local.database_name}" --host="${data.aws_db_instance.database.address}" --no-password --no-owner --no-privileges >> ./dump.sql && aws s3 cp ./dump.sql ${var.dump_file_storage_location} && rm ./dump.sql
 EOF
