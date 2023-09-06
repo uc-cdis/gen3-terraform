@@ -87,3 +87,45 @@ resource "null_resource" "user_setup" {
 
     depends_on = [ null_resource.db_setup ]
 }
+
+resource "null_resource" "db_restore" {
+  count = var.db_restore && var.dump_file_to_restore != "" ? 1 : 0
+
+  provisioner "local-exec" {
+        command = "aws s3 cp ${var.dump_file_to_restore} - --quiet | psql -h ${data.aws_db_instance.database.address} -U ${var.admin_database_username} -d ${var.admin_database_name}"
+
+        environment = {
+          # for instance, postgres would need the password here:
+          PGPASSWORD = var.admin_database_password != "" ? var.admin_database_password : data.aws_secretsmanager_secret_version.aurora-master-password.secret_string
+        }
+    }
+
+    triggers = {
+        username = local.database_username
+        database = local.database_name
+        password = local.database_password
+    }
+
+    depends_on = [ null_resource.user_setup ]
+}
+
+resource "null_resource" "db_dump" {
+  count = var.db_dump && var.dump_file_storage_location ? 1 : 0
+
+  provisioner "local-exec" {
+    command = "pg_dump \"--username=${local.database_username}\" \"--dbname=${local.database_name}\" \"--host=${data.aws_db_instance.database.address}\" --no-password --no-owner --no-privileges >> ./dump.sql && aws s3 cp ./dump.sql ${var.dump_file_storage_location} && rm ./dump.sql"
+
+    environment = {
+      # for instance, postgres would need the password here:
+      PGPASSWORD = var.admin_database_password != "" ? var.admin_database_password : data.aws_secretsmanager_secret_version.aurora-master-password.secret_string
+    }
+  }
+
+  triggers = {
+      username = local.database_username
+      database = local.database_name
+      password = local.database_password
+  }
+
+  depends_on = [ null_resource.user_setup ]
+}

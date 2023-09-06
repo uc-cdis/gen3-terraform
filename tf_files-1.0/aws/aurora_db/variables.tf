@@ -41,3 +41,19 @@ variable "password" {
 variable "secrets_manager_enabled" {
   default = true
 }
+
+variable "dump_file_to_restore" {
+  default = ""
+}
+
+variable "dump_file_storage_location" {
+  default = ""
+}
+
+variable "db_restore" {
+  default = false
+}
+
+variable "db_dump" {
+  default = false
+}
