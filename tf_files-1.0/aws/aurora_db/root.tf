@@ -110,7 +110,7 @@ resource "null_resource" "db_restore" {
 }
 
 resource "null_resource" "db_dump" {
-  count = var.db_dump && var.dump_file_storage_location ? 1 : 0
+  count = var.db_dump && var.dump_file_storage_location != "" ? 1 : 0
 
   provisioner "local-exec" {
     command = "pg_dump \"--username=${local.database_username}\" \"--dbname=${local.database_name}\" \"--host=${data.aws_db_instance.database.address}\" --no-password --no-owner --no-privileges >> ./dump.sql && aws s3 cp ./dump.sql ${var.dump_file_storage_location} && rm ./dump.sql"
