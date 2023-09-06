@@ -94,7 +94,7 @@ resource "null_resource" "db_restore" {
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command = <<EOF
-CREDENTIALS=$(aws sts assume-role --role-arn ${var.db_job_role_arn} --role-session-name "db-migration-cli" --query "[Credentials.AccessKeyId,Credentials.SecretAccessKey,Credentials.SessionToken]" --output text)
+CREDENTIALS=(`aws sts assume-role --role-arn ${var.db_job_role_arn} --role-session-name "db-migration-cli" --query "[Credentials.AccessKeyId,Credentials.SecretAccessKey,Credentials.SessionToken]" --output text`)
 
 unset AWS_PROFILE
 export AWS_DEFAULT_REGION=us-east-1
@@ -126,7 +126,7 @@ resource "null_resource" "db_dump" {
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command = <<EOF
-CREDENTIALS=$(aws sts assume-role --role-arn ${var.db_job_role_arn} --role-session-name "db-migration-cli" --query "[Credentials.AccessKeyId,Credentials.SecretAccessKey,Credentials.SessionToken]" --output text)
+CREDENTIALS=(`aws sts assume-role --role-arn ${var.db_job_role_arn} --role-session-name "db-migration-cli" --query "[Credentials.AccessKeyId,Credentials.SecretAccessKey,Credentials.SessionToken]" --output text`)
 
 unset AWS_PROFILE
 export AWS_DEFAULT_REGION=us-east-1
