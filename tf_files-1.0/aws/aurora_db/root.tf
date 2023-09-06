@@ -109,6 +109,7 @@ if [[ ${var.db_job_role_arn} != "" ]]; then
 fi
 
 aws s3 cp "${var.dump_file_to_restore}" - --quiet | psql -h "${data.aws_db_instance.database.address}" -U "${local.database_username}" -d "${local.database_name}"
+echo "Done restoring database"
 EOF
 
         environment = {
@@ -143,6 +144,7 @@ if [[ ${var.db_job_role_arn} != "" ]]; then
 fi
     
 pg_dump --username="${local.database_username}" --dbname="${local.database_name}" --host="${data.aws_db_instance.database.address}" --no-password --no-owner --no-privileges >> ./dump.sql && aws s3 cp ./dump.sql ${var.dump_file_storage_location} && rm ./dump.sql
+echo "Done restoring database"
 EOF
     environment = {
       # for instance, postgres would need the password here:
