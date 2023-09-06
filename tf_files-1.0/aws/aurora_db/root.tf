@@ -63,6 +63,10 @@ resource "null_resource" "db_setup" {
         }
       on_failure = continue
     }
+
+    triggers = {
+        database = local.database_name
+    }    
 }
 
 resource "null_resource" "user_setup" {
