@@ -57,3 +57,7 @@ variable "db_restore" {
 variable "db_dump" {
   default = false
 }
+
+variable "db_job_role_arn" {
+  default = ""
+}
