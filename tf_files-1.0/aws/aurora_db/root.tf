@@ -92,11 +92,11 @@ resource "null_resource" "db_restore" {
   count = var.db_restore && var.dump_file_to_restore != "" ? 1 : 0
 
   provisioner "local-exec" {
-        command = "aws s3 cp ${var.dump_file_to_restore} - --quiet | psql -h ${data.aws_db_instance.database.address} -U ${var.admin_database_username} -d ${var.admin_database_name}"
+        command = "aws s3 cp \"${var.dump_file_to_restore}\" - --quiet | psql -h \"${data.aws_db_instance.database.address}\" -U \"${local.database_username}\" -d \"${local.database_name}\""
 
         environment = {
           # for instance, postgres would need the password here:
-          PGPASSWORD = var.admin_database_password != "" ? var.admin_database_password : data.aws_secretsmanager_secret_version.aurora-master-password.secret_string
+          PGPASSWORD = local.database_password
         }
     }
 
@@ -117,7 +117,7 @@ resource "null_resource" "db_dump" {
 
     environment = {
       # for instance, postgres would need the password here:
-      PGPASSWORD = var.admin_database_password != "" ? var.admin_database_password : data.aws_secretsmanager_secret_version.aurora-master-password.secret_string
+      PGPASSWORD = local.database_password
     }
   }
 
