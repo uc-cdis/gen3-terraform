@@ -54,6 +54,7 @@ variable "image_name_search_criteria" {
 
 variable "extra_vars" {
   description = "List of variables that terraform will send to the bootstrapscript"
+  type        = list(string)
 }
 
 variable "bootstrap_path" {

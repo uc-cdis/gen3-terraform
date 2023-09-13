@@ -41,7 +41,9 @@ variable "image_name_search_criteria" {
   default = "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"
 }
 
-variable "extra_vars" {}
+variable "extra_vars" {
+  type    = list(string)
+}
 
 variable "bootstrap_path" {}
 
