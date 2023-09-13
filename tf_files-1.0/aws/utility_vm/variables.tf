@@ -21,6 +21,7 @@ variable "vpc_subnet_id" {
 }
 
 variable "vpc_cidr_list" {
+  type    = list(string)
   default = ["10.128.0.0/20", "54.0.0.0/8", "52.0.0.0/8"]
 }
 
