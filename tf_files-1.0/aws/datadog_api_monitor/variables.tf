@@ -42,7 +42,6 @@ variable project_slack_channel {
 #A list of test definitions, that contain the endpoint to test, which will be concatenated to the commons_url, as well as 
 #configuration data such as timeout, method, and notification information
 variable test_definitions {
-  type    = list(map)
   default = []
 }
 
