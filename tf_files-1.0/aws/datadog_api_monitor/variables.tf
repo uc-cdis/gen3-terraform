@@ -42,17 +42,20 @@ variable project_slack_channel {
 #A list of test definitions, that contain the endpoint to test, which will be concatenated to the commons_url, as well as 
 #configuration data such as timeout, method, and notification information
 variable test_definitions {
+  type    = list(string)
   default = ""
 }
 
 #A list of locations to run the tests from. For more information,
 #see: https://docs.datadoghq.com/synthetics/api_tests/#request
 variable locations {
+  type    = list(string)
   default = ""
 }
 
 #A list of strings representing tags, to make it easier to look up this test
 variable tags {
+  type    = list(string)
   default = ""
 }
 
