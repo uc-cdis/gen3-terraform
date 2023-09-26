@@ -1030,3 +1030,8 @@ variable "secrets_manager_enabled" {
 variable "ci_run" {
   default = false
 }
+
+variable "commons_log_retention" {
+  description = "value in days for the cloudwatch log retention period"
+  default = "3650"
+}

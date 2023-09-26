@@ -140,3 +140,8 @@ variable "deploy_cloud_trail" {
 variable "send_logs_to_csoc" {
   default = true
 }
+
+variable "commons_log_retention" {
+  description = "value in days for the cloudwatch log retention period"
+  default = "3650"
+}
