@@ -5,7 +5,7 @@ api_key = ""
 app_key = ""
 
 #The URL for the Datadog API. This can be changed if, for example, you are operating in Datadog EU
-api_url = "https://api.datadoghq.com/"
+api_url = "https://api.ddog-gov.com/"
 
 #The root URL of the commons, i.e. https://healdata.org, etc
 commons_url = ""
