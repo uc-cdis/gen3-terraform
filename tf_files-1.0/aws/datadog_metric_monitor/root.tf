@@ -20,9 +20,18 @@ resource "datadog_monitor" "metric_monitor" {
 
   query = "${var.query}"
 
-  monitor_thresholds {
-    warning  = var.warning_threshold
-    critical = var.critical_threshold
+
+  dynamic "monitor_thresholds" {
+    for_each = var.threshold_specificatons[*]
+
+    content {
+      critical = threshold_specificatons.value.critical
+      critical_recovery = threshold_specificatons.value.critical_recovery
+      ok = threshold_specificatons.value.ok
+      unknown = threshold_specificatons.value.unknown
+      warning = threshold_specificatons.value.warning
+      warning_recover = threshold_specificatons.value.warning_recover
+    }
   }
 
   include_tags = true

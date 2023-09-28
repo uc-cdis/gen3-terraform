@@ -21,11 +21,11 @@ variable monitor_name {}
 #https://docs.datadoghq.com/metrics/explorer/
 variable query {}
 
-#The threshold past which this monitor will fire a warining. See https://registry.terraform.io/providers/DataDog/datadog/latest/docs/resources/monitor#nested-schema-for-monitor_thresholds
-variable warning_threshold {}
-
-#The threshold past which this monitor will fire a critical notification. See https://registry.terraform.io/providers/DataDog/datadog/latest/docs/resources/monitor#nested-schema-for-monitor_thresholds
-variable critical_threshold {}
+#See https://registry.terraform.io/providers/DataDog/datadog/latest/docs/resources/monitor#nested-schema-for-monitor_thresholds
+variable threshold_specificatons {
+    type = map
+    description = "The specifications for notification thresholds"
+}
 
 #A list of strings representing tags, to make it easier to look up this monitor
 variable tags {}
