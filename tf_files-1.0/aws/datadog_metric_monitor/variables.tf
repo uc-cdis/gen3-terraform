@@ -22,7 +22,7 @@ variable monitor_name {}
 variable query {}
 
 #See https://registry.terraform.io/providers/DataDog/datadog/latest/docs/resources/monitor#nested-schema-for-monitor_thresholds
-variable threshold_specificatons {
+variable threshold_specifications {
     type = map
     description = "The specifications for notification thresholds"
 }

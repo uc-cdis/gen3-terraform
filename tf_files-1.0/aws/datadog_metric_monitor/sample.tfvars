@@ -22,6 +22,3 @@ message = "An API test message"
 
 #A list of strings representing tags, to make it easier to look up this monitor
 tags = []
-
-warning_threshold = 2
-critical_threshold = 4
