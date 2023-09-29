@@ -7,6 +7,16 @@ variable app_key {}
 #The URL for the Datadog API. This can be changed if, for example, you are operating in Datadog EU
 variable api_url {}
 
+#Whether or not to use secrets manager to store the Datadog API and app keys
+variable secrets_manager_enabled {
+  default = false
+}
+
+#The arn of the secrets manager that contains the Datadog API and app keys
+variable datadog_secrets_manager_arn {
+  default = ""
+}
+
 #The name of the commons, for use in messages and test names
 variable commons_name {}
 
