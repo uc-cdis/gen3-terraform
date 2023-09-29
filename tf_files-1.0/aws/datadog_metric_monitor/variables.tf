@@ -1,11 +1,17 @@
 #The Datadog API key, used to interface with Datadog
-variable api_key {}
+variable api_key {
+  default = ""
+}
 
 #The Datadog app key, used to interface with Datadog
-variable app_key {}
+variable app_key {
+  default = ""
+}
 
 #The URL for the Datadog API. This can be changed if, for example, you are operating in Datadog EU
-variable api_url {}
+variable api_url {
+  default = ""
+}
 
 #Whether or not to use secrets manager to store the Datadog API and app keys
 variable secrets_manager_enabled {
