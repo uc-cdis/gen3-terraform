@@ -6,10 +6,16 @@ terraform {
   }
 }
 
+locals {
+  api_key = var.secrets_manager_enabled ? jsondecode(data.aws_secretsmanager_secret_version.secrets.secret_string)["api-key"] : var.api_key
+  app_key = var.secrets_manager_enabled ? jsondecode(data.aws_secretsmanager_secret_version.secrets.secret_string)["application-key"] : var.app_key
+  api_url = var.secrets_manager_enabled ? jsondecode(data.aws_secretsmanager_secret_version.secrets.secret_string)["url"] : var.api_url
+}
+
 provider "datadog" {
-    api_key = var.api_key
-    app_key = var.app_key
-    api_url = var.api_url
+    api_key = local.api_key
+    app_key = local.app_key
+    api_url = local.api_url
 }
 
 
