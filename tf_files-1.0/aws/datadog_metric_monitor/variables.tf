@@ -38,9 +38,28 @@ variable monitor_name {}
 variable query {}
 
 #See https://registry.terraform.io/providers/DataDog/datadog/latest/docs/resources/monitor#nested-schema-for-monitor_thresholds
-variable threshold_specifications {
-    type = map
-    description = "The specifications for notification thresholds"
+variable critical {
+  default = ""
+}
+
+variable critical_recovery {
+  default = ""
+}
+
+variable ok {
+  default = ""
+}
+
+variable unknown {
+  default = ""
+}
+
+variable warning {
+  default = ""
+}
+
+variable warning_recovery {
+  default = ""
 }
 
 #A list of strings representing tags, to make it easier to look up this monitor
