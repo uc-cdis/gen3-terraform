@@ -31,12 +31,12 @@ resource "datadog_monitor" "metric_monitor" {
     for_each = var.threshold_specifications[*]
 
     content {
-      critical = threshold_specificatons.value.critical
-      critical_recovery = threshold_specificatons.value.critical_recovery
-      ok = threshold_specificatons.value.ok
-      unknown = threshold_specificatons.value.unknown
-      warning = threshold_specificatons.value.warning
-      warning_recovery = threshold_specificatons.value.warning_recover
+      critical = threshold_specificatons.critical
+      critical_recovery = threshold_specificatons.critical_recovery
+      ok = threshold_specificatons.ok
+      unknown = threshold_specificatons.unknown
+      warning = threshold_specificatons.warning
+      warning_recovery = threshold_specificatons.warning_recover
     }
   }
 
