@@ -27,7 +27,7 @@ resource "datadog_monitor" "metric_monitor" {
   query = "${var.query}"
 
 
-  dynamic "monitor_thresholds" {
+  dynamic "threshold_specifications" {
     for_each = var.threshold_specifications[*]
 
     content {
