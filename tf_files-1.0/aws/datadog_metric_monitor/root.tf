@@ -28,7 +28,7 @@ resource "datadog_monitor" "metric_monitor" {
 
 
   dynamic "monitor_thresholds" {
-    for_each = var.threshold_specificatons[*]
+    for_each = var.threshold_specifications[*]
 
     content {
       critical = threshold_specificatons.value.critical
@@ -36,7 +36,7 @@ resource "datadog_monitor" "metric_monitor" {
       ok = threshold_specificatons.value.ok
       unknown = threshold_specificatons.value.unknown
       warning = threshold_specificatons.value.warning
-      warning_recover = threshold_specificatons.value.warning_recover
+      warning_recovery = threshold_specificatons.value.warning_recover
     }
   }
 
