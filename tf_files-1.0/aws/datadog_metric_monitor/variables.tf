@@ -63,4 +63,6 @@ variable warning_recovery {
 }
 
 #A list of strings representing tags, to make it easier to look up this monitor
-variable tags {}
+variable tags {
+  type = list(string)
+}
