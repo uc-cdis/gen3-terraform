@@ -13,39 +13,39 @@ resource "aws_s3_bucket" "log_bucket" {
 #  acl    = "log-delivery-write"
 #}
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "log_bucket" {
-  bucket = aws_s3_bucket.log_bucket.bucket
+#resource "aws_s3_bucket_server_side_encryption_configuration" "log_bucket" {
+#  bucket = aws_s3_bucket.log_bucket.bucket
+#
+#  rule {
+#    apply_server_side_encryption_by_default {
+#      sse_algorithm = "AES256"
+#    }
+#  }
+#}
 
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
-resource "aws_s3_bucket_lifecycle_configuration" "log_bucket" {
-  bucket = aws_s3_bucket.log_bucket.id
-
-  rule {
-    status  = "Enabled"
-    id      = "log"
-
-    filter {
-      and {
-        prefix = "/"
-
-        tags = {
-          rule      = "log"
-          autoclean = "true"
-        }
-      }
-    }
-    expiration {
-      # 5 years
-      days = 1825
-    }
-  }
-}
+#resource "aws_s3_bucket_lifecycle_configuration" "log_bucket" {
+#  bucket = aws_s3_bucket.log_bucket.id
+#
+#  rule {
+#    status  = "Enabled"
+#    id      = "log"
+#
+#    filter {
+#      and {
+#        prefix = "/"
+#
+#        tags = {
+#          rule      = "log"
+#          autoclean = "true"
+#        }
+#      }
+#    }
+#    expiration {
+#      # 5 years
+#      days = 1825
+#    }
+#  }
+#}
 
 resource "aws_s3_bucket_public_access_block" "s3-log_bucket_privacy" {
   bucket                      = aws_s3_bucket.log_bucket.id

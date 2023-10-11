@@ -13,5 +13,5 @@ data "aws_security_group" "private" {
 }
 
 data "aws_vpc" "the_vpc" {
-  id = data.aws_vpcs.vpcs.ids[0]
+  id = data.aws_vpcs.vpcs.ids
 }

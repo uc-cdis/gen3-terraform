@@ -12,7 +12,7 @@ resource "aws_db_instance" "db_fence" {
   engine_version              = var.engine_version
   parameter_group_name        = aws_db_parameter_group.rds-cdis-pg.name
   instance_class              = var.fence_db_instance
-  db_name                     = var.fence_database_name
+  name                     = var.fence_database_name
   username                    = var.fence_db_username
   password                    = var.db_password_fence != "" ? var.db_password_fence : random_password.fence_password.result
   snapshot_identifier         = var.fence_snapshot
@@ -49,7 +49,7 @@ resource "aws_db_instance" "db_sheepdog" {
   engine_version              = var.engine_version
   parameter_group_name        = aws_db_parameter_group.rds-cdis-pg.name
   instance_class              = var.sheepdog_db_instance
-  db_name                     = var.sheepdog_database_name
+  name                     = var.sheepdog_database_name
   username                    = var.sheepdog_db_username
   password                    = var.db_password_sheepdog != "" ? var.db_password_sheepdog : random_password.sheepdog_password.result
   snapshot_identifier         = var.sheepdog_snapshot
@@ -86,7 +86,7 @@ resource "aws_db_instance" "db_indexd" {
   engine_version              = var.engine_version
   parameter_group_name        = aws_db_parameter_group.rds-cdis-pg.name
   instance_class              = var.indexd_db_instance
-  db_name                     = var.indexd_database_name
+  name                     = var.indexd_database_name
   username                    = var.indexd_db_username
   password                    = var.db_password_indexd != "" ? var.db_password_indexd : random_password.indexd_password.result
   snapshot_identifier         = var.indexd_snapshot
@@ -209,15 +209,6 @@ resource "aws_s3_bucket" "kube_bucket" {
 #  acl    = "private"
 #}
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "kube_bucket" {
-  bucket = aws_s3_bucket.kube_bucket.bucket
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
 
 resource "aws_s3_bucket_public_access_block" "kube_bucket_privacy" {
   bucket                  = aws_s3_bucket.kube_bucket.id

@@ -10,21 +10,21 @@ resource "aws_s3_bucket" "data_bucket" {
   }
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "data_bucket" {
-  bucket = aws_s3_bucket.data_bucket.bucket
+#resource "aws_s3_bucket_server_side_encryption_configuration" "data_bucket" {
+#  bucket = aws_s3_bucket.data_bucket.bucket
+#
+#  rule {
+#    apply_server_side_encryption_by_default {
+#      sse_algorithm = "AES256"
+#    }
+#  }
+#}
 
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
-resource "aws_s3_bucket_logging" "data_bucket" {
-  bucket        = aws_s3_bucket.data_bucket.id
-  target_bucket = aws_s3_bucket.log_bucket.id
-  target_prefix = "log/${var.vpc_name}-data-bucket/"
-}
+#resource "aws_s3_bucket_logging" "data_bucket" {
+#  bucket        = aws_s3_bucket.data_bucket.id
+#  target_bucket = aws_s3_bucket.log_bucket.id
+#  target_prefix = "log/${var.vpc_name}-data-bucket/"
+#}
 
 resource "aws_s3_bucket_public_access_block" "data_bucket_privacy" {
   bucket                      = aws_s3_bucket.data_bucket.id
@@ -56,39 +56,39 @@ resource "aws_s3_bucket" "log_bucket" {
   }
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "log_bucket" {
-  bucket = aws_s3_bucket.log_bucket.bucket
+#resource "aws_s3_bucket_server_side_encryption_configuration" "log_bucket" {
+#  bucket = aws_s3_bucket.log_bucket.bucket
+#
+#  rule {
+#    apply_server_side_encryption_by_default {
+#      sse_algorithm = "AES256"
+#    }
+#  }
+#}
 
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
-resource "aws_s3_bucket_lifecycle_configuration" "log_bucket" {
-  bucket = aws_s3_bucket.log_bucket.bucket
-
-  rule {
-      status  = "Enabled"
-      id      = "log"
-
-      filter {
-        and {
-          prefix = "/"
-
-          tags = {
-            rule      = "log"
-            autoclean = "true"
-          }
-        }
-      }
-
-      expiration {
-        days = 120
-      }
-  }
-}
+#resource "aws_s3_bucket_lifecycle_configuration" "log_bucket" {
+#  bucket = aws_s3_bucket.log_bucket.bucket
+#
+#  rule {
+#      status  = "Enabled"
+#      id      = "log"
+#
+#      filter {
+#        and {
+#          prefix = "/"
+#
+#          tags = {
+#            rule      = "log"
+#            autoclean = "true"
+#          }
+#        }
+#      }
+#
+#      expiration {
+#        days = 120
+#      }
+#  }
+#}
 
 
 resource "aws_s3_bucket_public_access_block" "data_bucket_logs_privacy" {
