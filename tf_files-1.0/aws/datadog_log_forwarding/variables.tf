@@ -7,4 +7,11 @@ variable filter_pattern {
 }
 
 #API key used to authenticate with Datadog
-variable datadog_api_key {}
+variable datadog_api_key {
+    default = ""
+}
+
+#Whether or not to use secrets manager to store the Datadog API and app keys
+variable secrets_manager_enabled {
+  default = false
+}

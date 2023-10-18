@@ -4,6 +4,11 @@ terraform {
   }
 }
 
+
+locals {
+  api_key = var.secrets_manager_enabled ? jsondecode(data.aws_secretsmanager_secret_version.secrets.secret_string)["api-key"] : var.api_key
+}
+
 # We're not going to use the S3 bucket module because it adds a bunch of extra stuff we don't need
 # for this application
 resource "aws_s3_bucket" "fargate_logs_backup_bucket" {
@@ -70,7 +75,7 @@ resource "aws_kinesis_firehose_delivery_stream" "fargate_logs_to_datadog" {
     http_endpoint_configuration {
         url = "https://aws-kinesis-http-intake.logs.ddog-gov.com/v1/input"
         name = "Datadog"
-        access_key = var.datadog_api_key
+        access_key = local.api_key
         s3_backup_mode = "FailedDataOnly"
 
         s3_configuration = {
