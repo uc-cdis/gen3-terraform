@@ -4,8 +4,6 @@ terraform {
   }
 }
 
-provider "aws" {}
-
 # We're not going to use the S3 bucket module because it adds a bunch of extra stuff we don't need
 # for this application
 resource "aws_s3_bucket" "fargate_logs_backup_bucket" {
