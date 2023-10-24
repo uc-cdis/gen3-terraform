@@ -79,7 +79,7 @@ resource "aws_kinesis_firehose_delivery_stream" "fargate_logs_to_datadog" {
         s3_backup_mode = "FailedDataOnly"
 
         s3_configuration {
-            role_arn = aws_iam_role.fargate_logs_backup_bucket_writer.fargate_logs_backup_bucket_writer
+            role_arn = aws_iam_role.fargate_logs_backup_bucket_writer.arn
             bucket_arn = aws_s3_bucket.fargate_logs_backup_bucket.arn
         }
     }
