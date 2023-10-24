@@ -1,10 +1,3 @@
-terraform {
-  backend "s3" {
-    encrypt = "true"
-  }
-}
-
-
 locals {
   api_key = var.secrets_manager_enabled ? jsondecode(data.aws_secretsmanager_secret_version.secrets.secret_string)["api-key"] : var.datadog_api_key
 }

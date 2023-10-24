@@ -17,5 +17,5 @@ data "aws_secretsmanager_secret_version" "secrets" {
 }
 
 data "aws_secretsmanager_secret" "dd_keys" {
-    arn = var.datadog_secrets_manager_arn
+  arn = var.datadog_secrets_manager_arn
 }
