@@ -15,3 +15,7 @@ variable datadog_api_key {
 variable secrets_manager_enabled {
   default = false
 }
+
+variable datadog_secrets_manager_arn {
+  default = ""
+}

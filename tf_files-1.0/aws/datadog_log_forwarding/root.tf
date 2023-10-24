@@ -53,8 +53,8 @@ resource "aws_iam_policy" "fargate_logs_backup_bucket_writer" {
 }
 
 resource "aws_iam_role_policy_attachment" "fargate_logs_backup_bucket_reader" {
-  role       = aws_iam_role.fargate_logs_backup_bucket_reader.name
-  policy_arn = aws_iam_policy.fargate_logs_backup_bucket_reader.arn
+  role       = aws_iam_role.fargate_logs_backup_bucket_writer.name
+  policy_arn = aws_iam_policy.fargate_logs_backup_bucket_writer.arn
 }
 
 # We're now going to make the cloudwatch subscription filter
