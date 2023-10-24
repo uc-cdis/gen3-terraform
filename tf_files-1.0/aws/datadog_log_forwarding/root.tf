@@ -6,7 +6,7 @@ terraform {
 
 
 locals {
-  api_key = var.secrets_manager_enabled ? jsondecode(data.aws_secretsmanager_secret_version.secrets.secret_string)["api-key"] : var.api_key
+  api_key = var.secrets_manager_enabled ? jsondecode(data.aws_secretsmanager_secret_version.secrets.secret_string)["api-key"] : var.datadog_api_key
 }
 
 # We're not going to use the S3 bucket module because it adds a bunch of extra stuff we don't need
