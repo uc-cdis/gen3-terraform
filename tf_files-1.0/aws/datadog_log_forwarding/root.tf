@@ -70,6 +70,7 @@ resource "aws_kinesis_firehose_delivery_stream" "fargate_logs_to_datadog" {
         name = "Datadog"
         access_key = local.api_key
         s3_backup_mode = "FailedDataOnly"
+        role_arn = aws_iam_role.fargate_logs_backup_bucket_writer.arn 
 
         s3_configuration {
             role_arn = aws_iam_role.fargate_logs_backup_bucket_writer.arn
