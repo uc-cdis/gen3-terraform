@@ -10,6 +10,7 @@ module "commons_vpc_es" {
   organization_name       = var.organization_name
   es_version              = var.es_version
   es_linked_role          = var.es_linked_role
+  es_name                 = var.es_name
   depends_on              = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id]
 }
 

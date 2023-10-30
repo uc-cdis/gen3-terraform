@@ -1,5 +1,9 @@
 variable "vpc_name" {}
 
+variable "es_name" {
+  default = ""
+}
+
 variable "vpc_id" {
   default = ""
 }

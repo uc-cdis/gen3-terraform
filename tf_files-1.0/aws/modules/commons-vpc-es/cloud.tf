@@ -58,7 +58,7 @@ CONFIG
 
 
 resource "aws_elasticsearch_domain" "gen3_metadata" {
-  domain_name           = "${var.vpc_name}-gen3-metadata"
+  domain_name           = var.es_name != "" ? var.es_name : "${var.vpc_name}-gen3-metadata"
   elasticsearch_version = var.es_version
   access_policies       = <<CONFIG
 {

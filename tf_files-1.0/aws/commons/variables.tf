@@ -618,6 +618,10 @@ variable "deploy_es" {
   default = true
 }
 
+variable "es_name" {
+  default = ""
+}
+
 variable "ebs_volume_size_gb" {
   default = 20
 }
