@@ -12,6 +12,14 @@ data "aws_iam_policy_document" "fargate_logs_backup_bucket_writer" {
   }
 }
 
+data "aws_iam_policy_document" "firehose_access" {
+  statement {
+    effect    = "Allow"
+    actions   = ["firehose:PutRecord","firehose:PutRecordBatch"] 
+    resources = ["${aws_kinesis_firehose_delivery_stream.fargate_logs_to_datadog.arn}"]
+  }
+}
+
 data "aws_secretsmanager_secret_version" "secrets" {
   secret_id = data.aws_secretsmanager_secret.dd_keys.id
 }

@@ -13,12 +13,7 @@ resource "aws_s3_bucket" "fargate_logs_backup_bucket" {
     }
 }
 
-# I think buckets are private by default, but doesn't hurt to be sure
-resource "aws_s3_bucket_acl" "bucket_acl" {
-  bucket = aws_s3_bucket.fargate_logs_backup_bucket.id
-  acl    = "private"
-}
-
+# IAM setup to access the backup bucket
 resource "aws_iam_role" "fargate_logs_backup_bucket_writer" {
   name = "bucket_writer_${var.environment}-fargate-logs-backup"
   path = "/"
@@ -50,30 +45,49 @@ resource "aws_iam_role_policy_attachment" "fargate_logs_backup_bucket_reader" {
   policy_arn = aws_iam_policy.fargate_logs_backup_bucket_writer.arn
 }
 
+
+# IAM setup to access the firehose
+resource "aws_iam_role" "firehose_log_sender" {
+  name = "bucket_writer_${var.environment}-fargate-logs-backup"
+  path = "/"
+}
+
+resource "aws_iam_policy" "firehose_log_sender" {
+  name        = "${var.environment}_datadog_firehose_access_policy"
+  description = "Policy that grants access to the firehose sending data to Datadog"
+  policy      = data.aws_iam_policy_document.firehose_access.json
+}
+
+resource "aws_iam_role_policy_attachment" "firehose_log_sender" {
+  role       = aws_iam_role.firehose_log_sender
+  policy_arn = aws_iam_policy.firehose_access
+}
+
 # We're now going to make the cloudwatch subscription filter
 resource "aws_cloudwatch_log_subscription_filter" "fargate_log_filter" {
-    name = "datadog_fargate_filter"
+    name            = "datadog_fargate_filter"
     destination_arn = aws_kinesis_firehose_delivery_stream.fargate_logs_to_datadog.arn
-    filter_pattern = var.filter_pattern
+    filter_pattern  = var.filter_pattern
     #TODO put a link to the output configuration
     #This is hardcoded here:
-    log_group_name = "fluent-bit-eks-cloudwatch"
+    log_group_name  = "fluent-bit-eks-cloudwatch"
+    role_arn        = aws_iam_role.firehose_log_sender.arn
 }
 
 #And the Kinesis Firehose
 resource "aws_kinesis_firehose_delivery_stream" "fargate_logs_to_datadog" {
-    name = "fargate_logs_to_datadog_forwarder"
+    name        = "fargate_logs_to_datadog_forwarder"
     destination = "http_endpoint"
 
     http_endpoint_configuration {
-        url = "https://aws-kinesis-http-intake.logs.ddog-gov.com/v1/input"
-        name = "Datadog"
-        access_key = local.api_key
+        url            = "https://aws-kinesis-http-intake.logs.ddog-gov.com/v1/input"
+        name           = "Datadog"
+        access_key     = local.api_key
         s3_backup_mode = "FailedDataOnly"
-        role_arn = aws_iam_role.fargate_logs_backup_bucket_writer.arn 
+        role_arn       = aws_iam_role.fargate_logs_backup_bucket_writer.arn 
 
         s3_configuration {
-            role_arn = aws_iam_role.fargate_logs_backup_bucket_writer.arn
+            role_arn   = aws_iam_role.fargate_logs_backup_bucket_writer.arn
             bucket_arn = aws_s3_bucket.fargate_logs_backup_bucket.arn
         }
     }
