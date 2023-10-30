@@ -70,12 +70,12 @@ EOF
 resource "aws_iam_policy" "firehose_log_sender" {
   name        = "${var.environment}_datadog_firehose_access_policy"
   description = "Policy that grants access to the firehose sending data to Datadog"
-  policy      = data.aws_iam_policy_document.firehose_access.json
+  policy      = data.aws_iam_policy_document.firehose_log_sender.json
 }
 
 resource "aws_iam_role_policy_attachment" "firehose_log_sender" {
   role       = aws_iam_role.firehose_log_sender
-  policy_arn = aws_iam_policy.firehose_access
+  policy_arn = aws_iam_policy.firehose_log_sender
 }
 
 # We're now going to make the cloudwatch subscription filter
