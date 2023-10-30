@@ -12,7 +12,7 @@ data "aws_iam_policy_document" "fargate_logs_backup_bucket_writer" {
   }
 }
 
-data "aws_iam_policy_document" "firehose_access" {
+data "aws_iam_policy_document" "firehose_log_sender" {
   statement {
     effect    = "Allow"
     actions   = ["firehose:PutRecord","firehose:PutRecordBatch"] 
