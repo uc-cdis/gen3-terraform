@@ -74,8 +74,8 @@ resource "aws_iam_policy" "firehose_log_sender" {
 }
 
 resource "aws_iam_role_policy_attachment" "firehose_log_sender" {
-  role       = aws_iam_role.firehose_log_sender
-  policy_arn = aws_iam_policy.firehose_log_sender
+  role       = aws_iam_role.firehose_log_sender.name
+  policy_arn = aws_iam_policy.firehose_log_sender.arn
 }
 
 # We're now going to make the cloudwatch subscription filter
