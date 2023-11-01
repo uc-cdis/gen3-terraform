@@ -146,7 +146,8 @@ resource "aws_subnet" "eks_private" {
      "Environment": var.vpc_name,
      "Organization": var.organization_name,
      "kubernetes.io/cluster/${var.vpc_name}": "owned",
-     "kubernetes.io/role/internal-elb": "1"})
+     "kubernetes.io/role/internal-elb": "1",
+     "karpenter.sh/discovery": var.vpc_name})
 }
 
 # The subnet for secondary CIDR block utilization
@@ -167,7 +168,8 @@ resource "aws_subnet" "eks_secondary_subnet" {
      "Environment": var.vpc_name,
      "Organization": var.organization_name,
      "kubernetes.io/cluster/${var.vpc_name}": "owned",
-     "kubernetes.io/role/internal-elb": "1"
+     "kubernetes.io/role/internal-elb": "1",
+     "karpenter.sh/discovery": var.vpc_name
     })
 }
 

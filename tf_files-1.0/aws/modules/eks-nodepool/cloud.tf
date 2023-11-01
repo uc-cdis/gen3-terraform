@@ -200,7 +200,8 @@ resource "aws_security_group" "eks_nodes_sg" {
 
   tags = tomap({
      "Name": "${var.vpc_name}-nodes-sg-${var.nodepool}",
-     "kubernetes.io/cluster/${var.vpc_name}": "owned"
+     "kubernetes.io/cluster/${var.vpc_name}": "owned",
+     "karpenter.sh/discovery": "${var.vpc_name}-${var.nodepool}"
   })
 }
 
@@ -357,8 +358,9 @@ resource "aws_security_group" "ssh" {
   }
 
   tags = {
-    Environment  = var.vpc_name
-    Organization = var.organization_name
-    Name         = "ssh_eks_${var.vpc_name}-nodepool-${var.nodepool}"
+    Environment            = var.vpc_name
+    Organization           = var.organization_name
+    Name                   = "ssh_eks_${var.vpc_name}-nodepool-${var.nodepool}"
+    karpenter.sh/discovery = "${var.vpc_name}-${var.nodepool}"
   }
 }
