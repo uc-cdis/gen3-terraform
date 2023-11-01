@@ -358,9 +358,9 @@ resource "aws_security_group" "ssh" {
   }
 
   tags = {
-    Environment            = var.vpc_name
-    Organization           = var.organization_name
-    Name                   = "ssh_eks_${var.vpc_name}-nodepool-${var.nodepool}"
-    karpenter.sh/discovery = "${var.vpc_name}-${var.nodepool}"
+    Environment              = var.vpc_name
+    Organization             = var.organization_name
+    Name                     = "ssh_eks_${var.vpc_name}-nodepool-${var.nodepool}"
+    "karpenter.sh/discovery" = "${var.vpc_name}-${var.nodepool}"
   }
 }
