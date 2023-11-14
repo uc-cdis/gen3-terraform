@@ -48,7 +48,7 @@ resource "aws_iam_role_policy_attachment" "fargate_logs_backup_bucket_reader" {
 
 # IAM setup to access the firehose
 resource "aws_iam_role" "firehose_log_sender" {
-  name = "bucket_writer_${var.environment}-fargate-logs-backup"
+  name = "${var.environment}-firehose-log-sender"
   path = "/"
 
   assume_role_policy = <<EOF
@@ -58,7 +58,7 @@ resource "aws_iam_role" "firehose_log_sender" {
         {
             "Effect": "Allow",
             "Principal": {
-                "Service": "firehose.amazonaws.com"
+                "Service": "logs.amazonaws.com"
             },
             "Action": "sts:AssumeRole"
         }
