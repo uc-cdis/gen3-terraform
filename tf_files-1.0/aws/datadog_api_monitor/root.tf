@@ -60,7 +60,7 @@ resource "datadog_synthetics_test" "api_tests" {
   }
 
   options_list {
-    tick_every = 300
+    tick_every = var.test_run_frequency_secs
     min_failure_duration = 300
   }
 }
