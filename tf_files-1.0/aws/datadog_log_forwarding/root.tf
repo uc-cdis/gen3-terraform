@@ -85,7 +85,7 @@ resource "aws_cloudwatch_log_subscription_filter" "fargate_log_filter" {
   filter_pattern  = var.filter_pattern
   #TODO put a link to the output configuration
   #This is hardcoded here:
-  log_group_name  = "fluent-bit-eks-cloudwatch"
+  log_group_name  = aws_cloudwatch_log_group.fargate_logs.name
   role_arn        = aws_iam_role.firehose_log_sender.arn
 }
 
@@ -113,5 +113,5 @@ resource "aws_kinesis_firehose_delivery_stream" "fargate_logs_to_datadog" {
 resource "aws_cloudwatch_log_group" "fargate_logs"{
   name              = "fluent-bit-eks-cloudwatch"
   retention_in_days = 1
-  
+
 }
