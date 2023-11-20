@@ -80,30 +80,38 @@ resource "aws_iam_role_policy_attachment" "firehose_log_sender" {
 
 # We're now going to make the cloudwatch subscription filter
 resource "aws_cloudwatch_log_subscription_filter" "fargate_log_filter" {
-    name            = "datadog_fargate_filter"
-    destination_arn = aws_kinesis_firehose_delivery_stream.fargate_logs_to_datadog.arn
-    filter_pattern  = var.filter_pattern
-    #TODO put a link to the output configuration
-    #This is hardcoded here:
-    log_group_name  = "fluent-bit-eks-cloudwatch"
-    role_arn        = aws_iam_role.firehose_log_sender.arn
+  name            = "datadog_fargate_filter"
+  destination_arn = aws_kinesis_firehose_delivery_stream.fargate_logs_to_datadog.arn
+  filter_pattern  = var.filter_pattern
+  #TODO put a link to the output configuration
+  #This is hardcoded here:
+  log_group_name  = "fluent-bit-eks-cloudwatch"
+  role_arn        = aws_iam_role.firehose_log_sender.arn
 }
 
 #And the Kinesis Firehose
 resource "aws_kinesis_firehose_delivery_stream" "fargate_logs_to_datadog" {
-    name        = "fargate_logs_to_datadog_forwarder"
-    destination = "http_endpoint"
+  name        = "fargate_logs_to_datadog_forwarder"
+  destination = "http_endpoint"
 
-    http_endpoint_configuration {
-        url            = "https://aws-kinesis-http-intake.logs.ddog-gov.com/v1/input"
-        name           = "Datadog"
-        access_key     = local.api_key
-        s3_backup_mode = "FailedDataOnly"
-        role_arn       = aws_iam_role.fargate_logs_backup_bucket_writer.arn 
+  http_endpoint_configuration {
+      url            = "https://aws-kinesis-http-intake.logs.ddog-gov.com/v1/input"
+      name           = "Datadog"
+      access_key     = local.api_key
+      s3_backup_mode = "FailedDataOnly"
+      role_arn       = aws_iam_role.fargate_logs_backup_bucket_writer.arn 
 
-        s3_configuration {
-            role_arn   = aws_iam_role.fargate_logs_backup_bucket_writer.arn
-            bucket_arn = aws_s3_bucket.fargate_logs_backup_bucket.arn
-        }
-    }
+      s3_configuration {
+          role_arn   = aws_iam_role.fargate_logs_backup_bucket_writer.arn
+          bucket_arn = aws_s3_bucket.fargate_logs_backup_bucket.arn
+      }
+  }
+}
+
+#And finally, the CloudWatch log group. Looks like the Fargate execution role needs permissions to create one
+#Which means its easier to just create it in Terraform
+resource "aws_cloudwatch_log_group" "fargate_logs"{
+  name              = "fluent-bit-eks-cloudwatch"
+  retention_in_days = 1
+  
 }
