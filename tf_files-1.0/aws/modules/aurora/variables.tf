@@ -1,5 +1,8 @@
-
 variable "vpc_name" {}
+
+variable "secrets_manager_enabled" {
+  default = false
+}
 
 variable "cluster_identifier" {
   description = "Cluster Identifier"
@@ -97,5 +100,5 @@ variable "preferred_backup_window" {
 variable "password_length" {
   type        = number
   description = "The length of the password string"
-  default     = 12
+  default     = 16
 }

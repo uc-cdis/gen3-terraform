@@ -28,6 +28,7 @@ variable "vpc_subnet_id" {
 
 variable "vpc_cidr_list" {
   description = "CIDRs that will skip the proxy"
+  type        = list(string)
   default     = ["10.128.0.0/20", "54.0.0.0/8", "52.0.0.0/8"]
 }
 
@@ -53,6 +54,7 @@ variable "image_name_search_criteria" {
 
 variable "extra_vars" {
   description = "List of variables that terraform will send to the bootstrapscript"
+  type        = list(string)
 }
 
 variable "bootstrap_path" {

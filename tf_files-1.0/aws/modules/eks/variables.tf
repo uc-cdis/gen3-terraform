@@ -43,7 +43,7 @@ variable "worker_drive_size" {
 }
 
 variable "eks_version" {
-  default = "1.21"
+  default = "1.25"
 }
 
 variable "workers_subnet_size" {
@@ -186,20 +186,27 @@ variable "fips_enabled_ami" {
   default = "ami-0de87e3680dcb13ec"
 }
 
-# The minimum amount of on demand nodes
-variable "minimum_on_demand_nodes" {
-  default = 3
-}
-
-variable "enable_spot_instances" {
-  default = false
-}
-
-variable "enable_on_demand_instances" {
+variable "use_asg" {
   default = true
 } 
+
+variable "use_karpenter" {
+  default = false
+}
 
 variable "scale_in_protection" {
   description = "set scale-in protection on ASG"
   default     = false
+}
+
+variable "ci_run" {
+  default = false
+}
+
+variable "karpenter_version" {
+  default = "v0.24.0"
+}
+
+variable "eks_public_access" {
+  default = "true"
 }

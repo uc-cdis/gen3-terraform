@@ -1,4 +1,3 @@
-
 resource "aws_cloudwatch_log_metric_filter" "metric_one" {
   name           = "SecurityGroupChangesMetricFilter"
   pattern        = "{($.eventName = AuthorizeSecurityGroupIngress) || ($.eventName = AuthorizeSecurityGroupEgress) || ($.eventName = RevokeSecurityGroupIngress) || ($.eventName = RevokeSecurityGroupEgress) || ($.eventName = CreateSecurityGroup) || ($.eventName = DeleteSecurityGroup)}"

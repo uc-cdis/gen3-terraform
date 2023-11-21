@@ -5,7 +5,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.0"
+      version = "~> 5.0"
     }
   }
 }
@@ -243,9 +243,4 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "transfer-bucket" 
       sse_algorithm = "AES256"
     }
   }
-}
-
-resource "aws_s3_bucket_acl" "data_bucket" {
-  bucket = aws_s3_bucket.transfer-bucket.id
-  acl    = "private"
 }

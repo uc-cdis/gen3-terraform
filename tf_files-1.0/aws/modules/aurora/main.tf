@@ -25,10 +25,10 @@ resource "aws_rds_cluster" "postgresql" {
   apply_immediately               = var.apply_immediate
   engine_mode        	            = var.engine_mode
   skip_final_snapshot	            = var.skip_final_snapshot
-  final_snapshot_identifier       = var.final_snapshot_identifier
+  final_snapshot_identifier       = "${var.vpc_name}-${var.final_snapshot_identifier}"
   backup_retention_period         = var.backup_retention_period
   preferred_backup_window         = var.preferred_backup_window
-  db_cluster_parameter_group_name =  aws_db_parameter_group.aurora_cdis_pg.name
+  db_cluster_parameter_group_name =  aws_rds_cluster_parameter_group.aurora_cdis_pg.name
 
   serverlessv2_scaling_configuration {
     max_capacity = var.serverlessv2_scaling_max_capacity
@@ -67,8 +67,17 @@ AURORACREDS
 
 # generating aurora-creds.json
 resource "local_sensitive_file" "aurora_creds" {
+  count    = var.secrets_manager_enabled ? 0 : 1
   content  = local.aurora-creds-template
   filename = "${path.cwd}/${var.vpc_name}_output/aurora-creds.json"
+}
+
+module "secrets_manager" {
+  count       = var.secrets_manager_enabled ? 1 : 0
+  source      = "../secrets_manager"
+  vpc_name    = var.vpc_name
+  secret      = aws_rds_cluster.postgresql.master_password
+  secret_name = "aurora-master-password"
 }
 
 # See https://www.postgresql.org/docs/9.6/static/runtime-config-logging.html
@@ -78,7 +87,7 @@ locals {
   pg_family_version = replace( var.cluster_engine_version ,"/\\.[0-9]/", "" )
 }
 
-resource "aws_db_parameter_group" "aurora_cdis_pg" {
+resource "aws_rds_cluster_parameter_group" "aurora_cdis_pg" {
   name   = "${var.vpc_name}-aurora-cdis-pg"
   family = "aurora-postgresql${local.pg_family_version}"
 

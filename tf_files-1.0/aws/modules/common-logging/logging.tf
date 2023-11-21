@@ -20,11 +20,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "common_logging_bu
   }
 }
 
-resource "aws_s3_bucket_acl" "common_logging_bucket" {
-  bucket = aws_s3_bucket.common_logging_bucket.id
-  acl    = "private"
-}
-
 resource "aws_s3_bucket_lifecycle_configuration" "common_logging_bucket" {
   bucket = aws_s3_bucket.common_logging_bucket.id
 

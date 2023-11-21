@@ -185,3 +185,24 @@ variable "scale_in_protection" {
   description = "set scale-in protection on ASG"
   default     = false
 }
+
+variable "ci_run" {
+  description = "Don't run local provisioner commands meant for adminvm if running in CI"
+  default     = false
+}
+
+variable "use_asg" {
+  default = true
+} 
+
+variable "use_karpenter" {
+  default = false
+}
+
+variable "karpenter_version" {
+  default = "v0.24.0"
+}
+
+variable "eks_public_access" {
+  default = "true"
+}

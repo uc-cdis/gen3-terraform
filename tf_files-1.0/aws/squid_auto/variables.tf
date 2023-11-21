@@ -13,7 +13,7 @@ variable "ami_account_id" {
 }
 
 variable "image_name_search_criteria" {
-  default = "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"
+  default = "ubuntu/images/hvm-ssd/ubuntu-*-20.04-amd64-server-*"
 }
 
 variable "peering_cidr" {

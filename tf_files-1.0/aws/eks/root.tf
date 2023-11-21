@@ -5,7 +5,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.0"
+      version = "~> 5.0"
     }
   }
 }
@@ -55,4 +55,9 @@ module "eks" {
   fips_ami_kms                     = var.fips_ami_kms
   fips_enabled_ami                 = var.fips_enabled_ami
   availability_zones               = var.availability_zones
+  ci_run                           = var.ci_run
+  use_asg                          = var.use_asg 
+  use_karpenter                    = var.user_karpenter
+  karpernter_version               = var.karpernter_version
+  eks_public_access                = var.eks_public_access
 }

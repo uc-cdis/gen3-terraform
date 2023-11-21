@@ -21,6 +21,7 @@ variable "vpc_subnet_id" {
 }
 
 variable "vpc_cidr_list" {
+  type    = list(string)
   default = ["10.128.0.0/20", "54.0.0.0/8", "52.0.0.0/8"]
 }
 
@@ -40,7 +41,9 @@ variable "image_name_search_criteria" {
   default = "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"
 }
 
-variable "extra_vars" {}
+variable "extra_vars" {
+  type    = list(string)
+}
 
 variable "bootstrap_path" {}
 

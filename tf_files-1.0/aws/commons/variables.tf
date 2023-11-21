@@ -2,6 +2,10 @@ variable "vpc_name" {
   default = "Commons1"
 }
 
+variable "iam_role_name" {
+  default = "csoc_adminvm"
+}
+
 variable "vpc_cidr_block" {
   default = "172.24.17.0/20"
 }
@@ -42,20 +46,24 @@ variable "indexd_db_size" {
   default = 10
 }
 
-variable "db_password_fence" {}
-
-variable "indexd_prefix" {
-  default = "dg.XXXX/"
+variable "db_password_fence" {
+  default = ""
+  sensitive = true
 }
 
-variable "db_password_peregrine" {}
+variable "db_password_peregrine" {
+  default = ""
+  sensitive = true  
+}
 
-variable "db_password_sheepdog" {}
+variable "db_password_sheepdog" {
+  default = ""
+  sensitive = true
+}
 
-variable "db_password_indexd" {}
-
-variable "dictionary_url" {
-  # ex: dev dictionary is at: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
+variable "db_password_indexd" {
+  default = ""
+  sensitive = true
 }
 
 variable "portal_app" {
@@ -95,7 +103,9 @@ variable "hostname" {
   default = "dev.bionimbus.org"
 }
 
-variable "kube_ssh_key" {}
+variable "kube_ssh_key" {
+  default = ""
+}
 
 /* A list of ssh keys that will be added to
    kubernete nodes, Example:
@@ -104,17 +114,22 @@ variable "kube_additional_keys" {
   default = ""
 }
 
-variable "google_client_id" {}
-
-variable "google_client_secret" {}
-
 # 32 alphanumeric characters
-variable "hmac_encryption_key" {}
+variable "hmac_encryption_key" {
+  default = ""
+  sensitive = true
+}
 
-variable "sheepdog_secret_key" {}
+variable "sheepdog_secret_key" {
+  default = ""
+  sensitive = true
+}
 
 # password for write access to indexd
-variable "sheepdog_indexd_password" {}
+variable "sheepdog_indexd_password" {
+  default = ""
+  sensitive = true
+}
 
 #
 # DEPRECATED - should no longer be necessary
@@ -122,10 +137,12 @@ variable "sheepdog_indexd_password" {}
 #
 variable "sheepdog_oauth2_client_id" {
   default = ""
+  sensitive = true
 }
 
 variable "config_folder" {
   # Object folder of user.yaml file - ex: s3://cdis-gen3-users/${config_folder}/user.yaml
+  default = "dev"
 }
 
 #
@@ -134,6 +151,7 @@ variable "config_folder" {
 #
 variable "sheepdog_oauth2_client_secret" {
   default = ""
+  sensitive = true
 }
 
 # id of AWS account that owns the public AMI's
@@ -143,7 +161,7 @@ variable "ami_account_id" {
 
 variable "squid_image_search_criteria" {
   description = "Search criteria for squid AMI look up"
-  default     = "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"
+  default     = "ubuntu/images/hvm-ssd/ubuntu-bionic-20.04-amd64-server-*"
 }
 
 variable "peering_vpc_id" {
@@ -154,11 +172,6 @@ variable "squid-nlb-endpointservice-name" {
   default = "com.amazonaws.vpce.us-east-1.vpce-svc-0ce2261f708539011"
   }
 
-# Path to user.yaml in s3://cdis-gen3-users/CONFIG_FOLDER/user.yaml
-variable "gitops_path" {
-  default = "https://github.com/uc-cdis/cdis-manifest.git"
-}
-
 locals {
   # kube-aws does not like '-' in cluster name
   cluster_name = "${replace(var.vpc_name, "-", "")}"
@@ -166,10 +179,12 @@ locals {
 
 variable "slack_webhook" {
   default = ""
+  sensitive = true
 }
 
 variable "secondary_slack_webhook" {
   default = ""
+  sensitive = true
 }
 
 variable "alarm_threshold" {
@@ -178,6 +193,10 @@ variable "alarm_threshold" {
 
 
 variable "csoc_managed" {
+  default = false
+}
+
+variable "csoc_peering" {
   default = false
 }
 
@@ -401,10 +420,12 @@ variable "indexd_max_allocated_storage" {
 
 variable "activation_id" {
   default = ""
+  sensitive = true
 }
 
 variable "customer_id" {
   default = ""
+  sensitive = true
 }
 
 variable "fips" {
@@ -466,7 +487,7 @@ variable "worker_drive_size" {
 }
 
 variable "eks_version" {
-  default = "1.21"
+  default = "1.25"
 }
 
 variable "workers_subnet_size" {
@@ -597,6 +618,10 @@ variable "deploy_es" {
   default = true
 }
 
+variable "es_name" {
+  default = ""
+}
+
 variable "ebs_volume_size_gb" {
   default = 20
 }
@@ -721,7 +746,7 @@ variable "preferred_backup_window" {
 variable "password_length" {
   type        = number
   description = "The length of the password string"
-  default     = 12
+  default     = 32
 }
 
 variable "deploy_aurora" {
@@ -732,17 +757,16 @@ variable "deploy_rds" {
   default = true
 }
 
-# The minimum amount of on demand nodes
-variable "minimum_on_demand_nodes" {
-  default = 3
-}
+variable "use_asg" {
+  default = true
+} 
 
-variable "enable_spot_instances" {
+variable "use_karpenter" {
   default = false
 }
 
-variable "enable_on_demand_instances" {
-  default = true
+variable "karpenter_version" {
+  default = "v0.24.0"
 }
 
 variable "deploy_cloud_trail" {
@@ -753,3 +777,265 @@ variable "send_logs_to_csoc" {
   default = true
 }
 
+variable "route_table_name" {
+  default = "eks_private"
+}
+
+variable "eks_public_access" {
+  default = "true"
+}
+
+#### helm chart values
+
+variable "deploy_gen3" {
+  default = false
+}
+
+variable "ambassador_enabled" {
+  description = "Enable ambassador"
+  type        = bool
+  default     = true
+}
+
+variable "arborist_enabled" {
+  description = "Enable arborist"
+  type        = bool
+  default     = true
+}
+
+variable "argo_enabled" {
+  description = "Enable argo"
+  type        = bool
+  default     = true
+}
+
+variable "audit_enabled" {
+  description = "Enable audit"
+  type        = bool
+  default     = true
+}
+
+variable "aws-es-proxy_enabled" {
+  description = "Enable aws-es-proxy"
+  type        = bool
+  default     = true
+}
+
+variable "dbgap_enabled" {
+  description = "Enable dbgap sync in the usersync job"
+  type        = bool
+  default     = false
+}
+
+variable "dd_enabled" {
+  description = "Enable datadog"
+  type        = bool
+  default     = false
+}
+
+variable "dictionary_url" {
+  description = "URL to the data dictionary"
+  default     = ""
+}
+
+variable "dispatcher_job_number" {
+  description = "Number of dispatcher jobs"
+  default     = 10
+}
+
+variable "fence_enabled" {
+  description = "Enable fence"
+  type        = bool
+  default     = true
+}
+
+variable "guppy_enabled" {
+  description = "Enable guppy"
+  type        = bool
+  default     = true
+}
+
+variable "hatchery_enabled" {
+  description = "Enable hatchery"
+  type        = bool
+  default     = true
+}
+
+variable "indexd_enabled" {
+  description = "Enable indexd"
+  type        = bool
+  default     = true
+}
+
+variable "indexd_prefix" {
+  description = "Indexd prefix"
+  default     = "dg.XXXX/"
+}
+
+variable "ingress_enabled" {
+  description = "Create ALB ingress"
+  type        = bool
+  default     = true
+}
+
+variable "manifestservice_enabled" {
+  description = "Enable manfiestservice"
+  type        = bool
+  default     = true
+}
+
+variable "metadata_enabled" {
+  description = "Enable metadata"
+  type        = bool
+  default     = true
+}
+
+variable "netpolicy_enabled" {
+  description = "Enable network policy security rules"
+  type        = bool
+  default     = false
+}
+
+variable "peregrine_enabled" {
+  description = "Enable perergrine"
+  type        = bool
+  default     = true
+}
+
+variable "pidgin_enabled" {
+  description = "Enable pidgin"
+  type        = bool
+  default     = true
+}
+
+variable "portal_enabled" {
+  description = "Enable portal"
+  type        = bool
+  default     = true
+}
+
+variable "public_datasets" {
+  description = "whether the datasets are public"
+  type        = bool
+  default     = false
+}
+
+variable "requestor_enabled" {
+  description = "Enable requestor"
+  type        = bool
+  default     = true
+}
+
+variable "revproxy_arn" {
+  description = "ARN for the revproxy cert in ACM"
+  default     = ""
+}
+
+variable "revproxy_enabled" {
+  description = "Enable revproxy"
+  type        = bool
+  default     = true
+}
+
+variable "sheepdog_enabled" {
+  description = "Enable sheepdog"
+  type        = bool
+  default     = true
+}
+
+variable "slack_send_dbgap" {
+  description = "Enable slack message for usersync job"
+  type        = bool
+  default     = false
+}
+
+variable "ssjdispatcher_enabled" {
+  description = "Enable ssjdispatcher"
+  type        = bool
+  default     = true
+}
+
+variable "tier_access_level" {
+  description = "Tier access level for guppy"
+  default     = "private"
+}
+
+variable "tier_access_limit" {
+  description = "value for tier access limit"
+  default     = "100"
+}
+
+variable "usersync_enabled" {
+  description = "Enable usersync cronjob"
+  type        = bool
+  default     = true
+}
+
+variable "usersync_schedule" {
+  description = "Cronjob schedule for usersync"
+  default     = "*/30 * * * *"
+}
+
+variable "useryaml_s3_path" {
+  description = "S3 path to the user.yaml file"
+  default     = "https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json"
+}
+
+variable "wts_enabled" {
+  description = "Enable wts"
+  type        = bool
+  default     = true
+}
+
+variable "fence_config_path" {
+  default = ""
+}
+
+variable "useryaml_path" {
+  default = ""
+}
+
+variable "gitops_path" {
+  default = "https://github.com/uc-cdis/cdis-manifest.git"
+}
+
+variable "google_client_id" {
+  default = ""
+  sensitive = true
+}
+
+variable "google_client_secret" {
+  default = ""
+  sensitive = true
+}
+
+variable "fence_access_key" {
+  default = ""
+  sensitive = true
+}
+
+variable "fence_secret_key" {
+  default = ""
+  sensitive = true
+}
+
+variable "upload_bucket" {
+  default = ""
+}
+
+variable "namespace" {
+  default = "default"
+}
+
+variable "secrets_manager_enabled" {
+  default = false
+}
+
+variable "ci_run" {
+  default = false
+}
+
+variable "commons_log_retention" {
+  description = "value in days for the cloudwatch log retention period"
+  default = "3650"
+}

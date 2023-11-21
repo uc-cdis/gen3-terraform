@@ -1,4 +1,3 @@
-
 #Basics
 
 data "aws_caller_identity" "current" {}
@@ -186,3 +185,5 @@ data "aws_iam_policy_document" "planx-csoc-alerts-topic_access" {
     resources = [var.sns_topic_arn]
   }
 }
+
+data "aws_ecrpublic_authorization_token" "token" {}
