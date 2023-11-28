@@ -109,6 +109,7 @@ variable "rds_instance_storage_encrypted" {
 
 variable "rds_instance_vpc_security_group_ids" {
   description = "List of VPC security groups to associate"
+  type        = list(string)
   default     = []
 }
 
