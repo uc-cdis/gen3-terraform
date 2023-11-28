@@ -26,7 +26,7 @@ data "aws_iam_policy_document" "backup_bucket_access_kms" {
 
   statement {
     actions = ["s3:GetObject","s3:PutObject","s3:ListMultipartUploadParts","s3:AbortMultipartUpload"]
-    resources = ["arn:aws:s3:::${var.rds_instance_backup_bucket_name}"]
+    resources = ["arn:aws:s3:::${var.rds_instance_backup_bucket_name}/*"]
     effect = "Allow"
   }
 }
