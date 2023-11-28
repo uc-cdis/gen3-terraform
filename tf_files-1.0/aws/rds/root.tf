@@ -33,6 +33,7 @@ module "aws_rds" {
   rds_instance_identifier                            = var.rds_instance_identifier
   rds_instance_instance_class                        = var.rds_instance_instance_class
   rds_instance_iops                                  = var.rds_instance_iops
+  rds_instance_throughput                            = var.rds_instance_throughput
   rds_instance_kms_key_id                            = var.rds_instance_kms_key_id
   rds_instance_license_model                         = var.rds_instance_license_model
   rds_instance_maintenance_window                    = var.rds_instance_maintenance_window

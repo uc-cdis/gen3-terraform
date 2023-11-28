@@ -137,7 +137,7 @@ resource "aws_db_instance" "this_mssql" {
   storage_encrypted                     = var.rds_instance_storage_encrypted
   kms_key_id                            = var.rds_instance_kms_key_id
   license_model                         = var.rds_instance_license_model
-  name                                  = var.rds_instance_name
+  db_name                               = var.rds_instance_name
   username                              = var.rds_instance_username
   password                              = var.rds_instance_password == "" ? random_string.randommssql.*.result[count.index] : var.rds_instance_password
   port                                  = var.rds_instance_port

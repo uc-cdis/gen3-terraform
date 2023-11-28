@@ -192,6 +192,11 @@ variable "rds_instance_iops" {
   default     = 0
 }
 
+variable "rds_instance_throughput" {
+  description = "The amount of provisioned throughput."
+  default     = 0
+}
+
 variable "rds_instance_deletion_protection" {
   description = "The database can't be deleted when this value is set to true."
   default     = false
