@@ -1,4 +1,5 @@
 data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
 
 data "aws_iam_policy_document" "enhanced_monitoring" {
   statement {
@@ -14,7 +15,7 @@ data "aws_iam_policy_document" "enhanced_monitoring" {
 data "aws_iam_policy_document" "backup_bucket_access_kms" {
   statement {
     actions = ["kms:DescribeKey","kms:GenerateDataKey","kms:Encrypt","kms:Decrypt"]
-    resources = ["arn:aws:kms:region:${data.aws_caller_identity.current.account_id}:key/${var.rds_instance_backup_kms_key}"]
+    resources = ["arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/${var.rds_instance_backup_kms_key}"]
     effect = "Allow"
   }
 
