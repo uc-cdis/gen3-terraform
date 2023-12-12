@@ -101,7 +101,7 @@ resource "aws_db_instance" "this" {
   iops                                  = var.rds_instance_iops
   publicly_accessible                   = var.rds_instance_publicly_accessible
   monitoring_interval                   = var.rds_instance_monitoring_interval
-  monitoring_role_arn                   = coalesce(var.rds_instance_monitoring_role_arn, join("",aws_iam_role.enhanced_monitoring.*.arn))
+  monitoring_role_arn                   = var.rds_instance_monitoring_interval == 0 ? "" : coalesce(var.rds_instance_monitoring_role_arn, join("",aws_iam_role.enhanced_monitoring.*.arn))
   allow_major_version_upgrade           = var.rds_instance_allow_major_version_upgrade
   auto_minor_version_upgrade            = var.rds_instance_auto_minor_version_upgrade
   apply_immediately                     = var.rds_instance_apply_immediately
@@ -137,7 +137,7 @@ resource "aws_db_instance" "this_mssql" {
   storage_encrypted                     = var.rds_instance_storage_encrypted
   kms_key_id                            = var.rds_instance_kms_key_id
   license_model                         = var.rds_instance_license_model
-  name                                  = var.rds_instance_name
+  db_name                               = var.rds_instance_name
   username                              = var.rds_instance_username
   password                              = var.rds_instance_password == "" ? random_string.randommssql.*.result[count.index] : var.rds_instance_password
   port                                  = var.rds_instance_port
@@ -153,7 +153,7 @@ resource "aws_db_instance" "this_mssql" {
   iops                                  = var.rds_instance_iops
   publicly_accessible                   = var.rds_instance_publicly_accessible
   monitoring_interval                   = var.rds_instance_monitoring_interval
-  monitoring_role_arn                   = coalesce(var.rds_instance_monitoring_role_arn, join("",aws_iam_role.enhanced_monitoring.*.arn))
+  monitoring_role_arn                   = var.rds_instance_monitoring_interval == 0 ? "" : coalesce(var.rds_instance_monitoring_role_arn, join("",aws_iam_role.enhanced_monitoring.*.arn))
   allow_major_version_upgrade           = var.rds_instance_allow_major_version_upgrade
   auto_minor_version_upgrade            = var.rds_instance_auto_minor_version_upgrade
   apply_immediately                     = var.rds_instance_apply_immediately

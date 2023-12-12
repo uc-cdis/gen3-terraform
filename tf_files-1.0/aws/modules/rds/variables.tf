@@ -110,6 +110,7 @@ variable "rds_instance_storage_encrypted" {
 
 variable "rds_instance_vpc_security_group_ids" {
   description = "List of VPC security groups to associate"
+  type        = list(string)
   default     = []
 }
 
@@ -189,6 +190,11 @@ variable "rds_instance_enabled_cloudwatch_logs_exports" {
 
 variable "rds_instance_iops" {
   description = "The amount of provisioned IOPS. Setting this implies a storage_type of 'io1'"
+  default     = 0
+}
+
+variable "rds_instance_throughput" {
+  description = "The amount of provisioned throughput."
   default     = 0
 }
 
