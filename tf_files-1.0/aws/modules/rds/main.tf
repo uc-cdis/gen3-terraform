@@ -111,7 +111,7 @@ resource "aws_db_instance" "this" {
   final_snapshot_identifier             = var.rds_instance_final_snapshot_identifier
   max_allocated_storage                 = var.rds_instance_max_allocated_storage
   performance_insights_enabled          = var.rds_instance_performance_insights_enabled
-  performance_insights_retention_period = var.rds_instance_performance_insights_enabled == true ? var.rds_instance_performance_insights_retention_period : 0
+  performance_insights_retention_period = var.rds_instance_performance_insights_enabled ? var.rds_instance_performance_insights_retention_period : 0
   backup_retention_period               = var.rds_instance_backup_retention_period
   backup_window                         = var.rds_instance_backup_window
   character_set_name                    = var.rds_instance_character_set_name
@@ -163,7 +163,7 @@ resource "aws_db_instance" "this_mssql" {
   final_snapshot_identifier             = var.rds_instance_final_snapshot_identifier
   max_allocated_storage                 = var.rds_instance_max_allocated_storage
   performance_insights_enabled          = var.rds_instance_performance_insights_enabled
-  performance_insights_retention_period = var.rds_instance_performance_insights_enabled == true ? var.rds_instance_performance_insights_retention_period : 0
+  performance_insights_retention_period = var.rds_instance_performance_insights_enabled ? var.rds_instance_performance_insights_retention_period : 0
   backup_retention_period               = var.rds_instance_backup_retention_period
   backup_window                         = var.rds_instance_backup_window
   timezone                              = var.rds_instance_timezone
