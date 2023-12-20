@@ -155,7 +155,7 @@ resource "aws_imagebuilder_image_pipeline" "nextflow" {
   distribution_configuration_arn = aws_imagebuilder_distribution_configuration.public_ami.arn
   
   image_scanning_configuration {
-    image_scanning_enabled = true
+    image_scanning_enabled = var.image_scanning_enabled
   }
 
 }

@@ -13,6 +13,11 @@ variable "base_image" {
   default = "arn:aws:imagebuilder:us-east-1:aws:image/amazon-linux-2-ecs-optimized-kernel-5-x86/x.x.x"
 }
 
+variable image_scanning_enabled {
+  type = bool
+  default = true
+}
+
 variable "user_data" {
   type = string
   default = <<EOT
