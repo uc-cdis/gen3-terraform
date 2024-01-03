@@ -18,21 +18,21 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "amazon_ssm" {
-  role       = aws_iam_role.image_builder
+  role       = aws_iam_role.image_builder.arn
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_role_policy_attachment" "image_builder" {
-  role       = aws_iam_role.image_builder
+  role       = aws_iam_role.image_builder.arn
   policy_arn = "arn:aws:iam::aws:policy/EC2InstanceProfileForImageBuilder"
 }
 
 resource "aws_iam_role_policy_attachment" "image_builder_ecr" {
-  role       = aws_iam_role.image_builder
+  role       = aws_iam_role.image_builder.arn
   policy_arn = "arn:aws:iam::aws:policy/EC2InstanceProfileForImageBuilderECRContainerBuilds"
 }
 
 resource "aws_iam_instance_profile" "image_builder" {
   name = "image-builder-profile"
-  role = aws_iam_role.image_builder
+  role = aws_iam_role.image_builder.arn
 }
