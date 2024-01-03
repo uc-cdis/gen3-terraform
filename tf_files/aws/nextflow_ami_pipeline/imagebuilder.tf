@@ -1,21 +1,10 @@
 ## Image builder component to install AWS cli using conda
 
-locals {
-  aws_imagebuilder_component_install_software = data.aws_imagebuilder_component.install_software == null ? aws_imagebuilder_component.install_software[0].arn : data.aws_imagebuilder_component.install_software.arn
-}
-
-# Data to get aws account id
-data "aws_caller_identity" "current" {}
-
-data "aws_imagebuilder_component" "install_software" {
-  arn = "arn:aws:imagebuilder:us-east-1:${data.aws_caller_identity.current.account_id}:component/installsoftware/1.0.1/1"
-}
-
 resource "aws_imagebuilder_component" "install_software" {
   count = data.aws_imagebuilder_component.install_software.id == null ? 1 : 0
-  name     = "InstallSoftware"
+  name     = "${var.pipeline_name}-InstallSoftware"
   platform = "Linux"
-  version  = "1.0.1"
+  version  = "1.0.0"
 
   data = yamlencode({
     name        = "InstallSoftware"
@@ -93,7 +82,7 @@ resource "aws_imagebuilder_component" "install_software" {
 
 ## Image builder infrastructure config 
 resource "aws_imagebuilder_infrastructure_configuration" "image_builder" {
-  name = "nextflow-infra-config"
+  name = "${var.pipeline_name}-infra-config"
   instance_profile_name = aws_iam_instance_profile.image_builder.name
   security_group_ids = [data.aws_security_group.default.id]    
   subnet_id = data.aws_subnet.private.id
@@ -104,7 +93,7 @@ resource "aws_imagebuilder_infrastructure_configuration" "image_builder" {
 ## Make sure the ami produced is public
 
 resource "aws_imagebuilder_distribution_configuration" "public_ami" {
-  name = "public-ami-distribution"
+  name = "${var.pipeline_name}-dist-config"
 
   distribution {    
     ami_distribution_configuration {
@@ -126,11 +115,11 @@ resource "aws_imagebuilder_distribution_configuration" "public_ami" {
 
 ## Image recipe 
 resource "aws_imagebuilder_image_recipe" "recipe" {
-  name = var.recipe_name
+  name = "${var.pipeline_name}-recipe"
   
   parent_image = var.base_image 
 
-  version = var.recipe_version
+  version = "1.0.0"
   
   block_device_mapping {
     device_name = "/dev/xvda"
@@ -150,10 +139,8 @@ resource "aws_imagebuilder_image_recipe" "recipe" {
   }
 
   component {
-    component_arn = local.aws_imagebuilder_component_install_software
+    component_arn = aws_imagebuilder_component.install_software.arn
   }
-
-  
   
 }
 
