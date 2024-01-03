@@ -20,32 +20,20 @@ variable "ssl_certificate_id" {
   default = "AWS-CERTIFICATE-ID"
 }
 
-variable "dictionary_url" {
-  # ex: https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json
-}
-
-variable "portal_app" {
-  # configuration key for data-portal - ex: dev, bloodpac, ...  #
-}
-
-variable "config_folder" {
-  # Object folder of user.yaml file - ex: s3://cdis-gen3-users/${config_folder}/user.yaml
-}
-
 # legacy oauth client setup for sheepdog as an oauth client to fence
-variable "gdcapi_oauth2_client_id" {
+variable "sheepdog_oauth2_client_id" {
   default = "deprecated"
 }
 
-variable "gdcapi_oauth2_client_secret" {
+variable "sheepdog_oauth2_client_secret" {
   default = "deprecated"
 }
 
-variable "gdcapi_indexd_password" {
-  # indexd basic-auth password for `gdcapi` indexd user
+variable "sheepdog_indexd_password" {
+  # indexd basic-auth password for `sheepdog` indexd user
 }
 
-variable "gdcapi_secret_key" {
+variable "sheepdog_secret_key" {
   # FLASK_SECRET_KEY thing - don't know why we have flask sessions
 }
 
@@ -87,42 +75,25 @@ variable "db_indexd_username" {
 variable "db_indexd_address" {}
 
 variable "db_sheepdog_password" {
-  # password for sheepdog user to shared gdcapi db
+  # password for sheepdog user to shared sheepdog db
 }
 
 variable "db_peregrine_password" {
-  # password for peregrine user to shared gdcapi db
+  # password for peregrine user to shared sheepdog db
 }
 
-variable "db_gdcapi_username" {
-  #
-  # legacy commons have a separate gdcapi db user
-  # that was used by the gdcapi service, and owns
-  # the gdcapi db
-  #
+variable "db_sheepdog_username" {
   default = "sheepdog"
 }
 
-variable "db_gdcapi_password" {
-  #
-  # legacy commons have a separate gdcapi db user
-  # that was used by the gdcapi service, and owns
-  # the gdcapi db
-  #
-  default = ""
+variable "db_sheepdog_name" {
+  default = "sheepdog"
 }
 
-variable "db_gdcapi_name" {
-  #
-  # Sheepdog and peregrine both share the same `gdcapi`
-  # database (there used to be just one gdcapi service).
-  # Really should always be `gdcapi`, but might be some
-  # old commons with a different name
-  #
-  default = "gdcapi"
-}
+variable "db_sheepdog_address" {}
 
-variable "db_gdcapi_address" {}
+variable "db_peregrine_address" {}
+
 
 variable "aws_user_key" {}
 
@@ -134,9 +105,13 @@ variable "indexd_prefix" {}
 variable "mailgun_api_key" {}
 
 variable "mailgun_smtp_host" {
-    default = "smtp.mailgun.org"
+  default = "smtp.mailgun.org"
 }
 
 variable "mailgun_api_url" {
-    default = "https://api.mailgun.net/v3/"
+  default = "https://api.mailgun.net/v3/"
+}
+
+variable "gitops_path" {
+  default = "https://github.com/uc-cdis/cdis-manifest.git"
 }

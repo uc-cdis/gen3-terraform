@@ -1,4 +1,9 @@
+
 variable "vpc_name" {}
+
+variable "vpc_id" {
+  default = ""
+}
 
 variable "ec2_keyname" {
   default = "someone@uchicago.edu"
@@ -30,12 +35,13 @@ variable "peering_vpc_id" {
 
 variable "users_policy" {}
 
+
 variable "worker_drive_size" {
   default = 30
 }
 
 variable "eks_version" {
-  default = "1.21"
+  default = "1.16"
 }
 
 variable "workers_subnet_size" {
@@ -117,6 +123,11 @@ variable "deploy_workflow" {
   default     = false
 }
 
+variable "deploy_jupyter" {
+  description = "Deploy workflow nodepool?"
+  default     = true
+}
+
 variable "dual_proxy" {
   description = "Single instance and HA"
   default     = false
@@ -129,7 +140,6 @@ variable "single_az_for_jupyter" {
 
 variable "oidc_eks_thumbprint" {
   description = "Thumbprint for the AWS OIDC identity provider"
-  type        = "list"
   default     = ["9e99a48a9960b14926bb7f3b02e22da2b0ab7280"]
 }
 
@@ -147,33 +157,52 @@ variable "customer_id" {
 }
 
 # This controls whether or not we use FIPS enabled AMI's
-
 variable "fips" {
   default = false
 }
 
 # the key that was used to encrypt the FIPS enabled AMI
 # This is needed to ASG can decrypt the ami 
-
 variable "fips_ami_kms" {
   default = "arn:aws:kms:us-east-1:707767160287:key/mrk-697897f040ef45b0aa3cebf38a916f99"
 }
 
 # This is the FIPS enabled AMI in cdistest account.
-
 variable "fips_enabled_ami" {
-  default = "ami-074d352c8e753fc93"
+  default = "ami-0de87e3680dcb13ec"
 }
 
 variable "availability_zones" {
   description = "AZ to be used by EKS nodes"
-  type        = "list"
   default     = ["us-east-1a", "us-east-1c", "us-east-1d"]
 }
 
-variable "secondary_availability_zones" {
-  description = "AZ to be used by EKS nodes in the secondary subnet"
-  type        = "list"
-  default     = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d"]
+variable "deploy_eks" {
+  default = true
 }
 
+variable "scale_in_protection" {
+  description = "set scale-in protection on ASG"
+  default     = false
+}
+
+variable "ci_run" {
+  description = "Don't run local provisioner commands meant for adminvm if running in CI"
+  default     = false
+}
+
+variable "use_asg" {
+  default = true
+} 
+
+variable "use_karpenter" {
+  default = false
+}
+
+variable "karpenter_version" {
+  default = "v0.24.0"
+}
+
+variable "eks_public_access" {
+  default = "true"
+}

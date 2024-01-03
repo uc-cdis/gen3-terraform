@@ -19,3 +19,7 @@ variable "s3_bucket" {
 variable "key_name" {
   default = ""
 }
+
+variable "organization_name" {
+  default = "Basic Services"
+}

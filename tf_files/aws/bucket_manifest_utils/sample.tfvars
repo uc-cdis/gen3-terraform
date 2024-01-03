@@ -39,6 +39,3 @@ lambda_function_security_groups = []
 
 #List of subnets for the lambda function with a vpc
 lambda_function_subnets_id = []
-
-
-

@@ -1,5 +1,3 @@
-#Automatically generated from a corresponding variables.tf on 2022-07-13 11:07:41.300390
-
 #ID of the account that will own the NLB
 aws_account_id = "433568766270"
 
@@ -42,4 +40,4 @@ csoc_cidr = "10.128.0.0/20"
 
 #The ARNs of one or more principals allowed to discover the endpoint service. For more information on the endpoint service,
 #see: https://docs.aws.amazon.com/vpc/latest/privatelink/privatelink-share-your-services.html
-allowed_principals_list = ["arn:aws:iam::707767160287:root"]
+allowed_principals_list = ["arn:aws:iam::707767160287:root"] 

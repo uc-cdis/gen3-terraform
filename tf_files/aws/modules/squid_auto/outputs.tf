@@ -1,5 +1,3 @@
-#output "squid_nlb_dns_name" {
-#  value = "${aws_lb.squid_nlb.dns_name}"
-#}
-
-
+output "squid_auto-name" {
+  value = aws_autoscaling_group.squid_auto.name
+}

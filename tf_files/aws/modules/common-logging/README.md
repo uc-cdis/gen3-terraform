@@ -4,7 +4,7 @@ Centralize logging for all commons in other AWS accounts
 
 ## 1. QuickStart
 
-```
+```bash
 gen3 workon csoc <commons account>
 ```
 
@@ -19,12 +19,9 @@ gen3 workon csoc <commons account>
   - [4.1 Required Variables](#41-required-variables)
   - [4.2 Optional Variables](#42-optional-variables)
 
-
 ## 2. Overview
 
 The CSOC account is conceptualized to represent a centralized management account for all commons account. The commons account, conceptually, would act like child accounts for CSOC.
-
-
 
 ## 3. Centralized logging
 
@@ -38,14 +35,13 @@ Additionally, logs are also sent to ElasticSearch and S3 simultaneously. Elastic
 
 [Figure 1] Image of workflow reflects how the logs are sent from different accounts into the CSOC account and how the process is.
 
-
 ### 3.1 How it works
 
 When logs come in through the data stream service, it comes base64 encoded and zipped. We need to process it before sending it to ElasticSearch, otherwise it won't be properly interpreted and ultimately won't be inserted and create an index.
 
 An example on what is received:
 
-```
+```json
 {
   "Records": [
     {
@@ -83,7 +79,7 @@ When data comes in, it's in form of Records, which is basically an array (list i
 - eventID - an Id given by kinesis which also add the shardID in use.
 - eventVersion - self explanatory.
 - kinesis - this is what actually comes in from the other account.
-  - approximateArrivalTimestamp	- timestamp when the stream reaches Kinesis.
+  - approximateArrivalTimestamp - timestamp when the stream reaches Kinesis.
   - partitionKey - yet another key value, not really helpful.
   - data - the data we want to decode and actually log into ES/S3
   - kinesisSchemaVersion - yet another version
@@ -105,7 +101,7 @@ For more deep info of what comes in and how it is formatted, please checkout the
 | child_account_id | Account id where the subscription filter lives | string |
 | common_name | Name of the commons | string |
 
-### 4.2 Optional Variables 
+### 4.2 Optional Variables
 
 | Name | Description | Type | Default |
 |------|-------------|:----:|:-----:|
@@ -117,4 +113,3 @@ For more deep info of what comes in and how it is formatted, please checkout the
 | slack_webhook | Where to send alerts | string | "" |
 | timeout | Timeout threshold for the lambda function to wait before exiting | number | 300 |
 | memory_size | Memory allocation for the lambda function | number | 128 |
-

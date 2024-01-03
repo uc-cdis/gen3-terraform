@@ -1,19 +1,17 @@
-#Automatically generated from a corresponding variables.tf on 2022-07-13 15:41:28.272806
-
 #ID of the AWS account that owns the public AMIs
-#TODO Figure out what this means
+#TODO Figure out what this actually means
 ami_account_id = "099720109477"
 
 #Account ID of where the VM would be spun up. By default we use CSOC's.
 aws_account_id = "433568766270"
 
-#What AWS region to deploy this VM in
+#The AWS region to spin up this resource in
 aws_region = "us-east-1"
 
-#The ID of the VPC to deploy this VM in
+#The ID of the VPC to spin up this resource in
 vpc_id = "vpc-e2b51d99"
 
-#The ID of the subnet to deploy this VM in
+#The ID of the subnet to spin up this resource in
 vpc_subnet_id = "subnet-6127013c"
 
 #List of CIDRs to overpass the proxy
@@ -28,58 +26,35 @@ environment = "CSOC"
 
 #The EC2 instance type to use for VM(s) spun up from this module. For more information on EC2 instance types, see:
 #https://aws.amazon.com/ec2/instance-types/
-instance_type = "t2.micro"
+instance_type = "t3.micro"
 
-#The EC2 instance type to use for VM(s) spun up from this module. For more information on EC2 instance types, see:
-#https://aws.amazon.com/ec2/instance-types/
-image_name_search_criteria = "ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-2018*"
+#A filter to apply against the names of AMIs when searching. We search, rather than specifying a specific image,
+#to ensure that all of the latest security updates are present.
+image_name_search_criteria = "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"
 
+#Extra variables that can be applied
 extra_vars = ["hostname=stuff","accountid=34534534534"]
 
-#The full name of the directory in which the bootstrap script is located
+#The directory in which the bootstrap script is located
 bootstrap_path = "cloud-automation/flavors/nginx/"
 
 #The name of the bootstrap script
 bootstrap_script = "es_revproxy.sh"
 
-#The name given to the VM in AWS
+#The name to be given to this VM
 vm_name = "nginx_server"
 
-#The hostname given to the Vm
+#The hostname to be given to this VM
 vm_hostname = "csoc_nginx_server"
 
 #If the VM will be behind a proxy
 proxy = true
 
-#The location of a file that has all the keys authorized to access this VM
+#A file containing keys authorized to access this VM
 authorized_keys = "files/authorized_keys/ops_team"
 
-#The name of the organization, used for tracking and tagging in AWS
+#The name of the organization, used for tagging and tracking in AWS
 organization_name = "Basic Service"
 
-#The branch of cloud-automation to use for this VM
+#The branch of the repo to use
 branch = "master"
-
-#A policy to allow the user to pull log events
-user_policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "logs:PutLogEvents"
-      ],
-      "Effect": "Allow",
-      "Resource": ["*"],
-      "Sid": ""
-    }
-  ]
-}
-POLICY
-
-#Used for Qualys monitoring
-activation_id = ""
-
-#Used for Qualys monitoring
-customer_id = ""
-

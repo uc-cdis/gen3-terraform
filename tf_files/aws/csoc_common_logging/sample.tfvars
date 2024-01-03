@@ -32,4 +32,3 @@ timeout = 300
 
 #Memory allocation for the Lambda function, in MB
 memory_size = 512
-

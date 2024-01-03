@@ -1,5 +1,3 @@
-#Automatically generated from a corresponding variables.tf on 2022-07-13 12:13:48.803420
-
 #The first octet (number) of the CIDR block for this VPC
 env_vpc_octet1 = "10"
 
@@ -42,4 +40,3 @@ bootstrap_path = "cloud-automation/flavors/squid_nlb/"
 
 #The name of the bootstrap script
 bootstrap_script = "squidvm.sh"
-

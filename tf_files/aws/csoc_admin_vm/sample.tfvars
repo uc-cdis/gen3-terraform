@@ -1,5 +1,3 @@
-#Automatically generated from a corresponding variables.tf on 2022-07-12 11:45:02.625524
-
 #ID of AWS account the owns the public AMIs
 #TODO Figure out what this means
 ami_account_id = "707767160287"
@@ -34,4 +32,4 @@ vpc_cidr_list= ""
 
 #The name of an AWS SSH key pair to attach to EC2 instances. For more information,
 #see https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html
-ssh_key_name= ""
+ssh_key_name= "" 

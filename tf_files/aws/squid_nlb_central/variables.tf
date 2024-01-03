@@ -15,7 +15,6 @@ variable "env_nlb_name" {
 }
 
 # id of AWS account that owns the public AMI's
-
 variable "ami_account_id" {
   default = "099720109477"
 }
@@ -33,18 +32,15 @@ variable "env_pub_subnet_routetable_id" {
 }
 
 # name of aws_key_pair ssh key to attach to VM's
-
 variable "ssh_key_name" {
   default = "rarya_id_rsa"
 }
 
 variable "allowed_principals_list" {
-  type = "list"
   default = ["arn:aws:iam::707767160287:root"]
 }
 
 ## variable for the bootstrap 
-
 variable "bootstrap_path" {
   default = "cloud-automation/flavors/squid_nlb_central/"
 }
@@ -53,11 +49,4 @@ variable "bootstrap_script" {
   default = "squidvm.sh"
 }
 
-variable "csoc_internal_dns_zone_id"{
-  #default = "ZA1HVV5W0QBG1"
-}
-
-
-
-
-
+variable "csoc_internal_dns_zone_id"{}

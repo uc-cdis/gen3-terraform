@@ -1,5 +1,3 @@
-#Automatically generated from a corresponding variables.tf on 2022-07-12 13:47:23.877126
-
 #The VPC this EKS cluster should be spun up
 vpc_name= ""
 
@@ -122,8 +120,10 @@ fips = false
 fips_ami_kms = "arn:aws:kms:us-east-1:707767160287:key/mrk-697897f040ef45b0aa3cebf38a916f99"
 
 #This is the FIPS enabled AMI in cdistest account
-fips_enabled_ami = "ami-074d352c8e753fc93"
+fips_enabled_ami = "ami-0de87e3680dcb13ec"
 
 #A list of AZs to be used by EKS nodes
 availability_zones = ["us-east-1a", "us-east-1c", "us-east-1d"]
 
+#This determines if the ASG has scale-in protection enabled
+scale_in_protection = false
