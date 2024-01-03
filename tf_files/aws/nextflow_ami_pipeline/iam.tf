@@ -33,6 +33,6 @@ resource "aws_iam_role_policy_attachment" "image_builder_ecr" {
 }
 
 resource "aws_iam_instance_profile" "image_builder" {
-  name = "image-builder-profile"
+  name = "${var.pipeline_name}-image-builder-profile"
   role = aws_iam_role.image_builder.name
 }
