@@ -1,7 +1,7 @@
 ## Image builder component to install AWS cli using conda
 
 locals {
-  aws_imagebuilder_component_install_software = data.aws_imagebuilder_component.install_software == null ? aws_imagebuilder_component.install_software[*].name : data.aws_imagebuilder_component.install_software.name
+  aws_imagebuilder_component_install_software = data.aws_imagebuilder_component.install_software == null ? aws_imagebuilder_component.install_software[0].name : data.aws_imagebuilder_component.install_software.name
 }
 
 # Data to get aws account id
