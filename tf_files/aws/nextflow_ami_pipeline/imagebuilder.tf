@@ -1,5 +1,11 @@
 ## Image builder component to install AWS cli using conda
 
+data "aws_ssm_parameter" "ecs_optimized_ami_id" {
+  count = var.enable_ssm_fetch ? 1 : 0
+  name  = var.ssm_parameter_name
+}
+
+
 resource "aws_imagebuilder_component" "install_software" {
   name     = "${var.pipeline_name}-InstallSoftware"
   platform = "Linux"
@@ -116,7 +122,7 @@ resource "aws_imagebuilder_distribution_configuration" "public_ami" {
 resource "aws_imagebuilder_image_recipe" "recipe" {
   name = "${var.pipeline_name}-recipe"
   
-  parent_image = var.base_image 
+  parent_image = var.enable_ssm_fetch ? data.aws_ssm_parameter.ecs_optimized_ami_id[0].value : var.base_image 
 
   version = "1.0.0"
   

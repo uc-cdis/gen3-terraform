@@ -18,6 +18,16 @@ variable image_scanning_enabled {
   default = true
 }
 
+variable "enable_ssm_fetch" {
+  description = "Enable fetching SSM parameter"
+  type        = bool
+}
+
+variable ssm_parameter_name {
+  description = "SSM parameter name"
+  type        = string
+  default     = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"
+}
 
 variable pipeline_name {
   type = string
