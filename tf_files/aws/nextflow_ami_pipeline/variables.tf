@@ -20,6 +20,7 @@ variable image_scanning_enabled {
 
 variable "enable_ssm_fetch" {
   description = "Enable fetching SSM parameter"
+  default = false
   type        = bool
 }
 
