@@ -1,7 +1,7 @@
 ## IAM Instance Profile for image builder
 
 locals {
-  image_builder_iam_role = data.aws_iam_role.existing_image_builder == null ? aws_iam_role[count.index].image_builder.name : data.aws_iam_role.existing_image_builder.name
+  image_builder_iam_role = data.aws_iam_role.existing_image_builder == null ? aws_iam_role.image_builder[count.index].name : data.aws_iam_role.existing_image_builder.name
 }
 
 # Attempt to fetch the existing IAM role
