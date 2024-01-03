@@ -18,10 +18,6 @@ variable image_scanning_enabled {
   default = true
 }
 
-variable imagebuilder_instance_profilename {
-  type = string
-  default = "EC2InstanceProfileForImageBuilder-nextflow"
-}
 
 variable pipeline_name {
   type = string
