@@ -1,7 +1,7 @@
 ## Image builder component to install AWS cli using conda
 
 locals {
-  aws_imagebuilder_component_install_software = data.aws_imagebuilder_component.install_software == null ? aws_imagebuilder_component.install_software.name : data.aws_imagebuilder_component.install_software.name
+  aws_imagebuilder_component_install_software = data.aws_imagebuilder_component.install_software == null ? aws_imagebuilder_component[count.index].install_software.name : data.aws_imagebuilder_component.install_software.name
 }
 
 data "aws_imagebuilder_component" "install_software" {
@@ -9,6 +9,7 @@ data "aws_imagebuilder_component" "install_software" {
 }
 
 resource "aws_imagebuilder_component" "install_software" {
+  count = data.aws_imagebuilder_component.install_software.id == null ? 1 : 0
   name     = "InstallSoftware"
   platform = "Linux"
   version  = "1.0.1"
