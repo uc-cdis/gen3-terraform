@@ -1,7 +1,6 @@
 ## Image builder component to install AWS cli using conda
 
 resource "aws_imagebuilder_component" "install_software" {
-  count = data.aws_imagebuilder_component.install_software.id == null ? 1 : 0
   name     = "${var.pipeline_name}-InstallSoftware"
   platform = "Linux"
   version  = "1.0.0"
