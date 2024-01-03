@@ -2,7 +2,7 @@
 
 # Conditionally create the IAM role if it does not already exist
 resource "aws_iam_role" "image_builder" {
-  name               = var.imagebuilder_instance_profilename
+  name               = "${var.pipeline_name}-image-builder-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json 
 }
 
