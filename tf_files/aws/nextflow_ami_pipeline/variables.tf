@@ -18,6 +18,26 @@ variable image_scanning_enabled {
   default = true
 }
 
+variable pipeline_name {
+  type = string
+  default = "nextflow-fips"
+}
+
+variable recipe_name {
+  type = string
+  default = "nextflow-fips-recipe"
+}
+
+variable recipe_version {
+  type = string
+  default = "1.0.0"
+}
+
+variable public_ami_name {
+  type = string
+  default = "gen3-nextflow-{{ imagebuilder:buildDate }}"
+}
+
 variable "user_data" {
   type = string
   default = <<EOT

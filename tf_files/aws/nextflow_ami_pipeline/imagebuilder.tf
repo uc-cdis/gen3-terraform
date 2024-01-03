@@ -1,5 +1,13 @@
 ## Image builder component to install AWS cli using conda
 
+locals {
+  aws_imagebuilder_component_install_software = data.aws_imagebuilder_component.install_software == null ? aws_imagebuilder_component.install_software.name : data.aws_imagebuilder_component.install_software.name
+}
+
+data "aws_imagebuilder_component" "install_software" {
+  name = "InstallSoftware"
+}
+
 resource "aws_imagebuilder_component" "install_software" {
   name     = "InstallSoftware"
   platform = "Linux"
@@ -96,7 +104,7 @@ resource "aws_imagebuilder_distribution_configuration" "public_ami" {
 
   distribution {    
     ami_distribution_configuration {
-      name = "gen3-nextflow-{{ imagebuilder:buildDate }}"
+      name = var.public_ami_name
 
       ami_tags = {
         Role = "Public Image"
@@ -114,11 +122,11 @@ resource "aws_imagebuilder_distribution_configuration" "public_ami" {
 
 ## Image recipe 
 resource "aws_imagebuilder_image_recipe" "recipe" {
-  name = "nextflow-fips-recipe"
+  name = var.recipe_name
   
   parent_image = var.base_image 
 
-  version = "1.0.0"
+  version = var.recipe_version
   
   block_device_mapping {
     device_name = "/dev/xvda"
@@ -132,12 +140,13 @@ resource "aws_imagebuilder_image_recipe" "recipe" {
 
   user_data_base64 = try(base64encode(var.user_data), null)
 
+  # TODO: Do we need this? ECS optimized should come with docker
   component {
     component_arn = "arn:aws:imagebuilder:us-east-1:aws:component/docker-ce-linux/1.0.0/1"
   }
 
   component {
-    component_arn = aws_imagebuilder_component.install_software.arn
+    component_arn = local.aws_imagebuilder_component_install_software
   }
 
   
@@ -150,7 +159,7 @@ resource "aws_imagebuilder_image_recipe" "recipe" {
 resource "aws_imagebuilder_image_pipeline" "nextflow" {
   image_recipe_arn                 = aws_imagebuilder_image_recipe.recipe.arn
   infrastructure_configuration_arn = aws_imagebuilder_infrastructure_configuration.image_builder.arn
-  name                             = "nextflow-fips"
+  name                             = var.pipeline_name
 
   distribution_configuration_arn = aws_imagebuilder_distribution_configuration.public_ami.arn
   
