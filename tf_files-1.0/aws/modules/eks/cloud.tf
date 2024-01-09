@@ -232,7 +232,7 @@ resource "aws_route" "public_access" {
   count                  = var.ha_squid ? var.dual_proxy ? 1 : 0 : 1
   destination_cidr_block = "0.0.0.0/0"
   route_table_id         = aws_route_table.eks_private.id
-  network_interface_id   = data.aws_instances.squid_proxy[count.index].ids
+  network_interface_id   = data.aws_instances.squid_proxy[0].ids[0]
 }
 
 resource "aws_route_table_association" "private_kube" {
