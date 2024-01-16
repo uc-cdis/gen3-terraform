@@ -1,5 +1,4 @@
 # id of AWS account that owns the public AMI's
-
 variable "ami_account_id" {
   # by default lets use canonical stuff only
   default = "099720109477"
@@ -22,12 +21,11 @@ variable "vpc_subnet_id" {
 }
 
 variable "vpc_cidr_list" {
-  type = list
+  type    = list(string)
   default = ["10.128.0.0/20", "54.0.0.0/8", "52.0.0.0/8"]
 }
 
 # name of aws_key_pair ssh key to attach to VM's
-
 variable "ssh_key_name" {
 }
 
@@ -40,29 +38,20 @@ variable "instance_type" {
 }
 
 variable "image_name_search_criteria" {
-  default = "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-2022*"
+  default = "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"
 }
 
 variable "extra_vars" {
-  type = list
-  #default = ["hostname=stuff","accountid=34534534534"]
+  type    = list(string)
 }
 
-variable "bootstrap_path" {
-  #default = "cloud-automation/flavors/nginx/"
-}
+variable "bootstrap_path" {}
 
-variable "bootstrap_script" {
-  #default = "es_revproxy.sh"
-}
+variable "bootstrap_script" {}
 
-variable "vm_name" {
-  #default = "nginx_server"
-}
+variable "vm_name" {}
 
-variable "vm_hostname" {
-  #default = "csoc_nginx_server"
-}
+variable "vm_hostname" {}
 
 variable "proxy" {
   default = true

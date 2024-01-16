@@ -1,12 +1,8 @@
 
 variable "vpc_name" {}
 
-variable "slack_webhook" {
+variable "vpc_id" {
   default = ""
-}
-
-variable "secondary_slack_webhook" {
-  default  = ""
 }
 
 variable "instance_type" {
@@ -38,4 +34,8 @@ variable "es_version" {
 variable "es_linked_role" {
   description = "Whether or no to deploy a linked roll for ES"
   default     = true
+}
+
+variable "deploy_es" {
+  default = true
 }

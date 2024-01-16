@@ -1,5 +1,3 @@
-#Automatically generated from a corresponding variables.tf on 2022-07-12 16:47:21.465202
-
 #Whether to create this resource or not?
 rds_instance_create = true
 
@@ -153,4 +151,3 @@ rds_instance_backup_kms_key = ""
 
 #The bucket to send bacups to
 rds_instance_backup_bucket_name = ""
-

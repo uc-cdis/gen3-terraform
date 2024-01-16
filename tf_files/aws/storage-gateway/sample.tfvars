@@ -1,5 +1,3 @@
-#Automatically generated from a corresponding variables.tf on 2022-07-13 12:22:29.434675
-
 #The name of the VPC this storage gateway will be spun up on
 vpc_name= ""
 
@@ -19,4 +17,3 @@ s3_bucket = ""
 #The name of an AWS SSH key pair to attach to EC2 instances. For more information,
 #see https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html
 key_name = ""
-

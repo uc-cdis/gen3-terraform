@@ -2,4 +2,4 @@
 access_url  = ""
 
 #The ARN to an Amazon ACM-managed certificate
-access_cert = ""
+access_cert = "" 

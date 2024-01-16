@@ -10,4 +10,4 @@ data:
   logs_bucket: ${logs_bucket}
   # Set up hook at https://yourslack.slack.com/apps/manage/custom-integrations
   slack_webhook: 'None'
-  gitops_path: "https://github.com/uc-cdis/cdis-manifest.git"
+  gitops_path: ${gitops_path}

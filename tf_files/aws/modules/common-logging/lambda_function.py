@@ -251,8 +251,6 @@ def nice_it(r_data):
     return individuals
     
 
-
-
 def handler(event, context):
     if os.environ.get('stream_name') is not None:
         client = boto3.client('firehose')
@@ -271,7 +269,7 @@ def handler(event, context):
                     if os.environ.get('es') is True:
                         client.put_record_batch(DeliveryStreamName=os.environ['stream_name']+'_to_es', Records=message_batch)
                     if os.environ.get('s3') is True:
-                        client.put_record_batch(DeliveryStreamName=os.environ['stream_name']+'_to_s3', Records=message_batch)
+                        client.put_record_batch(DeliveryStreamName=os.environ['stream_name']+'_to_s3', Records=message_batch)                        
                 else:
                     #return message_batch
                     output += str(message_batch)

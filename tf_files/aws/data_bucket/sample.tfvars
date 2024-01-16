@@ -10,4 +10,3 @@ environment= ""
 #Using this module to create another bucket in the same "environment" with a nonzero count for this variable will 
 #result in an error because aspects of the cloud trail will already exist.
 cloud_trail_count = "1"
-

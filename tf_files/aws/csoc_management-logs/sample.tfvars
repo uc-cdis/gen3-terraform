@@ -9,4 +9,3 @@ elasticsearch_domain = "commons-logs"
 
 #The S3 bucket used to store logs
 log_bucket_name = "management-logs-remote-accounts"
-

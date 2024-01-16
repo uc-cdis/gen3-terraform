@@ -1,5 +1,12 @@
-
 variable "vpc_name" {}
+
+variable "vpc_id" {
+  default = ""
+}
+
+variable "csoc_account_id" {
+  default = "433568766270"
+}
 
 variable "ec2_keyname" {
   default = "someone@uchicago.edu"
@@ -36,7 +43,7 @@ variable "worker_drive_size" {
 }
 
 variable "eks_version" {
-  default = "1.16"
+  default = "1.25"
 }
 
 variable "workers_subnet_size" {
@@ -109,20 +116,12 @@ variable "iam-serviceaccount" {
 
 variable "oidc_eks_thumbprint" {
   description = "Thumbprint for the AWS OIDC identity provider"
-  type        = "list"
   default     = ["9e99a48a9960b14926bb7f3b02e22da2b0ab7280"]
 }
 
 variable "availability_zones" {
   description = "AZ to be used by EKS nodes"
-  type        = "list"
   default     = ["us-east-1a", "us-east-1c", "us-east-1d"]
-}
-
-variable "secondary_availability_zones" {
-  description = "AZ to be used by EKS nodes in the secondary subnet"
-  type        = "list"
-  default     = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d"]
 }
 
 variable "domain_test" {
@@ -140,9 +139,18 @@ variable "deploy_workflow" {
   default     = false
 }
 
+variable "secondary_availability_zones" {
+  description = "AZ to be used by EKS nodes in the secondary subnet"
+  default     = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d"]
+}
+
+variable "deploy_jupyter" {
+  description = "Deploy workflow nodepool?"
+  default     = true
+}
+
 variable "dual_proxy" {
   description = "Single instance and HA"
-  #default     = false
 }
 
 variable "single_az_for_jupyter" {
@@ -175,5 +183,30 @@ variable "fips_ami_kms" {
 
 # This is the FIPS enabled AMI in cdistest account.
 variable "fips_enabled_ami" {
-  default = "ami-074d352c8e753fc93"
+  default = "ami-0de87e3680dcb13ec"
+}
+
+variable "use_asg" {
+  default = true
+} 
+
+variable "use_karpenter" {
+  default = false
+}
+
+variable "scale_in_protection" {
+  description = "set scale-in protection on ASG"
+  default     = false
+}
+
+variable "ci_run" {
+  default = false
+}
+
+variable "karpenter_version" {
+  default = "v0.24.0"
+}
+
+variable "eks_public_access" {
+  default = "true"
 }

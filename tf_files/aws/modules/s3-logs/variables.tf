@@ -1,8 +1,7 @@
 variable "log_bucket_name" {}
-variable "environment" {
-  # value for 'Environment' key to tag the new resources with
-}
+
+variable "environment" {}
 
 locals {
-  clean_bucket_name = "${replace(replace(var.log_bucket_name, "_", "-"),".", "-")}"
+  clean_bucket_name = replace(replace(var.log_bucket_name, "_", "-"),".", "-")
 }
