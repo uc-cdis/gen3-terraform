@@ -161,7 +161,7 @@ variable "ami_account_id" {
 
 variable "squid_image_search_criteria" {
   description = "Search criteria for squid AMI look up"
-  default     = "ubuntu/images/hvm-ssd/ubuntu-bionic-20.04-amd64-server-*"
+  default     = "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"
 }
 
 variable "peering_vpc_id" {
