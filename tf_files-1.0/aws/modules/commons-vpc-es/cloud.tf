@@ -83,6 +83,10 @@ CONFIG
     enabled = var.encryption
   }
 
+  node_to_node_encryption {
+    enabled = var.encryption
+  }
+
   vpc_options {
     security_group_ids = [aws_security_group.private_es.id]
     subnet_ids         = data.aws_subnets.private.ids
