@@ -324,7 +324,7 @@ variable "ha-squid_instance_type" {
 
 variable "ha-squid_instance_drive_size" {
   description = "Volume size for HA squid instances"
-  default     = 20
+  default     = 25
 }
 
 
@@ -487,7 +487,7 @@ variable "worker_drive_size" {
 }
 
 variable "eks_version" {
-  default = "1.25"
+  default = "1.24"
 }
 
 variable "workers_subnet_size" {
@@ -1037,5 +1037,5 @@ variable "ci_run" {
 
 variable "commons_log_retention" {
   description = "value in days for the cloudwatch log retention period"
-  default = "3650"
+  default = "3653"
 }
