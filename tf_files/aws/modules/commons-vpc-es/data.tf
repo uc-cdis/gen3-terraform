@@ -17,10 +17,6 @@ locals {
   all_cidr_blocks = [for assoc in data.aws_vpc.the_vpc.cidr_block_associations : assoc.cidr_block]
 }
 
-locals {
-  all_cidr_blocks = [for assoc in data.aws_vpc.the_vpc.cidr_block_association : assoc.cidr_block]
-}
-
 data "aws_iam_user" "es_user" {
   user_name = "${var.vpc_name}_es_user"
 }
