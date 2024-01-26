@@ -244,12 +244,12 @@ resource "aws_security_group" "vpnnlb_in" {
   description = "security group that only enables ssh from VPC nodes and CSOC"
   vpc_id      = var.env_vpc_id
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "TCP"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  # ingress {
+  #   from_port   = 22
+  #   to_port     = 22
+  #   protocol    = "TCP"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
 
   ingress {
     from_port   = 1194
@@ -258,19 +258,19 @@ resource "aws_security_group" "vpnnlb_in" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "TCP"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  # ingress {
+  #   from_port   = 80
+  #   to_port     = 80
+  #   protocol    = "TCP"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
 
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "TCP"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  # ingress {
+  #   from_port   = 443
+  #   to_port     = 443
+  #   protocol    = "TCP"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
 
   lifecycle {
     ignore_changes = [description]
