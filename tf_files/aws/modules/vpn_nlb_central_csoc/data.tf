@@ -1,6 +1,8 @@
 data "aws_caller_identity" "current" {}
 
-data "aws_availability_zones" "available" {}
+data "aws_availability_zones" "available" {
+  state = "available"
+}
 
 # These VPN VMs should only have access to Cloudwatch and nothing more
 data "aws_iam_policy_document" "vpn_policy_document" {
