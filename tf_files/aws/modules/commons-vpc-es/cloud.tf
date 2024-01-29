@@ -16,14 +16,14 @@ resource "aws_security_group" "private_es" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = [local.all_cidr_blocks]
+    cidr_blocks = local.all_cidr_blocks
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = [data.aws_vpc.the_vpc.cidr_block]
+    cidr_blocks = local.all_cidr_blocks
   }
 
   tags = {
@@ -80,6 +80,10 @@ CONFIG
 
   encrypt_at_rest {
     # For small instance type like t2.medium, encryption is not available
+    enabled = var.encryption
+  }
+
+  node_to_node_encryption {
     enabled = var.encryption
   }
 

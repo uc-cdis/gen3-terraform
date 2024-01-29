@@ -161,7 +161,7 @@ variable "ami_account_id" {
 
 variable "squid_image_search_criteria" {
   description = "Search criteria for squid AMI look up"
-  default     = "ubuntu/images/hvm-ssd/ubuntu-bionic-20.04-amd64-server-*"
+  default     = "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"
 }
 
 variable "peering_vpc_id" {
@@ -324,7 +324,7 @@ variable "ha-squid_instance_type" {
 
 variable "ha-squid_instance_drive_size" {
   description = "Volume size for HA squid instances"
-  default     = 20
+  default     = 25
 }
 
 
@@ -1037,5 +1037,5 @@ variable "ci_run" {
 
 variable "commons_log_retention" {
   description = "value in days for the cloudwatch log retention period"
-  default = "3650"
+  default = "3653"
 }
