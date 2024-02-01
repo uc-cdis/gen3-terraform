@@ -60,4 +60,5 @@ module "eks" {
   use_karpenter                    = var.user_karpenter
   karpernter_version               = var.karpernter_version
   eks_public_access                = var.eks_public_access
+  enable_vpc_endpoints             = var.enable_vpc_endpoints
 }
