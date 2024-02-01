@@ -172,9 +172,8 @@ CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
       sudo /usr/local/qualys/cloud-agent/bin/qualys-cloud-agent.sh ActivationId=${var.activation_id} CustomerId=${var.customer_id}
     fi
   fi
-) >> /var/log/bootstrapping_script.log
-
---BOUNDARY--    
+) > /var/log/bootstrapping_script_part2.log
+--BOUNDARY--
 EOF
 
   root_block_device {
