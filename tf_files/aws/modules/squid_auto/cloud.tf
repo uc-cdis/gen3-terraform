@@ -78,11 +78,20 @@ resource "aws_launch_configuration" "squid_auto" {
   iam_instance_profile        = aws_iam_instance_profile.squid-auto_role_profile.id
   associate_public_ip_address = true
   user_data                   = <<EOF
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="BOUNDARY"
+
+--BOUNDARY
+Content-Type: text/x-shellscript; charset="us-ascii"
+
 #!/bin/bash
 DISTRO=$(awk -F '[="]*' '/^NAME/ { print $2 }' < /etc/os-release)
 USER="ubuntu"
 if [[ $DISTRO == "Amazon Linux" ]]; then
   USER="ec2-user"
+  if [[ $(awk -F '[="]*' '/^VERSION_ID/ { print $2 }' < /etc/os-release) == "2023" ]]; then
+    DISTRO="al2023"
+  fi
 fi
 USER_HOME="/home/$USER"
 CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
@@ -93,7 +102,12 @@ CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
   fi
   if [[ $DISTRO == "Amazon Linux" ]]; then
     sudo yum update -y
-    sudo yum install git lsof -y
+    sudo yum install git lsof dracut-fips openssl -y
+    sudo /sbin/grubby --update-kernel=ALL --args="fips=1"
+  elif [[ $DISTRO == "al2023" ]]; then
+    sudo dnf update -y
+    sudo dnf install git lsof docker crypto-policies crypto-policies-scripts -y
+    sudo fips-mode-setup --enable
   fi
   git clone https://github.com/uc-cdis/cloud-automation.git
   cd $CLOUD_AUTOMATION
@@ -135,6 +149,18 @@ CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
       sudo /usr/local/qualys/cloud-agent/bin/qualys-cloud-agent.sh ActivationId=${var.activation_id} CustomerId=${var.customer_id}
     fi
   fi
+
+--BOUNDARY
+Content-Type: text/cloud-config; charset="us-ascii"
+
+power_state:
+    delay: now
+    mode: reboot
+    message: Powering off
+    timeout: 2
+    condition: true
+
+--BOUNDARY--    
 ) > /var/log/bootstrapping_script.log
 EOF
 
