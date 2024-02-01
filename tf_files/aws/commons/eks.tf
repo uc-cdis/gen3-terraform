@@ -47,5 +47,6 @@ module "eks" {
   karpenter_version                = var.karpenter_version
   ci_run                           = var.ci_run
   eks_public_access                = var.eks_public_access
+  enable_vpc_endpoints             = var.enable_vpc_endpoints
   depends_on                       = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id, module.cdis_vpc.squid_auto]
 }
