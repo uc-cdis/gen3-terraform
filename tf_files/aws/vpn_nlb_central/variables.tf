@@ -46,7 +46,7 @@ variable "bootstrap_path" {
 }
 
 variable "bootstrap_script" {
-  default = "vpnvm.sh"
+  default = "vpnvm_ubuntu18.sh"
 }
 
 variable "organization_name" {
