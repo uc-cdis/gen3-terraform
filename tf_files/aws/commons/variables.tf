@@ -1039,3 +1039,7 @@ variable "commons_log_retention" {
   description = "value in days for the cloudwatch log retention period"
   default = "3653"
 }
+
+variable "enable_vpc_endpoints" {
+  default = true
+}

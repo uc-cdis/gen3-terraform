@@ -210,3 +210,7 @@ variable "karpenter_version" {
 variable "eks_public_access" {
   default = "true"
 }
+
+variable "enable_vpc_endpoints" {
+  default = true
+}
