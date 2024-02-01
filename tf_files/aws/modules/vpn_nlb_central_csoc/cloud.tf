@@ -43,6 +43,12 @@ resource "aws_iam_policy" "vpn_policy" {
   policy      = data.aws_iam_policy_document.vpn_policy_document.json
 }
 
+resource "aws_iam_policy_attachment" "ssm-policy" {
+  name      = "${var.env_vpn_nlb_name}_ssm_policy_attach"
+  roles     = [aws_iam_role.vpn-nlb_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+}
+
 resource "aws_iam_policy_attachment" "vpn_policy_attachment" {
   name        = "${var.env_vpn_nlb_name}_policy_attach"
   roles       = [aws_iam_role.vpn-nlb_role.name]
