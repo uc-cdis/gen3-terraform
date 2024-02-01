@@ -135,7 +135,7 @@ CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
 
   bash "${var.bootstrap_path}${var.bootstrap_script}" "cwl_group=${var.env_log_group};${join(";",var.extra_vars)}" 2>&1
   cd $CLOUD_AUTOMATION
-  git checkout master
+  git checkout chore/al23
   # Install qualys agent if the activtion and customer id provided
   # Amazon Linux does not support qualys agent (?)
   # https://success.qualys.com/discussions/s/question/0D52L00004TnwvgSAB/installing-qualys-cloud-agent-on-amazon-linux-2-instances
@@ -149,7 +149,7 @@ CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
       sudo /usr/local/qualys/cloud-agent/bin/qualys-cloud-agent.sh ActivationId=${var.activation_id} CustomerId=${var.customer_id}
     fi
   fi
-
+) > /var/log/bootstrapping_script.log
 --BOUNDARY
 Content-Type: text/cloud-config; charset="us-ascii"
 
@@ -161,7 +161,6 @@ power_state:
     condition: true
 
 --BOUNDARY--    
-) > /var/log/bootstrapping_script.log
 EOF
 
   root_block_device {

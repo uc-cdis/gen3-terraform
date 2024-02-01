@@ -1,9 +1,3 @@
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="BOUNDARY"
-
---BOUNDARY
-Content-Type: text/x-shellscript; charset="us-ascii"
-
 #!/bin/bash -xe
 
 # User data for our EKS worker nodes basic arguments to call the bootstrap script for EKS images 
