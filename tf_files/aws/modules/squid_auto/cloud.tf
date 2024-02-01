@@ -117,6 +117,7 @@ power_state:
 --BOUNDARY
 Content-Type: text/x-shellscript; charset="us-ascii"
 
+#!/bin/bash
 DISTRO=$(awk -F '[="]*' '/^NAME/ { print $2 }' < /etc/os-release)
 USER="ubuntu"
 if [[ $DISTRO == "Amazon Linux" ]]; then
