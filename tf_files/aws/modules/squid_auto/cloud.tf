@@ -93,13 +93,7 @@ if [[ $DISTRO == "Amazon Linux" ]]; then
     DISTRO="al2023"
   fi
 fi
-USER_HOME="/home/$USER"
-CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
 (
-  cd $USER_HOME
-  if [[ ! -z "${var.slack_webhook}" ]]; then
-    echo "${var.slack_webhook}" > /slackWebhook
-  fi
   if [[ $DISTRO == "Amazon Linux" ]]; then
     sudo yum update -y
     sudo yum install git lsof dracut-fips openssl -y
@@ -108,6 +102,35 @@ CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
     sudo dnf update -y
     sudo dnf install git lsof docker crypto-policies crypto-policies-scripts -y
     sudo fips-mode-setup --enable
+  fi
+) > /var/log/bootstrapping_script.log
+--BOUNDARY
+Content-Type: text/cloud-config; charset="us-ascii"
+
+power_state:
+    delay: now
+    mode: reboot
+    message: Powering off
+    timeout: 2
+    condition: true
+
+--BOUNDARY
+Content-Type: text/x-shellscript; charset="us-ascii"
+
+DISTRO=$(awk -F '[="]*' '/^NAME/ { print $2 }' < /etc/os-release)
+USER="ubuntu"
+if [[ $DISTRO == "Amazon Linux" ]]; then
+  USER="ec2-user"
+  if [[ $(awk -F '[="]*' '/^VERSION_ID/ { print $2 }' < /etc/os-release) == "2023" ]]; then
+    DISTRO="al2023"
+  fi
+fi
+USER_HOME="/home/$USER"
+CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
+(
+  cd $USER_HOME
+  if [[ ! -z "${var.slack_webhook}" ]]; then
+    echo "${var.slack_webhook}" > /slackWebhook
   fi
   git clone https://github.com/uc-cdis/cloud-automation.git
   cd $CLOUD_AUTOMATION
@@ -135,7 +158,7 @@ CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
 
   bash "${var.bootstrap_path}${var.bootstrap_script}" "cwl_group=${var.env_log_group};${join(";",var.extra_vars)}" 2>&1
   cd $CLOUD_AUTOMATION
-  git checkout chore/al23
+  git checkout master
   # Install qualys agent if the activtion and customer id provided
   # Amazon Linux does not support qualys agent (?)
   # https://success.qualys.com/discussions/s/question/0D52L00004TnwvgSAB/installing-qualys-cloud-agent-on-amazon-linux-2-instances
@@ -149,16 +172,7 @@ CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
       sudo /usr/local/qualys/cloud-agent/bin/qualys-cloud-agent.sh ActivationId=${var.activation_id} CustomerId=${var.customer_id}
     fi
   fi
-) > /var/log/bootstrapping_script.log
---BOUNDARY
-Content-Type: text/cloud-config; charset="us-ascii"
-
-power_state:
-    delay: now
-    mode: reboot
-    message: Powering off
-    timeout: 2
-    condition: true
+) >> /var/log/bootstrapping_script.log
 
 --BOUNDARY--    
 EOF
