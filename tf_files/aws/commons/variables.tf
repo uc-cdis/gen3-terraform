@@ -156,12 +156,12 @@ variable "sheepdog_oauth2_client_secret" {
 
 # id of AWS account that owns the public AMI's
 variable "ami_account_id" {
-  default = "099720109477"
+  default = "137112412989"
 }
 
 variable "squid_image_search_criteria" {
   description = "Search criteria for squid AMI look up"
-  default     = "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"
+  default     = "al2023-ami-*"
 }
 
 variable "peering_vpc_id" {

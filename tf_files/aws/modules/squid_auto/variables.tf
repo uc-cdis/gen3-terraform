@@ -10,11 +10,11 @@ variable "env_squid_name" {}
 
 # id of AWS account that owns the public AMI's
 variable "ami_account_id" {
-  default = "099720109477"
+  default = "137112412989"
 }
 
 variable "image_name_search_criteria" {
-  default = "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"
+  default = "al2023-ami-*"
 }
 
 variable "peering_cidr" {
