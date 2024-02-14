@@ -193,16 +193,15 @@ CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
   echo ${var.env_cloud_name} | tee /etc/hostname
   hostnamectl set-hostname ${var.env_cloud_name}
 
-  apt -y update
-  DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade
-
-  cd $USER_HOME
+  # Update and upgrade packages based on the distribution
+  if [ "$DISTRO" = "Ubuntu" ]; then
+    apt -y update
+    DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade
+  else  # Assuming Amazon Linux 2 for else case
+    yum update -y
+  fi
 
   bash "${var.bootstrap_path}${var.bootstrap_script}" "cwl_group=${aws_cloudwatch_log_group.vpn_log_group.name};vpn_nlb_name=${var.env_vpn_nlb_name};account_id=${data.aws_caller_identity.current.account_id};csoc_vpn_subnet=${var.csoc_vpn_subnet};csoc_vm_subnet=${var.csoc_vm_subnet};cloud_name=${var.env_cloud_name};${join(";",var.extra_vars)}" 2>&1
-
-  apt autoremove -y
-  apt clean
-  apt autoclean
 
   cd $CLOUD_AUTOMATION
   git checkout master
