@@ -170,6 +170,7 @@ if [[ $DISTRO == "Ubuntu" ]]; then
   USER="ubuntu"
 else
   USER="ec2-user"
+  yum install -y git
 fi
 USER_HOME="/home/$USER"
 CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
