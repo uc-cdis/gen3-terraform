@@ -166,7 +166,7 @@ resource "aws_launch_configuration" "vpn_nlb" {
   user_data                   = <<EOF
 #!/bin/bash
 DISTRO=$(awk -F '[="]*' '/^NAME/ { print $2 }' < /etc/os-release)
-if $DISTRO == "Ubuntu"; then
+if [[ $DISTRO == "Ubuntu" ]]; then
   USER="ubuntu"
 else
   USER="ec2-user"
@@ -194,13 +194,14 @@ CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
   hostnamectl set-hostname ${var.env_cloud_name}
 
   # Update and upgrade packages based on the distribution
-  if [ "$DISTRO" = "Ubuntu" ]; then
+  if [[ $DISTRO == "Ubuntu" ]]; then
     apt -y update
     DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade
-  else  # Assuming Amazon Linux 2 for else case
+  else
     yum update -y
   fi
 
+  cd $USER_HOME
   bash "${var.bootstrap_path}${var.bootstrap_script}" "cwl_group=${aws_cloudwatch_log_group.vpn_log_group.name};vpn_nlb_name=${var.env_vpn_nlb_name};account_id=${data.aws_caller_identity.current.account_id};csoc_vpn_subnet=${var.csoc_vpn_subnet};csoc_vm_subnet=${var.csoc_vm_subnet};cloud_name=${var.env_cloud_name};${join(";",var.extra_vars)}" 2>&1
 
   cd $CLOUD_AUTOMATION
