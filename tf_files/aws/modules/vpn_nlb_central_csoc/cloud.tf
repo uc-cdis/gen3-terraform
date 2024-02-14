@@ -165,8 +165,12 @@ resource "aws_launch_configuration" "vpn_nlb" {
   depends_on                  = [aws_iam_instance_profile.vpn-nlb_role_profile]
   user_data                   = <<EOF
 #!/bin/bash
-
-USER="ubuntu"
+DISTRO=$(awk -F '[="]*' '/^NAME/ { print $2 }' < /etc/os-release)
+if $DISTRO == "Ubuntu"; then
+  USER="ubuntu"
+else
+  USER="ec2-user"
+fi
 USER_HOME="/home/$USER"
 CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
 
