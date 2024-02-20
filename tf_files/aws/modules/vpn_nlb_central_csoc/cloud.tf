@@ -170,7 +170,7 @@ if [[ $DISTRO == "Ubuntu" ]]; then
   USER="ubuntu"
 else
   USER="ec2-user"
-  yum install -y git
+  yum install -y git -q
 fi
 USER_HOME="/home/$USER"
 CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
@@ -178,7 +178,7 @@ CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
 (
   cd $USER_HOME
   git clone https://github.com/uc-cdis/cloud-automation.git
-
+  git config --global --add safe.directory $USER_HOME/cloud-automation
   # This is needed temporarily for testing purposes ; before merging the code to master
   if [ "${var.branch}" != "master" ];
   then
@@ -199,7 +199,7 @@ CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
     apt -y update
     DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade
   else
-    yum update -y
+    yum update -y -q
   fi
 
   cd $USER_HOME
