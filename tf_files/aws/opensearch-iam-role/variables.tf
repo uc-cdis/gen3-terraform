@@ -6,3 +6,6 @@ variable "environment" {}
 
 # The URL for the cluster's OIDC provider
 variable "oidc_url" {}
+
+# The ARN of the cluster's OIDC provider
+variable "oidc_provider_arn" {}

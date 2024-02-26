@@ -1,3 +1,7 @@
+locals {
+  oidc_url = replace(var.oidc_url, "https://", "")
+}
+
 data "aws_iam_policy_document" "opensearch_cluster_access" {
   statement {
     actions   = ["es:*"]
@@ -12,13 +16,13 @@ data "aws_iam_policy_document" "opensearch_assume_role" {
     effect  = "Allow"
 
     condition {
-      test     = "StringEquals"
-      variable = var.oidc_url
-      values   = ["system:serviceaccount:kube-system:aws-node"]
+      test     = "StringLike"
+      variable = "${locals.oidc_url}:sub"
+      values   = ["system:serviceaccount:*:es-proxy"]
     }
 
     principals {
-      identifiers = [aws_iam_openid_connect_provider.eks.arn]
+      identifiers = ["${var.oidc_provider_arn}"]
       type        = "Federated"
     }
   }
