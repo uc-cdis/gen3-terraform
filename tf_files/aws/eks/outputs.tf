@@ -5,3 +5,7 @@ output "kubeconfig" {
 output "config_map_aws_auth" {
   value = module.eks[0].config_map_aws_auth
 }
+
+output "cluster_oidc_provider_url" {
+  value = module.eks[0].cluster_oidc_provider_url
+}
