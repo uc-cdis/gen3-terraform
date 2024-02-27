@@ -1,5 +1,5 @@
 locals {
-  oidc_url = replace(var.oidc_url, "https://", "")
+  oidc_url = replace(var.oidc_provider_url, "https://", "")
 }
 
 data "aws_iam_policy_document" "opensearch_cluster_access" {
