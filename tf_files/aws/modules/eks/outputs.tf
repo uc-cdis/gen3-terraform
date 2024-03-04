@@ -27,5 +27,5 @@ output "cluster_oidc_provider_url" {
 }
 
 output "cluster_oidc_provider_arn" {
-  value = aws_iam_openid_connect_provider[0].identity_provider.arn
+  value = aws_iam_openid_connect_provider[count.index].identity_provider.arn
 }
