@@ -1,5 +1,9 @@
 resource "aws_s3_bucket" "mybucket" {
   bucket = var.bucket_name
+
+  lifecycle {
+    ignore_changes  = ["tags", "tags_all"]
+  }  
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "default_kms_encryption" {
