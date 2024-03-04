@@ -60,7 +60,7 @@ output "cluster_oidc_provider_url" {
 }
 
 output "opensearch_cluster_arn" {
-  value = module.commons_vpc_es.es_arn
+  value = module.commons_vpc_es[0].es_arn
 }
 
 ##
