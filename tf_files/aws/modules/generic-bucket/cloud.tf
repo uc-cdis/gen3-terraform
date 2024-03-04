@@ -42,6 +42,10 @@ resource "aws_s3_bucket_logging" "mybucket" {
   bucket        = aws_s3_bucket.mybucket.id
   target_bucket = var.logging_bucket_name
   target_prefix = "log/${var.bucket_name}/"
+
+  lifecycle {
+    ignore_changes  = all
+  }    
 }
 
 resource "aws_s3_bucket_ownership_controls" "mybucket" {
