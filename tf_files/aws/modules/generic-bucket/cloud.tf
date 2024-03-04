@@ -39,3 +39,11 @@ resource "aws_s3_bucket_logging" "mybucket" {
   target_bucket = var.logging_bucket_name
   target_prefix = "log/${var.bucket_name}/"
 }
+
+resource "aws_s3_bucket_ownership_controls" "mybucket" {
+  bucket = aws_s3_bucket.mybucket.id
+
+  rule {
+    object_ownership = var.bucket_ownership
+  }
+}

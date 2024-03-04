@@ -1,8 +1,7 @@
 variable "bucket_name" {}
 
 variable "bucket_ownership" {
-  type        = bool
-  default     = true
+  default     = "BucketOwnerEnforced"
 }
 
 variable "cloudtrail_bucket" {
