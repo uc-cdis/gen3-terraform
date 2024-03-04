@@ -59,9 +59,14 @@ output "cluster_oidc_provider_url" {
   value = module.eks[0].cluster_oidc_provider_url
 }
 
+output "cluster_oidc_provider_arn" {
+  value = module.eks[0].cluster_oidc_provider_arn
+}
+
 output "opensearch_cluster_arn" {
   value = module.commons_vpc_es[0].es_arn
 }
+
 
 ##
 # aws_rds_aurora_cluster
