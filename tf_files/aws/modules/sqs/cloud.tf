@@ -1,6 +1,6 @@
 module "alarms-lambda" {
   source                  = "../alarms-lambda"
-  vpc_name                = var.sqs_name
+  lambda_name             = var.sqs_name
   slack_webhook           = var.slack_webhook
 }
 
