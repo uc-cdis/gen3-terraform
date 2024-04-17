@@ -38,3 +38,16 @@ variable "restrict_public_buckets" {
 variable "versioning" {
   default = true
 }
+
+variable "bucket_lifecycle_configuration" {
+  default = ""
+}
+
+variable "policy_role_arn" {
+  default = ""
+}
+
+variable "policy_actions" {
+  type    = list(string)
+  default = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"]
+}

@@ -28,6 +28,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "kms_key_encryptio
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "mybucket" {
+  count = var.bucket_lifecycle_configuration != "" ? 1 : 0
   bucket = aws_s3_bucket.mybucket.id
   rule {
       status  = "Enabled"
@@ -39,6 +40,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "mybucket" {
 }
 
 resource "aws_s3_bucket_logging" "mybucket" {
+  count = var.logging_bucket_name != "" ? 1 : 0
   bucket        = aws_s3_bucket.mybucket.id
   target_bucket = var.logging_bucket_name
   target_prefix = "log/${var.bucket_name}/"
@@ -71,4 +73,22 @@ resource "aws_s3_bucket_versioning" "name" {
   versioning_configuration {
     status = var.versioning ? "Enabled" : "Disabled"
   }
+}
+
+resource "aws_s3_bucket_policy" "mybucket" {
+  count  = var.policy_role_arn != "" ? 1 : 0
+  bucket = aws_s3_bucket.mybucket.id
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect    = "Allow",
+        Principal = {
+          "AWS" = var.policy_role_arn
+        },
+        Action    = var.policy_actions,
+        Resource  = [aws_s3_bucket.mybucket.arn, "${aws_s3_bucket.mybucket.arn}/*"]
+      }
+    ]
+  })
 }
