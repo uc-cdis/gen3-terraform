@@ -7,7 +7,7 @@ resource "aws_s3_bucket" "mybucket" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "default_kms_encryption" {
-  count  = var.kms_key_id != "" ? 1 : 0
+  count  = var.kms_key_id != "" ? 0 : 1
   bucket = aws_s3_bucket.mybucket.id
   rule {
     apply_server_side_encryption_by_default {
@@ -17,7 +17,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_kms_encry
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "kms_key_encryption" {
-  count  = var.kms_key_id != "" ? 0 : 1
+  count  = var.kms_key_id != "" ? 1 : 0
   bucket = aws_s3_bucket.mybucket.id
   rule {
     apply_server_side_encryption_by_default {
