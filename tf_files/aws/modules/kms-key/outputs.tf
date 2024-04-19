@@ -1,4 +1,4 @@
 output "kms_arn" {
-  value = aws_kms_key_policy.example.arn
+  value = aws_kms_key.example.arn
 }
 
