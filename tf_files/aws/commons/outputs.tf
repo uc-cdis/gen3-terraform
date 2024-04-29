@@ -9,51 +9,74 @@
 #
 
 output "aws_region" {
-  value = "${var.aws_region}"
+  value = var.aws_region
 }
 
 output "vpc_name" {
-  value = "${var.vpc_name}"
+  value = var.vpc_name
 }
 
 output "vpc_cidr_block" {
-  value = "${module.cdis_vpc.vpc_cidr_block}"
+  value = module.cdis_vpc.vpc_cidr_block
 }
 
 output "indexd_rds_id" {
-  value = "${aws_db_instance.db_indexd.*.id}"
+  value = aws_db_instance.db_indexd.*.identifier
 }
 
 output "fence_rds_id" {
-  value = "${aws_db_instance.db_fence.*.id}"
+  value = aws_db_instance.db_fence.*.identifier
 }
 
-output "gdcapi_rds_id" {
-  value = "${aws_db_instance.db_gdcapi.*.id}"
+output "sheepdog_rds_id" {
+  value = aws_db_instance.db_sheepdog.*.identifier
 }
 
 output "fence-bot_user_secret" {
-  value = "${module.cdis_vpc.fence-bot_secret}"
-#  value = "${module.fence-bot-user.fence-bot_secret}"
+  value     = module.cdis_vpc.fence-bot_secret
+  sensitive = true
 }
 
 output "fence-bot_user_id" {
-#  value = "${module.fence-bot-user.fence-bot_id}"
-  value = "${module.cdis_vpc.fence-bot_id}"
+  value = module.cdis_vpc.fence-bot_id
 }
 
 output "data-bucket_name" {
-  value = "${module.cdis_vpc.data-bucket_name}"
+  value = module.cdis_vpc.data-bucket_name
+}
+
+output "kubeconfig" {
+  value = module.eks[0].kubeconfig
+  sensitive   = true  
+}
+
+output "config_map_aws_auth" {
+  value = module.eks[0].config_map_aws_auth
+  sensitive   = true  
+}
+
+##
+# aws_rds_aurora_cluster
+##
+
+output "aurora_cluster_writer_endpoint" {
+  description = "Aurora cluster writer instance endpoint"
+  value       = one(module.aurora[*].aurora_cluster_writer_endpoint)
+}
+
+output "aurora_cluster_reader_endpoint" {
+  description = "Aurora cluster reader endpoint"
+  value       = one(module.aurora[*].aurora_cluster_reader_endpoint)
 }
 
 
-#--------------------------------------------------------------
-# Legacy stuff ...
-# We want to move away from generating output files, and
-# instead just publish output variables
-#
-#resource "null_resource" "config_setup" {
-#  provisioner "local-exec" {
-#    command = "echo \"${module.config_files.k8s_vars_sh}\" | cat - \"${path.module}/kube-up-body.sh\" > ${var.vpc_name}_output/kube-up.sh"
-#  }
-#}
+output "aurora_cluster_master_username" {
+  description = "Aurora cluster master username"
+  value       = one(module.aurora[*].aurora_cluster_master_username)
+}
+
+output "aurora_cluster_master_password" {
+  description = "Aurora cluster master user's password"
+  value       = one(module.aurora[*].aurora_cluster_master_password)
+  sensitive   = true
+}

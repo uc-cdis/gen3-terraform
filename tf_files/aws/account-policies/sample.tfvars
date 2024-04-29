@@ -3,4 +3,4 @@ region = "us-east-1"
 
 
 #The IAM roles to be created
-roles  = ["devopsdirector", "bsdisocyber", "projectmanagerplanx", "devopsplanx", "devplanx"]
+roles  = ["devopsdirector", "bsdisocyber", "projectmanagerplanx", "devopsplanx", "devplanx"] 

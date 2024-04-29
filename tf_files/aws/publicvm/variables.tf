@@ -24,7 +24,6 @@ variable "volume_size" {
 
 variable "policies" {
   default = []
-  type    = "list"
 }
 
 variable "ami" {

@@ -1,5 +1,3 @@
-#Automatically generated from a corresponding variables.tf on 2022-07-13 10:48:45.059589
-
 #The CIDR block used by the VPC this deployment will reside on
 env_vpc_cidr = "172.24.192.0/20"
 
@@ -93,4 +91,3 @@ customer_id = ""
 
 #A webhook used to send alarms to a Slack channel
 slack_webhook = ""
-

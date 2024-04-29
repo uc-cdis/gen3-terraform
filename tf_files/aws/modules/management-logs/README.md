@@ -4,7 +4,7 @@ Centralize logging for all commons in other AWS accounts
 
 ## 1. QuickStart
 
-```
+```bash
 gen3 workon csoc management-logs
 ```
 
@@ -16,12 +16,9 @@ gen3 workon csoc management-logs
   - [3.1 How it works](#21-how-it-works)
     - [3.1.1 JSON breakdown](#311-json-breakdown)
 
-
 ## 2. Overview
 
 The CSOC account is conceptualized to represent a centralized management account for all commons account. The commons account, conceptually, would act like child accounts for CSOC.
-
-
 
 ## 3. Centralized logging
 
@@ -35,14 +32,13 @@ As for now, logs will be send to a bucket. We can later send them to ES if we wa
 
 [Figure 1] Image of workflow reflects how the logs are sent from different accounts into the CSOC account and how the process is.
 
-
 ### 3.1 How it works
 
 When logs come in through the data stream service, it comes base64 encoded and zipped. We need to process it before sending it to its destination (s3 or ES), otherwise it won't be properly interpreted and ultimately won't be inserted and create an index (For ES). For s3, we can store them encoded, but the idea is to have easy read access for later send the to QRadar.
 
 An example how it is received:
 
-```
+```json
 {
   "Records": [
     {
@@ -71,7 +67,6 @@ The actual data from child account is in the `data` part of the above JSON, the 
 
 Logs are being sent to S3 as well. There are multiple ways to store the data into S3, as it comes from the stream, or processed the same way we do for ElasticSearch. As for now, we are processing it so we don't need to decode/uncompress if we want/need to see the content.
 
-
 #### 3.1.1 JSON breakdown
 
 When data comes in, it's in form of Records, which is basically an array (list in python). Said array can be as long as it wants.
@@ -79,7 +74,7 @@ When data comes in, it's in form of Records, which is basically an array (list i
 - eventID - an Id given by kinesis which also add the shardID in use.
 - eventVersion - self explanatory.
 - kinesis - this is what actually comes in from the other account.
-  - approximateArrivalTimestamp	- timestamp when the stream reaches Kinesis.
+  - approximateArrivalTimestamp - timestamp when the stream reaches Kinesis.
   - partitionKey - yet another key value, not really helpful.
   - data - the data we want to decode and actually log into ES/S3
   - kinesisSchemaVersion - yet another version

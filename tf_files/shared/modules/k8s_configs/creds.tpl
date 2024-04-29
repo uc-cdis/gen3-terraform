@@ -15,26 +15,26 @@
         "fence_username": "${fence_user}",
         "fence_password": "${fence_pwd}",
         "fence_database": "${fence_db}",
-        "db_host": "${gdcapi_host}",
+        "db_host": "${sheepdog_host}",
         "db_username": "${sheepdog_user}",
         "db_password": "${sheepdog_pwd}",
-        "db_database": "${gdcapi_db}",
-        "gdcapi_secret_key": "${gdcapi_secret_key}",
-        "indexd_password": "${gdcapi_indexd_password}",
+        "db_database": "${sheepdog_db}",
+        "gdcapi_secret_key": "${sheepdog_secret_key}",
+        "indexd_password": "${sheepdog_indexd_password}",
         "hostname": "${hostname}",
-        "oauth2_client_id": "${gdcapi_oauth2_client_id}",
-        "oauth2_client_secret": "${gdcapi_oauth2_client_secret}"
+        "oauth2_client_id": "${sheepdog_oauth2_client_id}",
+        "oauth2_client_secret": "${sheepdog_oauth2_client_secret}"
     },
     "peregrine": {
         "fence_host": "${fence_host}",
         "fence_username": "${fence_user}",
         "fence_password": "${fence_pwd}",
         "fence_database": "${fence_db}",
-        "db_host": "${gdcapi_host}",
-        "db_username": "${peregrine_user}",
+        "db_host": "${peregrine_host}",
+        "db_username": "peregrine",
         "db_password": "${peregrine_pwd}",
-        "db_database": "${gdcapi_db}",
-        "gdcapi_secret_key": "${gdcapi_secret_key}",
+        "db_database": "${sheepdog_db}",
+        "gdcapi_secret_key": "${sheepdog_secret_key}",
         "hostname": "${hostname}"
     },
     "indexd": {
@@ -47,7 +47,7 @@
           "PREPEND_PREFIX": true
         },
         "user_db": {
-          "gdcapi": "${gdcapi_indexd_password}",
+          "gdcapi": "${sheepdog_indexd_password}",
           "fence": ""
         }
     },

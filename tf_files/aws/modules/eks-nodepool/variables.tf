@@ -1,5 +1,8 @@
-
 variable "vpc_name" {}
+
+variable "vpc_id" {
+  default = ""
+}
 
 variable "ec2_keyname" {
   default = "someone@uchicago.edu"
@@ -31,9 +34,7 @@ variable "eks_cluster_endpoint" {
   default = ""
 }
 
-variable "eks_private_subnets" {
-  type  = "list"
-}
+variable "eks_private_subnets" {}
 
 variable "control_plane_sg" {}
 
@@ -81,7 +82,7 @@ variable "customer_id" {
   default = ""
 }
 
-# This is the FIPS enabled AMI in cdistest account.
-variable "fips_enabled_ami" {
-  default = "ami-074d352c8e753fc93"
+variable "scale_in_protection" {
+  description = "set scale-in protection on ASG"
+  default     = false
 }

@@ -9,7 +9,6 @@ variable "vpc_cidr_block" {
   default = "172.24.17.0/20"
 }
 
-
 variable "secondary_cidr_block" {
   default = ""
 }
@@ -41,12 +40,6 @@ variable "csoc_managed" {
   default = true
 }
 
-# controls whether or not to setup the cloudwatch subscription filter to send logs to CSOC for long term storage
-# CTDS uses datadog and this is no longer needed for us.
-variable "send_logs_to_csoc" {
-  default = true
-}
-
 variable "organization_name" {
   description = "for tagging purposes"
   default     = "Basic Service"
@@ -54,7 +47,6 @@ variable "organization_name" {
 
 variable "availability_zones" {
   description = "AZ to be used by EKS nodes"
-  type        = "list"
   default     = ["us-east-1a", "us-east-1c", "us-east-1d"]
 }
 
@@ -67,7 +59,6 @@ variable "squid_instance_drive_size" {
   description = "Volume size for the squid instance"
   default     = 8
 }
-
 
 variable "squid_instance_type" {
   description = "Instance type for HA squid instances"
@@ -86,8 +77,6 @@ variable  "deploy_single_proxy" {
 
 variable "squid_extra_vars" {
   description = "additional variables to pass along with the bootstrapscript"
-  type        = "list"
-  #default     = ["squid_image=master"]
 }
 
 variable "branch" {
@@ -97,8 +86,6 @@ variable "branch" {
 
 variable "fence-bot_bucket_access_arns" {
   description = "When fence bot has to access another bucket that wasn't created by the VPC module"
-  type        = "list"
-  #default     = []
 }
 
 variable "deploy_ha_squid" {
@@ -144,4 +131,17 @@ variable "slack_webhook" {
 
 variable "fips" {
   default = false
+}
+
+variable "deploy_cloud_trail" {
+  default = true
+}
+
+variable "send_logs_to_csoc" {
+  default = true
+}
+
+variable "commons_log_retention" {
+  description = "value in days for the cloudwatch log retention period"
+  default = "3650"
 }

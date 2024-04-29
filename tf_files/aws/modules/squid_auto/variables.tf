@@ -1,27 +1,20 @@
 variable "env_vpc_cidr"{
   description = "CIDR of the VPC where this cluster will reside"
-  #default     = 172.24.192.0/20
 }
 
-variable "squid_proxy_subnet"{
-  #default = 172.24.197.0/24
-}
+variable "squid_proxy_subnet"{}
 
-variable "env_vpc_name" {
-  #default = "raryav1"
-}
+variable "env_vpc_name" {}
 
-variable "env_squid_name" {
-  #default = "commons_squid_auto"
-}
+variable "env_squid_name" {}
 
 # id of AWS account that owns the public AMI's
 variable "ami_account_id" {
-  default = "099720109477"
+  default = "137112412989"
 }
 
 variable "image_name_search_criteria" {
-  default = "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"
+  default = "al2023-ami-*"
 }
 
 variable "peering_cidr" {
@@ -70,7 +63,6 @@ variable "squid_instance_drive_size" {
 
 variable "squid_availability_zones" {
   description = "AZs on wich to associate the routes for the squid proxies"
-  type        = "list"
 }
 
 variable "main_public_route" {
@@ -88,7 +80,6 @@ variable "branch" {
 
 variable "extra_vars" {
   description = "additional variables to pass along with the bootstrapscript"
-  type        = "list"
   default     = ["squid_image=master"]
 }
 

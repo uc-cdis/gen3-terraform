@@ -1,3 +1,2 @@
-#This bucket is required by config.tf
-bucket_name=WHATEVER
-
+# Name of the bukcet the queue is being created for
+bucket_name = ""

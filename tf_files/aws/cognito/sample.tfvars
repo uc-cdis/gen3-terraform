@@ -1,4 +1,3 @@
-
 #A list of allowed OAuth Flows
 cognito_oauth_flows = ["code", "implicit"]
 
@@ -41,4 +40,3 @@ tags = {
     "Organization" = "PlanX"
     "Environment"  = "CSOC"
   }
-

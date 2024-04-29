@@ -1,5 +1,3 @@
-#Automatically generated from a corresponding variables.tf on 2022-07-12 16:07:24.564137
-
 #The name of the VPC these resources will be spun up in
 vpc_name = "vadcprod"
 
@@ -27,4 +25,3 @@ ami = ""
 
 #The name for the VM, should be unique.
 vm_name= ""
-

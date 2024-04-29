@@ -54,7 +54,7 @@ compute_env_type = "EC2"
 compute_type = "MANAGED"
 
 #The EC2 key pair that is used for instances launched in the compute environment.
-ec2_key_pair = "giangb"
+ec2_key_pair = "emalinowski"
 
 #The name of the job queue to create as part of this deployment.
 batch_job_queue_name = ""

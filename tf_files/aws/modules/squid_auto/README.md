@@ -2,15 +2,13 @@
   
 This module is intended to bring up a ha-squid environment comprised by at least two instances in an autoscaling group
 
-
 ## 1. QuickStart
 
 This module is intended to be part of the VPC module and not to be called by itself. Nonetheless it could work on its own.
 
-```
+```bash
 gen3 workon <profile> <commons-mane>_squidauto
 ```
-
 
 ## 2. Table of content
 
@@ -22,14 +20,11 @@ gen3 workon <profile> <commons-mane>_squidauto
   - [4.2 Optional Variables](#42-optional-variables)
 - [5. Output](#5-output)
 
-
-
 ## 3. Overview
 
 Once you workon the workspace, you may want to edit the config.tfvars accordingly. To access the file more easily, try `gen3 cd`
 
 There are mandatory variables, and there are a few other optionals that are set by default in the variables.tf file, but you could change them accordingly.
-
 
 ## 4. Variables
 
@@ -49,8 +44,6 @@ There are mandatory variables, and there are a few other optionals that are set 
 | ssh_key_name | Key pair in EC2 | string | n/a |
 | squid_availability_zones | AZs where to deploy squid insances | list | n/a |
 
-
-
 ### 4.2 Optional Variables
 
 | Name | Description | Type | Default |
@@ -64,8 +57,6 @@ There are mandatory variables, and there are a few other optionals that are set 
 | squid_instance_drive_size | Volume size for the root partition  | integer | 8 |
 | extra_vars | Additional information to be bassed on the bootstrap script | list | ["squid_image=master"] |
 | deploy_ha_squid | If to deploy this module | boolean | true |
-
-
 
 ### 5. Output
 
