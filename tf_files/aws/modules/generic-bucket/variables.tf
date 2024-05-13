@@ -6,7 +6,7 @@ variable "bucket_ownership" {
 
 variable "logging_bucket_name" {
   type        = string
-  default     = "logging"
+  default     = ""
 }
 
 variable "kms_key_id" {
