@@ -17,6 +17,10 @@ variable "bucket_lifecycle_configuration" {
   default = ""
 }
 
+variable "public_access_block" {
+  default = true
+}
+
 variable "block_public_acls" {
   default = true
 }
@@ -34,7 +38,7 @@ variable "restrict_public_buckets" {
 }
 
 variable "versioning" {
-  default = true
+  default = false
 }
 
 variable "policy_role_arn" {
