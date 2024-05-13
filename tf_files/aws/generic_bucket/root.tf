@@ -16,7 +16,7 @@ module "s3_bucket" {
   bucket_ownership               = var.bucket_ownership
   logging_bucket_name            = var.logging_bucket_name
   kms_key_id                     = var.kms_key_id
-  public_access_bloc             = var.public_access_bloc
+  public_access_block            = var.public_access_bloc
   block_public_acls              = var.block_public_acls
   block_public_policy            = var.block_public_policy
   ignore_public_acls             = var.ignore_public_acls
