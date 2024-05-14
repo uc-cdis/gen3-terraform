@@ -9,6 +9,10 @@ variable "logging_bucket_name" {
   default     = ""
 }
 
+variable "aes_encryption" {
+  default = false
+}
+
 variable "kms_key_id" {
   description = "The KMS key to use for the bucket"
 }
