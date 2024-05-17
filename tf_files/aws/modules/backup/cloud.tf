@@ -9,13 +9,13 @@ resource "aws_kms_key" "backup_key" {
   enable_key_rotation     = true
 }
 
-resource "aws_backup_plan" "rds_backup_plan" {
-  name = "rds-backup-plan"
+resource "aws_backup_plan" "weekly" {
+  name = "rds-backup-weekly"
 
   rule {
     rule_name         = "rds-backup-rule"
     target_vault_name = aws_backup_vault.rds_backup_vault.name
-    schedule          = "cron(0 2 * * ? *)"  # Run backup daily at 2:00 AM UTC
+    schedule          = "weekly" 
 
     lifecycle {
       delete_after = var.retention_period

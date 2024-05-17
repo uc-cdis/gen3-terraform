@@ -11,5 +11,5 @@ terraform {
 
 
 module "backup" {
-    source   = "..//modules/backup"
+    source   = "../modules/backup"
 }
