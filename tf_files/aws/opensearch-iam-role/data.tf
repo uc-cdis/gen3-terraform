@@ -27,3 +27,14 @@ data "aws_iam_policy_document" "opensearch_assume_role" {
     }
   }
 }
+
+resource "aws_iam_policy" "opensearch_access_policy" {
+  name   = "opensearch-access-policy"
+  policy = data.aws_iam_policy_document.opensearch_cluster_access.json
+}
+
+resource "aws_iam_role" "opensearch_access_role" {
+  name                = "opensearch-access-role"
+  assume_role_policy  = data.aws_iam_policy_document.opensearch_assume_role.json
+  managed_policy_arns = [aws_iam_policy.opensearch_access_policy.arn]
+}
