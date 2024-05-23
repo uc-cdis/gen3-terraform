@@ -192,10 +192,6 @@ resource "aws_s3_bucket" "kube_bucket" {
   # S3 buckets are in a global namespace, so dns style naming
   bucket = "kube-${replace(var.vpc_name, "_", "-")}-gen3"
 
-  lifecycle {
-    ignore_changes = all
-  }
-
   tags = {
     Name         = "kube-${replace(var.vpc_name, "_", "-")}-gen3"
     Environment  = var.vpc_name
@@ -215,6 +211,10 @@ resource "aws_s3_bucket" "kube_bucket" {
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "kube_bucket" {
   bucket = aws_s3_bucket.kube_bucket.bucket
+
+  lifecycle {
+    ignore_changes = all
+  }
 
   rule {
     apply_server_side_encryption_by_default {
