@@ -9,6 +9,6 @@ resource "aws_iam_policy" "opensearch_iam_role_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "opensearch" {
-  role       = aws_iam_role.opensearch_iam_role
+  role       = aws_iam_role.opensearch_iam_role.name
   policy_arn = aws_iam_policy.opensearch_iam_role_policy.arn
 }
