@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "opensearch_assume_role" {
 
     condition {
       test     = "StringLike"
-      variable = "${locals.oidc_url}:sub"
+      variable = "${local.oidc_url}:sub"
       values   = ["system:serviceaccount:*:es-proxy"]
     }
 
