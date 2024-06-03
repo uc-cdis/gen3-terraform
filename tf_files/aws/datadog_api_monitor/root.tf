@@ -20,7 +20,7 @@ provider "datadog" {
 
 resource "datadog_synthetics_test" "api_tests" {
   name      = "${var.commons_name} tests"
-  message   = "@slack-gpe-alarms Service failure on ${var.commons_name} ${var.project_slack_channel}"
+  message   = "@slack-gen3-synthetics Service failure on ${var.commons_name} ${var.project_slack_channel}"
   tags      = var.tags
   type      = "api"
   subtype   = "multi"
