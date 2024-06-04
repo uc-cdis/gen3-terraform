@@ -5,7 +5,7 @@ locals {
 data "aws_iam_policy_document" "opensearch_cluster_access" {
   statement {
     actions   = ["es:*"]
-    resources = ["${var.opensearch_cluster_arn}"]
+    resources = ["${var.opensearch_cluster_arn}/*"]
     effect    = "Allow"
   }
 }
