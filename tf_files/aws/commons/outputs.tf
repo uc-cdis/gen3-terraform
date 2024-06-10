@@ -55,6 +55,23 @@ output "config_map_aws_auth" {
   sensitive   = true  
 }
 
+output "eks_cluster_name" {
+  value = module.eks[0].eks_cluster_name
+}
+
+output "eks_cluster_endpoint" {
+  value = module.eks[0].cluster_endpoint
+}
+
+output "eks_cluster_ca_cert" {
+  value = module.eks[0].cluster_certificate_authority_data
+  sensitive   = true
+}
+
+output "eks_oidc_arn" {
+  value = module.eks[0].oidc_provider_arn
+}
+
 ##
 # aws_rds_aurora_cluster
 ##
