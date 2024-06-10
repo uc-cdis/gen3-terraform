@@ -242,7 +242,7 @@ variable "useryaml_s3_path" {
 
 variable "vpc_name" {
   description = "Name of the VPC"
-  default     = "emalinowskiv1"
+  default     = ""
 }
 
 variable "wts_enabled" {
