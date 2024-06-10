@@ -1,9 +1,3 @@
-module "alarms-lambda" {
-  source                  = "../alarms-lambda"
-  vpc_name                = var.sqs_name
-  slack_webhook           = var.slack_webhook
-}
-
 resource "aws_sqs_queue" "generic_queue" {
   name                       = var.sqs_name
   # 5 min visilibity timeout; avoid consuming the same message twice
