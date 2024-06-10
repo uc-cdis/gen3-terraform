@@ -98,7 +98,7 @@ EDOC
 
 resource "aws_iam_role_policy" "fence-role-policy" {
   name = "fence-role-policy"
-  role = aws_iam_role.fence-role.id
+  role = aws_iam_role.fence-role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -109,7 +109,7 @@ resource "aws_iam_role_policy" "fence-role-policy" {
         ]
         Effect   = "Allow"
         Resource = [
-          module.sqs.sqs-arn
+          module.audit-sqs.sqs-arn
         ]
       }
     ]

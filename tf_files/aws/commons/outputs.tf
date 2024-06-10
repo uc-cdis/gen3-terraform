@@ -56,7 +56,7 @@ output "config_map_aws_auth" {
 }
 
 output "eks_cluster_name" {
-  value = module.eks[0].eks_cluster_name
+  value = module.eks[0].cluster_name
 }
 
 output "eks_cluster_endpoint" {
