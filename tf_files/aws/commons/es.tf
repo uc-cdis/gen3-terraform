@@ -35,15 +35,15 @@ resource "aws_iam_role" "esproxy-role" {
             "Sid": "",
             "Effect": "Allow",
             "Principal": {
-                "Federated": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${module.eks.oidc_provider_arn}"
+                "Federated": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${module.eks[0].oidc_provider_arn}"
             },
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
                 "ForAllValues:StringLike": {
-                    "${module.eks.oidc_provider_arn}:sub": [
+                    "${module.eks[0].oidc_provider_arn}:sub": [
                         "system:serviceaccount:*:esproxy-sa"
                     ],
-                    "${module.eks.oidc_provider_arn}:aud": "sts.amazonaws.com"
+                    "${module.eks[0].oidc_provider_arn}:aud": "sts.amazonaws.com"
                 }
             }
         }

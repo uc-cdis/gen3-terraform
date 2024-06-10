@@ -9,20 +9,3 @@ resource "aws_sqs_queue" "generic_queue" {
     description  = "Created by SQS module"
   }
 }
-
-resource "aws_cloudwatch_metric_alarm" "sqs_alarm" {
-  alarm_name                = "sqs_old_message_alarm-${var.sqs_name}"
-  comparison_operator       = "GreaterThanOrEqualToThreshold"
-  evaluation_periods        = "1"
-  metric_name               = "ApproximateAgeOfOldestMessage"
-  namespace                 = "AWS/SQS"
-  period                    = "120"
-  statistic                 = "Average"
-  threshold                 = "604800"
-  alarm_description         = "sqs queue has messages over a week old"
-  insufficient_data_actions = []
-  alarm_actions             = [module.alarms-lambda.sns-topic]
-  dimensions                = {
-   QueueName = var.sqs_name
-  }
-}

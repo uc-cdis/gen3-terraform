@@ -38,7 +38,7 @@ EDOC
 
 resource "aws_iam_role_policy" "audit-role-policy" {
   name = "audit-role-policy"
-  role = aws_iam_role.audit-role.id
+  role = aws_iam_role.audit-role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -51,7 +51,7 @@ resource "aws_iam_role_policy" "audit-role-policy" {
         ]
         Effect   = "Allow"
         Resource = [
-          module.sqs.sqs-arn
+          module.audit-sqs.sqs-arn
         ]
       }
     ]
@@ -224,7 +224,7 @@ EDOC
 
 resource "aws_iam_role_policy" "hatchery-role-policy" {
   name = "hatchery-role-policy"
-  role = aws_iam_role.hatchery-role.id
+  role = aws_iam_role.hatchery-role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -252,7 +252,7 @@ resource "aws_iam_role_policy" "hatchery-role-policy" {
 resource "aws_iam_policy_attachment" "hatchery-role-policy-attachment" {
   count = var.hatchery_enabled ? 1 : 0
   name = "hatchery-role-policy-attachment"
-  roles = [aws_iam_role.hatchery-role.name]
+  roles = [aws_iam_role.hatchery-role[0].name]
   policy_arn = "arn:aws:iam::aws:policy/AWSResourceAccessManagerFullAccess"
 }
 
@@ -296,7 +296,7 @@ EDOC
 
 resource "aws_iam_role_policy" "manifestservice-role-policy" {
   name = "manifestservice-role-policy"
-  role = aws_iam_role.manifestservice-role.id
+  role = aws_iam_role.manifestservice-role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -366,7 +366,7 @@ EDOC
 
 resource "aws_iam_role_policy" "aws-load-balancer-role-policy" {
   name = "audit-role-policy"
-  role = aws_iam_role.aws-load-balancer-role.id
+  role = aws_iam_role.aws-load-balancer-controller-role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"

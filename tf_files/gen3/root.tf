@@ -6,7 +6,7 @@ locals {
       arborist_enabled = var.arborist_enabled
       argo_enabled = var.argo_enabled
       audit_enabled = var.audit_enabled
-      audit_service_account = aws_iam_role.audit_role.arn
+      audit_service_account = aws_iam_role.audit-role[0].arn
       aurora_hostname = var.aurora_hostname
       aurora_username = var.aurora_username
       aurora_password = var.aurora_password
@@ -27,11 +27,11 @@ locals {
         upload_buckety       = var.upload_bucket
       })
       fence_enabled = var.fence_enabled
-      fence_service_account = aws_iam_role.fence_role.arn
+      fence_service_account = aws_iam_role.fence-role[0].arn
       gitops_file = var.gitops_path != "" ? indent(4, file(var.gitops_path)) : "{}"
       guppy_enabled = var.guppy_enabled
       hatchery_enabled = var.hatchery_enabled
-      hatchery_service_account = aws_iam_role.hatchery_role.arn
+      hatchery_service_account = aws_iam_role.hatchery-role[0].arn
       hostname = var.hostname
       indexd_enabled = var.indexd_enabled
       indexd_prefix = var.indexd_prefix
