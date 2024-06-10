@@ -31,8 +31,8 @@ module "audit-db" {
   secrets_manager_enabled = true
 }
 
-module "dicom-db" {
-  count                   = var.dicom_enabled ? 1 : 0
+module "dicom-viewer-db" {
+  count                   = var.dicom-viewer_enabled ? 1 : 0
   source                  = "../aws/aurora_db"
   vpc_name                = var.vpc_name
   service                 = "dicom"
@@ -43,7 +43,7 @@ module "dicom-db" {
 }
 
 module "dicom-server-db" {
-  count                   = var.dicom_server_enabled ? 1 : 0
+  count                   = var.dicom-server_enabled ? 1 : 0
   source                  = "../aws/aurora_db"
   vpc_name                = var.vpc_name
   service                 = "dicom-server"

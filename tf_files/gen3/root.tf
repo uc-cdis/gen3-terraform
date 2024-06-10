@@ -13,8 +13,8 @@ locals {
       aws-es-proxy_enabled = var.aws-es-proxy_enabled
       dbgap_enabled = var.dbgap_enabled
       dd_enabled = var.dd_enabled
-      dicom-server_enabled = var.dicom_server_enabled
-      dicom-viewer_enabled = var.dicom_viewer_enabled
+      dicom-server_enabled = var.dicom-server_enabled
+      dicom-viewer_enabled = var.dicom-viewer_enabled
       dictionary_url = var.dictionary_url
       dispatcher_job_number = var.dispatcher_job_number
       es_endpoint = var.es_endpoint
