@@ -630,7 +630,7 @@ EDOC
 resource "aws_iam_role_policy" "external-secrets-role-policy" {
   count = var.namespace == "default" ? 1 : 0
   name = "external-secrets-role-policy"
-  role = aws_iam_role.external-secrets-role.id
+  role = aws_iam_role.external-secrets-role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
