@@ -365,7 +365,8 @@ EDOC
 
 
 resource "aws_iam_role_policy" "aws-load-balancer-role-policy" {
-  name = "audit-role-policy"
+  count = var.namespace == "default" ? 1 : 0
+  name = "aws-load-balancer-controller-role-policy"
   role = aws_iam_role.aws-load-balancer-controller-role[0].id
 
   policy = jsonencode({
@@ -588,6 +589,7 @@ resource "aws_iam_role_policy" "aws-load-balancer-role-policy" {
 }
 
 resource "aws_iam_role" "external-secrets-role" {
+  count = var.namespace == "default" ? 1 : 0
   name = "${var.vpc_name}-${var.namespace}-external-secrets-sa"
   description = "Role for external-secrets service account for ${var.vpc_name}"
   assume_role_policy = <<EDOC
@@ -626,6 +628,7 @@ EDOC
 }
 
 resource "aws_iam_role_policy" "external-secrets-role-policy" {
+  count = var.namespace == "default" ? 1 : 0
   name = "external-secrets-role-policy"
   role = aws_iam_role.external-secrets-role.id
 

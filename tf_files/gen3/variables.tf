@@ -276,7 +276,7 @@ variable "gitops_path" {
 }
 
 variable "fence_config_path" {
-  default = "s3://cdis-gen3-users/dev/user.yaml"
+  default = ""
 }
 
 variable "google_client_id" {
