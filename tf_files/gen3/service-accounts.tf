@@ -2,37 +2,34 @@ resource "aws_iam_role" "audit-role" {
   count = var.audit_enabled ? 1 : 0
   name = "${var.vpc_name}-${var.namespace}-audit-sa"
   description = "Role for ES proxy service account for ${var.vpc_name}"
-  assume_role_policy = <<EDOC
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "ec2.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        },
-        {
-            "Sid": "",
-            "Effect": "Allow",
-            "Principal": {
-                "Federated": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
-            },
-            "Action": "sts:AssumeRoleWithWebIdentity",
-            "Condition": {
-                "StringEquals": {
-                    "${var.oidc_provider_arn}:sub": [
-                        "system:serviceaccount:${var.namespace}:audit-sa"
-                    ],
-                    "${var.oidc_provider_arn}:aud": "sts.amazonaws.com"
-                }
-            }
+  assume_role_policy = jsondecode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
         }
+        Action = "sts:AssumeRole"
+      },
+      {
+        Sid = ""
+        Effect = "Allow"
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${var.oidc_provider_arn}:sub" = [
+              "system:serviceaccount:${var.namespace}:audit-sa"
+            ]
+            "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
     ]
-}
-EDOC
-
+  })
   path = "/gen3-service/"
 }
 
@@ -62,36 +59,34 @@ resource "aws_iam_role" "fence-role" {
   count = var.fence_enabled ? 1 : 0
   name = "${var.vpc_name}-${var.namespace}-fence-sa"
   description = "Role for ES proxy service account for ${var.vpc_name}"
-  assume_role_policy = <<EDOC
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "ec2.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        },
-        {
-            "Sid": "",
-            "Effect": "Allow",
-            "Principal": {
-                "Federated": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
-            },
-            "Action": "sts:AssumeRoleWithWebIdentity",
-            "Condition": {
-                "StringEquals": {
-                    "${var.oidc_provider_arn}:sub": [
-                        "system:serviceaccount:${var.namespace}:fence-sa"
-                    ],
-                    "${var.oidc_provider_arn}:aud": "sts.amazonaws.com"
-                }
-            }
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
         }
+        Action = "sts:AssumeRole"
+      },
+      {
+        Sid = ""
+        Effect = "Allow"
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${var.oidc_provider_arn}:sub" = [
+              "system:serviceaccount:${var.namespace}:fence-sa"
+            ]
+            "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
     ]
-}
-EDOC
+  })
 
   path = "/gen3-service/"
 }
@@ -119,36 +114,34 @@ resource "aws_iam_role_policy" "fence-role-policy" {
 resource "aws_iam_role" "gitops-role" {
   name = "${var.vpc_name}-${var.namespace}-gitops-sa"
   description = "Role for gitops service account for ${var.vpc_name}"
-  assume_role_policy = <<EDOC
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "ec2.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        },
-        {
-            "Sid": "",
-            "Effect": "Allow",
-            "Principal": {
-                "Federated": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
-            },
-            "Action": "sts:AssumeRoleWithWebIdentity",
-            "Condition": {
-                "StringEquals": {
-                    "${var.oidc_provider_arn}:sub": [
-                        "system:serviceaccount:${var.namespace}:gitops-sa"
-                    ],
-                    "${var.oidc_provider_arn}:aud": "sts.amazonaws.com"
-                }
-            }
+  assume_role_policy = jsondecode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
         }
+        Action = "sts:AssumeRole"
+      },
+      {
+        Sid = ""
+        Effect = "Allow"
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${var.oidc_provider_arn}:sub" = [
+              "system:serviceaccount:${var.namespace}:gitops-sa"
+            ]
+            "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
     ]
-}
-EDOC
+  })
 
   path = "/gen3-service/"
 }
@@ -188,36 +181,34 @@ resource "aws_iam_role" "hatchery-role" {
   count = var.hatchery_enabled ? 1 : 0
   name = "${var.vpc_name}-${var.namespace}-hatchery-sa"
   description = "Role for ES proxy service account for ${var.vpc_name}"
-  assume_role_policy = <<EDOC
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "ec2.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        },
-        {
-            "Sid": "",
-            "Effect": "Allow",
-            "Principal": {
-                "Federated": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
-            },
-            "Action": "sts:AssumeRoleWithWebIdentity",
-            "Condition": {
-                "ForAllValues:StringLike": {
-                    "${var.oidc_provider_arn}:sub": [
-                        "system:serviceaccount:${var.namespace}:hatchery-sa"
-                    ],
-                    "${var.oidc_provider_arn}:aud": "sts.amazonaws.com"
-                }
-            }
+  assume_role_policy = jsondecode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
         }
+        Action = "sts:AssumeRole"
+      },
+      {
+        Sid = ""
+        Effect = "Allow"
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${var.oidc_provider_arn}:sub" = [
+              "system:serviceaccount:${var.namespace}:hatchery-sa"
+            ]
+            "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
     ]
-}
-EDOC
+  })
 
   path = "/gen3-service/"
 }
@@ -260,36 +251,34 @@ resource "aws_iam_role" "manifestservice-role" {
   count = var.manifestservice_enabled ? 1 : 0
   name = "${var.vpc_name}-${var.namespace}-manifestservice-sa"
   description = "Role for manifestservice service account for ${var.vpc_name}"
-  assume_role_policy = <<EDOC
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "ec2.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        },
-        {
-            "Sid": "",
-            "Effect": "Allow",
-            "Principal": {
-                "Federated": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
-            },
-            "Action": "sts:AssumeRoleWithWebIdentity",
-            "Condition": {
-                "StringEquals": {
-                    "${var.oidc_provider_arn}:sub": [
-                        "system:serviceaccount:${var.namespace}:manifestservice-sa"
-                    ],
-                    "${var.oidc_provider_arn}:aud": "sts.amazonaws.com"
-                }
-            }
+  assume_role_policy = jsondecode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
         }
+        Action = "sts:AssumeRole"
+      },
+      {
+        Sid = ""
+        Effect = "Allow"
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${var.oidc_provider_arn}:sub" = [
+              "system:serviceaccount:${var.namespace}:manifestservice-sa"
+            ]
+            "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
     ]
-}
-EDOC
+  })
 
   path = "/gen3-service/"
 }
@@ -329,36 +318,34 @@ resource "aws_iam_role" "aws-load-balancer-controller-role" {
   count = var.namespace == "default" ? 1 : 0
   name = "${var.vpc_name}-aws-load-balancer-controller-sa"
   description = "Role for ALB controller service account for ${var.vpc_name}"
-  assume_role_policy = <<EDOC
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "ec2.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        },
-        {
-            "Sid": "",
-            "Effect": "Allow",
-            "Principal": {
-                "Federated": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
-            },
-            "Action": "sts:AssumeRoleWithWebIdentity",
-            "Condition": {
-                "StringEquals": {
-                    "${var.oidc_provider_arn}:sub": [
-                        "system:serviceaccount:kube-system:aws-load-balancer-controller"
-                    ],
-                    "${var.oidc_provider_arn}:aud": "sts.amazonaws.com"
-                }
-            }
+  assume_role_policy = jsondecode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
         }
+        Action = "sts:AssumeRole"
+      },
+      {
+        Sid = ""
+        Effect = "Allow"
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${var.oidc_provider_arn}:sub" = [
+              "system:serviceaccount:kube-system:aws-load-balancer-controller"
+            ]
+            "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
     ]
-}
-EDOC
+  })
 
   path = "/gen3-service/"
 }
@@ -592,37 +579,34 @@ resource "aws_iam_role" "external-secrets-role" {
   count = var.namespace == "default" ? 1 : 0
   name = "${var.vpc_name}-${var.namespace}-external-secrets-sa"
   description = "Role for external-secrets service account for ${var.vpc_name}"
-  assume_role_policy = <<EDOC
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "ec2.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        },
-        {
-            "Sid": "",
-            "Effect": "Allow",
-            "Principal": {
-                "Federated": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
-            },
-            "Action": "sts:AssumeRoleWithWebIdentity",
-            "Condition": {
-                "StringEquals": {
-                    "${var.oidc_provider_arn}:sub": [
-                        "system:serviceaccount:external-secrets:external-secrets"
-                    ],
-                    "${var.oidc_provider_arn}:aud": "sts.amazonaws.com"
-                }
-            }
+  assume_role_policy = jsondecode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
         }
+        Action = "sts:AssumeRole"
+      },
+      {
+        Sid = ""
+        Effect = "Allow"
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${var.oidc_provider_arn}:sub" = [
+              "system:serviceaccount:external-secrets:external-secrets"
+            ]
+            "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
     ]
-  
-}
-EDOC
+  })
 
   path = "/gen3-service/"
 }

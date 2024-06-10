@@ -4,7 +4,7 @@ module "arborist-db" {
   vpc_name                = var.vpc_name
   service                 = "arborist"
   admin_database_username = var.aurora_username
-  admin_database_name     = var.aurora_password
+  admin_database_password = var.aurora_password
   namespace               = var.namespace
   secrets_manager_enabled = true
 }
@@ -15,7 +15,7 @@ module "argo-db" {
   vpc_name                = var.vpc_name
   service                 = "argo"
   admin_database_username = var.aurora_username
-  admin_database_name     = var.aurora_password
+  admin_database_password = var.aurora_password
   namespace               = var.namespace
   secrets_manager_enabled = true
 }
@@ -26,7 +26,7 @@ module "audit-db" {
   vpc_name                = var.vpc_name
   service                 = "audit"
   admin_database_username = var.aurora_username
-  admin_database_name     = var.aurora_password
+  admin_database_password = var.aurora_password
   namespace               = var.namespace
   secrets_manager_enabled = true
 }
@@ -37,7 +37,7 @@ module "dicom-viewer-db" {
   vpc_name                = var.vpc_name
   service                 = "dicom"
   admin_database_username = var.aurora_username
-  admin_database_name     = var.aurora_password
+  admin_database_password = var.aurora_password
   namespace               = var.namespace
   secrets_manager_enabled = true
 }
@@ -48,7 +48,7 @@ module "dicom-server-db" {
   vpc_name                = var.vpc_name
   service                 = "dicom-server"
   admin_database_username = var.aurora_username
-  admin_database_name     = var.aurora_password
+  admin_database_password = var.aurora_password
   namespace               = var.namespace
   secrets_manager_enabled = true
 }
@@ -59,7 +59,7 @@ module "fence-db" {
   vpc_name                = var.vpc_name
   service                 = "fence"
   admin_database_username = var.aurora_username
-  admin_database_name     = var.aurora_password
+  admin_database_password = var.aurora_password
   namespace               = var.namespace
   secrets_manager_enabled = true
 }
@@ -70,7 +70,7 @@ module "indexd-db" {
   vpc_name                = var.vpc_name
   service                 = "indexd"
   admin_database_username = var.aurora_username
-  admin_database_name     = var.aurora_password
+  admin_database_password = var.aurora_password
   namespace               = var.namespace
   secrets_manager_enabled = true
 }
@@ -81,7 +81,7 @@ module "metadata-db" {
   vpc_name                = var.vpc_name
   service                 = "metadata"
   admin_database_username = var.aurora_username
-  admin_database_name     = var.aurora_password
+  admin_database_password = var.aurora_password
   namespace               = var.namespace
   secrets_manager_enabled = true
 }
@@ -92,7 +92,7 @@ module "requestor-db" {
   vpc_name                = var.vpc_name
   service                 = "requestor"
   admin_database_username = var.aurora_username
-  admin_database_name     = var.aurora_password
+  admin_database_password = var.aurora_password
   namespace               = var.namespace
   secrets_manager_enabled = true
 }
@@ -103,7 +103,7 @@ module "sheepdog-db" {
   vpc_name                = var.vpc_name
   service                 = "sheepdog"
   admin_database_username = var.aurora_username
-  admin_database_name     = var.aurora_password
+  admin_database_password = var.aurora_password
   namespace               = var.namespace
   secrets_manager_enabled = true
 }
@@ -114,7 +114,7 @@ module "wts-db" {
   vpc_name                = var.vpc_name
   service                 = "wts"
   admin_database_username = var.aurora_username
-  admin_database_name     = var.aurora_password
+  admin_database_password = var.aurora_password
   namespace               = var.namespace
   secrets_manager_enabled = true
 }
