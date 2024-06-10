@@ -85,7 +85,7 @@ POLICY1
             "Principal": {
               "AWS": [
                 "${data.aws_iam_user.es_user.arn}",
-                "${data.aws_iam_role.es_role.arn}"
+                "${var.role_arn}"
               ]
             },
             "Effect": "Allow",

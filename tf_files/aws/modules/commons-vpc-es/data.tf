@@ -21,10 +21,6 @@ data "aws_iam_user" "es_user" {
   user_name = "${var.vpc_name}_es_user"
 }
 
-data "aws_iam_role" "es_role" {
-  name = "${var.vpc_name}-esproxy-sa"
-}
-
 data "aws_cloudwatch_log_group" "logs_group" {
   name = var.vpc_name
 }
