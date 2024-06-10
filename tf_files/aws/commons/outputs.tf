@@ -61,6 +61,7 @@ output "eks_cluster_name" {
 
 output "eks_cluster_endpoint" {
   value = module.eks[0].cluster_endpoint
+  sensitive = true
 }
 
 output "eks_cluster_ca_cert" {
