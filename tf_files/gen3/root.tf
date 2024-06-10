@@ -26,7 +26,7 @@ locals {
         google_client_secret = var.google_client_secret
         fence_access_key     = var.fence_access_key
         fence_secret_key     = var.fence_secret_key
-        upload_buckety       = var.upload_bucket
+        upload_bucket       = var.upload_bucket
       })
       fence_enabled = var.fence_enabled
       fence_service_account = aws_iam_role.fence-role[0].arn
