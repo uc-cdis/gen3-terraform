@@ -99,5 +99,5 @@ output "aurora_cluster_master_password" {
 }
 
 output "es_endpoint" {
-  value       = module.commons_vpc_es.es_endpoint
+  value       = module.commons_vpc_es[0].es_endpoint
 }

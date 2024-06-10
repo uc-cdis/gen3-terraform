@@ -65,13 +65,13 @@ variable "dispatcher_job_number" {
   default     = 10
 }
 
-variable "dicom_enabled" {
+variable "dicom-server_enabled" {
   description = "Enable dicom"
   type        = bool
   default     = false
 }
 
-variable "dicom_server_enabled" {
+variable "dicom-viewer_enabled" {
   description = "Enable dicom server"
   type        = bool
   default     = false
