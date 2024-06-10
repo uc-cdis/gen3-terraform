@@ -16,7 +16,7 @@ resource "aws_iam_role" "audit-role" {
         Sid = ""
         Effect = "Allow"
         Principal = {
-          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider_arn}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
@@ -73,7 +73,7 @@ resource "aws_iam_role" "fence-role" {
         Sid = ""
         Effect = "Allow"
         Principal = {
-          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider_arn}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
@@ -128,7 +128,7 @@ resource "aws_iam_role" "gitops-role" {
         Sid = ""
         Effect = "Allow"
         Principal = {
-          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider_arn}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
@@ -195,7 +195,7 @@ resource "aws_iam_role" "hatchery-role" {
         Sid = ""
         Effect = "Allow"
         Principal = {
-          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider_arn}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
@@ -265,7 +265,7 @@ resource "aws_iam_role" "manifestservice-role" {
         Sid = ""
         Effect = "Allow"
         Principal = {
-          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider_arn}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
@@ -332,7 +332,7 @@ resource "aws_iam_role" "aws-load-balancer-controller-role" {
         Sid = ""
         Effect = "Allow"
         Principal = {
-          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider_arn}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
@@ -593,7 +593,7 @@ resource "aws_iam_role" "external-secrets-role" {
         Sid = ""
         Effect = "Allow"
         Principal = {
-          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${var.oidc_provider_arn}"
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider_arn}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
