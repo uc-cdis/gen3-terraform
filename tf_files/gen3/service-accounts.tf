@@ -2,7 +2,7 @@ resource "aws_iam_role" "audit-role" {
   count = var.audit_enabled ? 1 : 0
   name = "${var.vpc_name}-${var.namespace}-audit-sa"
   description = "Role for ES proxy service account for ${var.vpc_name}"
-  assume_role_policy = jsondecode({
+  assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -114,7 +114,7 @@ resource "aws_iam_role_policy" "fence-role-policy" {
 resource "aws_iam_role" "gitops-role" {
   name = "${var.vpc_name}-${var.namespace}-gitops-sa"
   description = "Role for gitops service account for ${var.vpc_name}"
-  assume_role_policy = jsondecode({
+  assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -181,7 +181,7 @@ resource "aws_iam_role" "hatchery-role" {
   count = var.hatchery_enabled ? 1 : 0
   name = "${var.vpc_name}-${var.namespace}-hatchery-sa"
   description = "Role for ES proxy service account for ${var.vpc_name}"
-  assume_role_policy = jsondecode({
+  assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -251,7 +251,7 @@ resource "aws_iam_role" "manifestservice-role" {
   count = var.manifestservice_enabled ? 1 : 0
   name = "${var.vpc_name}-${var.namespace}-manifestservice-sa"
   description = "Role for manifestservice service account for ${var.vpc_name}"
-  assume_role_policy = jsondecode({
+  assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -318,7 +318,7 @@ resource "aws_iam_role" "aws-load-balancer-controller-role" {
   count = var.namespace == "default" ? 1 : 0
   name = "${var.vpc_name}-aws-load-balancer-controller-sa"
   description = "Role for ALB controller service account for ${var.vpc_name}"
-  assume_role_policy = jsondecode({
+  assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -579,7 +579,7 @@ resource "aws_iam_role" "external-secrets-role" {
   count = var.namespace == "default" ? 1 : 0
   name = "${var.vpc_name}-${var.namespace}-external-secrets-sa"
   description = "Role for external-secrets service account for ${var.vpc_name}"
-  assume_role_policy = jsondecode({
+  assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
