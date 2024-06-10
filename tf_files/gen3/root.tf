@@ -1,9 +1,12 @@
 locals {
   values = templatefile("${path.module}/values.tftpl", {
+      account_id = data.aws_caller_identity.current.account_id
+      namespace = var.namespace
       ambassador_enabled = var.ambassador_enabled
       arborist_enabled = var.arborist_enabled
       argo_enabled = var.argo_enabled
       audit_enabled = var.audit_enabled
+      audit_service_account = aws_iam_role.audit_role.arn
       aurora_hostname = var.aurora_hostname
       aurora_username = var.aurora_username
       aurora_password = var.aurora_password
@@ -24,9 +27,11 @@ locals {
         upload_buckety       = var.upload_bucket
       })
       fence_enabled = var.fence_enabled
+      fence_service_account = aws_iam_role.fence_role.arn
       gitops_file = var.gitops_path != "" ? indent(4, file(var.gitops_path)) : "{}"
       guppy_enabled = var.guppy_enabled
       hatchery_enabled = var.hatchery_enabled
+      hatchery_service_account = aws_iam_role.hatchery_role.arn
       hostname = var.hostname
       indexd_enabled = var.indexd_enabled
       indexd_prefix = var.indexd_prefix
@@ -57,6 +62,7 @@ locals {
 }
 
 resource "helm_release" "gen3" {
+  count      = var.deploy_gen3 ? 1 : 0
   name       = var.namespace
   repository = "http://helm.gen3.org"
   chart      = "gen3"
@@ -69,6 +75,16 @@ resource "helm_release" "gen3" {
 }
 
 resource "local_file" "values" {
+  count    = var.deploy_gen3 ? 1 : 0
   filename = "values.yaml"
   content  = local.values
+}
+
+resource "aws_secretsmanager_secret" "secret" {
+  name = "${var.vpc_name}_${var.namespace}-values"
+}
+
+resource "aws_secretsmanager_secret_version" "secret" {
+  secret_id     = aws_secretsmanager_secret.secret.id
+  secret_string = local.values
 }

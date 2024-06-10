@@ -65,6 +65,18 @@ variable "dispatcher_job_number" {
   default     = 10
 }
 
+variable "dicom_enabled" {
+  description = "Enable dicom"
+  type        = bool
+  default     = false
+}
+
+variable "dicom_server_enabled" {
+  description = "Enable dicom server"
+  type        = bool
+  default     = false
+}
+
 variable "es_endpoint" {
   description = "Elasticsearch endpoint"
   default     = ""
@@ -147,7 +159,7 @@ variable "peregrine_enabled" {
 variable "pidgin_enabled" {
   description = "Enable pidgin"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "portal_enabled" {
@@ -165,7 +177,7 @@ variable "public_datasets" {
 variable "requestor_enabled" {
   description = "Enable requestor"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "revproxy_arn" {
@@ -252,37 +264,41 @@ variable "cluster_name" {
 }
 
 variable "useryaml_path" {
-  
+  default = ""
 }
 
 variable "gitops_path" {
-  
+  default = ""
 }
 
 variable "fence_config_path" {
-  
+  default = "s3://cdis-gen3-users/dev/user.yaml"
 }
 
 variable "google_client_id" {
-  
+  default = ""
 }
 
 variable "google_client_secret" {
-  
+  default = "" 
 }
 
 variable "fence_access_key" {
-  
+  default = ""
 }
 
 variable "fence_secret_key" {
-
+  default = ""
 }
 
 variable "upload_bucket" {
-  
+  default = ""
 }
 
 variable "namespace" {
-  
+  default = "default"
+}
+
+variable "deploy_gen3" {
+  default = false
 }

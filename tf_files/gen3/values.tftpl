@@ -1,6 +1,8 @@
 global:
   aws:
     enabled: true
+    account: ${account_id}
+    hatchery_role: ${hatchery_service_account}
 
   dev: false
   postgres:
@@ -27,12 +29,18 @@ ambassador:
 
 arborist:
   enabled: ${arborist_enabled}
+  externalSecrets:
+    dbcreds: "${vpc_name}_${namespace}-arborist-creds"
 
 argo-wrapper:
   enabled: ${argo_enabled}
 
 audit:
   enabled: ${audit_enabled}
+  serviceAccount:
+    annotations: "eks.amazonaws.com/role-arn: ${audit_service_account}"
+  externalSecrets:
+    dbcreds: "${vpc_name}_${namespace}-audit-creds"    
 
 
 aws-es-proxy:
@@ -42,8 +50,29 @@ aws-es-proxy:
     awsAccessKeyId: ${es_user_key}
     awsSecretAccessKey: ${es_user_secret}
 
+dicom-server:
+  enabled: ${dicom-server_enabled}
+  externalSecrets:
+    dbcreds: "${vpc_name}_${namespace}-dicom-server-creds"
+
+dicom-viewer:
+  enabled: ${dicom-viewer_enabled}
+  externalSecrets:
+    dbcreds: "${vpc_name}_${namespace}-dicom-viewer-creds"
+
 fence:
   enabled: ${fence_enabled}
+  serviceAccount:
+    annotations: "eks.amazonaws.com/role-arn: ${fence_service_account}"
+   
+  externalSecrets:
+    fenceJwtKeys: ""
+    fenceGoogleAppCredsSecret: ""
+    fenceGoogleStorageCredsSecret: ""  
+    createK8sJwtKeysSecret: true
+    createK8sGoogleAppSecrets: true
+    createK8sFenceConfigSecret: true
+    dbcreds: "${vpc_name}_${namespace}-fence-creds"    
 
   FENCE_CONFIG: 
     ${fence_config}
@@ -119,6 +148,8 @@ hatchery:
 indexd:
   enabled: ${indexd_enabled}
   defaultPrefix: ${indexd_prefix}
+  externalSecrets:
+    dbcreds: "${vpc_name}_${namespace}-indexd-creds"
 
 
 manifestservice:
@@ -126,9 +157,13 @@ manifestservice:
 
 metadata:
   enabled: ${metadata_enabled}
+  externalSecrets:
+    dbcreds: "${vpc_name}_${namespace}-metadata-creds"
 
 peregrine:
   enabled: ${peregrine_enabled}
+  externalSecrets:
+    dbcreds: "${vpc_name}_${namespace}-sheepdg-creds"
 
 pidgin:
   enabled: ${pidgin_enabled}
@@ -141,15 +176,21 @@ portal:
 
 requestor:
   enabled: ${requestor_enabled}
+  externalSecrets:
+    dbcreds: "${vpc_name}_${namespace}-requestor-creds"
 
 revproxy:
   enabled: ${revproxy_enabled}
 
 sheepdog:
   enabled: ${sheepdog_enabled}
+  externalSecrets:
+    dbcreds: "${vpc_name}_${namespace}-sheepdog-creds"
 
 ssjdispatcher:
   enabled: ${ssjdispatcher_enabled}
 
 wts:
   enabled: ${wts_enabled}
+  externalSecrets:
+    dbcreds: "${vpc_name}_${namespace}-wts-creds"
