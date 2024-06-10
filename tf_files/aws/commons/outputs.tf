@@ -80,3 +80,7 @@ output "aurora_cluster_master_password" {
   value       = one(module.aurora[*].aurora_cluster_master_password)
   sensitive   = true
 }
+
+output "es_endpoint" {
+  value       = module.commons_vpc_es.es_endpoint
+}
