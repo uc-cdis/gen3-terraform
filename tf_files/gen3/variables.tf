@@ -263,6 +263,10 @@ variable "cluster_name" {
   default = ""
 }
 
+variable "oidc_provider_arn" {
+  default = ""
+}
+
 variable "useryaml_path" {
   default = ""
 }
