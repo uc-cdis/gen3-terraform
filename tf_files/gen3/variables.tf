@@ -55,6 +55,12 @@ variable "dd_enabled" {
   default     = false
 }
 
+variable "deploy_external_secrets" {
+  description = "Deploy external secrets"
+  type        = bool
+  default     = false
+}
+
 variable "dictionary_url" {
   description = "URL to the data dictionary"
   default     = ""

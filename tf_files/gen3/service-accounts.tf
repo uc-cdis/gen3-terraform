@@ -576,7 +576,7 @@ resource "aws_iam_role_policy" "aws-load-balancer-role-policy" {
 }
 
 resource "aws_iam_role" "external-secrets-role" {
-  count = var.namespace == "default" ? 1 : 0
+  count = var.namespace == "default" || var.deploy_external_secrets  ? 1 : 0
   name = "${var.vpc_name}-${var.namespace}-external-secrets-sa"
   description = "Role for external-secrets service account for ${var.vpc_name}"
   assume_role_policy = jsonencode({
@@ -612,7 +612,7 @@ resource "aws_iam_role" "external-secrets-role" {
 }
 
 resource "aws_iam_role_policy" "external-secrets-role-policy" {
-  count = var.namespace == "default" ? 1 : 0
+  count = var.namespace == "default" || var.deploy_external_secrets ? 1 : 0
   name = "external-secrets-role-policy"
   role = aws_iam_role.external-secrets-role[0].id
 
