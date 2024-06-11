@@ -240,10 +240,9 @@ resource "aws_iam_role_policy" "hatchery-role-policy" {
   })
 }
 
-resource "aws_iam_policy_attachment" "hatchery-role-policy-attachment" {
+resource "aws_iam_role_policy_attachment" "hatchery-role-policy-attachment" {
   count = var.hatchery_enabled ? 1 : 0
-  name = "hatchery-role-policy-attachment"
-  roles = [aws_iam_role.hatchery-role[0].name]
+  role = aws_iam_role.hatchery-role[0].name
   policy_arn = "arn:aws:iam::aws:policy/AWSResourceAccessManagerFullAccess"
 }
 
