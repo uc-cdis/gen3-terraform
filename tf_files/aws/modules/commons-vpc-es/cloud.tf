@@ -58,7 +58,7 @@ CONFIG
 
 
 locals {
-  es_policy  = var.role_arn != "" ? local.policy1 : local.policy2
+  es_policy  = var.role_arn == "" ? local.policy1 : local.policy2
   policy1 = <<POLICY1
 {
     "Version": "2012-10-17",
