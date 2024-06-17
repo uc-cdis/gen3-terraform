@@ -18,19 +18,15 @@ locals {
       dictionary_url = var.dictionary_url
       dispatcher_job_number = var.dispatcher_job_number
       es_endpoint = var.es_endpoint
-      es_user_key = var.es_user_key
-      es_user_secret =  var.es_user_secret
-      fence_config = var.fence_config_path != "" ? indent(4, file(var.fence_config_path)) : templatefile("${path.module}/fence-config.tftpl", {
-        hostname             = var.hostname
-        google_client_id     = var.google_client_id
-        google_client_secret = var.google_client_secret
-        fence_access_key     = var.fence_access_key
-        fence_secret_key     = var.fence_secret_key
-        upload_bucket       = var.upload_bucket
-      })
+      es_secret_name = aws_secretsmanager_secret.es_user_creds.name
+      fence_config_secret_name = aws_secretsmanager_secret.fence_config.name
       fence_enabled = var.fence_enabled
       fence_service_account = aws_iam_role.fence-role[0].arn
+      frontend_root = var.gen3ff_enabled ? "gen3ff" : "portal"
       gitops_file = var.gitops_path != "" ? indent(4, file(var.gitops_path)) : "{}"
+      gen3ff_enabled = var.gen3ff_enabled
+      gen3ff_repo = var.gen3ff_repo
+      gen3ff_tag = var.gen3ff_tag
       guppy_enabled = var.guppy_enabled
       hatchery_enabled = var.hatchery_enabled
       hatchery_service_account = aws_iam_role.hatchery-role[0].arn
@@ -82,11 +78,3 @@ resource "local_file" "values" {
   content  = local.values
 }
 
-resource "aws_secretsmanager_secret" "secret" {
-  name = "${var.vpc_name}_${var.namespace}-values"
-}
-
-resource "aws_secretsmanager_secret_version" "secret" {
-  secret_id     = aws_secretsmanager_secret.secret.id
-  secret_string = local.values
-}

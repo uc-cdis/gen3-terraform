@@ -7,11 +7,7 @@ global:
   dev: false
   postgres:
     dbCreate: false
-    master:
-      username: "${aurora_username}"
-      password: "${aurora_password}"
-      host: "${aurora_hostname}"
-      port: "5432"
+    externalSecret: "${vpc_name}_aurora-master-password"
   environment: "${vpc_name}"
   hostname: "${hostname}"
   revproxyArn: "${revproxy_arn}"
@@ -22,6 +18,7 @@ global:
   tierAccessLimit: ${tier_access_limit}
   netPolicy: ${netpolicy_enabled}
   dispatcherJobNum: "${dispatcher_job_number}"
+  frontendRoot: "${frontend_root}"
   ddEnabled: ${dd_enabled}
 
 ambassador:
@@ -46,9 +43,8 @@ audit:
 aws-es-proxy:
   enabled: ${aws-es-proxy_enabled}
   esEndpoint: ${es_endpoint}
-  secrets:
-    awsAccessKeyId: ${es_user_key}
-    awsSecretAccessKey: ${es_user_secret}
+  externalSecrets:
+    awsCreds: "${es_secret_name}"
 
 dicom-server:
   enabled: ${dicom-server_enabled}
@@ -67,6 +63,7 @@ fence:
    
   externalSecrets:
     fenceJwtKeys: ""
+    fenceConfig: ${fence_config_secret_name}
     fenceGoogleAppCredsSecret: ""
     fenceGoogleStorageCredsSecret: ""  
     createK8sJwtKeysSecret: true
@@ -74,8 +71,6 @@ fence:
     createK8sFenceConfigSecret: true
     dbcreds: "${vpc_name}_${namespace}-fence-creds"    
 
-  FENCE_CONFIG: 
-    ${fence_config}
 
   USER_YAML: |
     ${user_yaml}
@@ -87,6 +82,12 @@ fence:
     userYamlS3Path: "${useryaml_s3_path}"
     slack_webhook: "${slack_webhook}"
     slack_send_dbgap: ${slack_send_dbgap}
+
+frontend-framework:
+  enabled: ${gen3ff_enabled}
+  image:
+    repository: ${gen3ff_repo}
+    tag: ${gen3ff_tag}
 
 guppy:
   enabled: ${guppy_enabled}

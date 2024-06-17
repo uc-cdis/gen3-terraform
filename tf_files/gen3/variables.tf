@@ -104,6 +104,22 @@ variable "fence_enabled" {
   default     = true
 }
 
+variable "gen3ff_enabled" {
+  description = "Enable gen3ff"
+  type        = bool
+  default     = false
+}
+
+variable "gen3ff_repo" {
+  description = "Gen3ff repo"
+  default     = "quay.io/cdis/frontend-framework"
+}
+
+variable "gen3ff_tag" {
+  description = "Gen3ff tag"
+  default     = "main"
+}
+
 variable "guppy_enabled" {
   description = "Enable guppy"
   type        = bool
