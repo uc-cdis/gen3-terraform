@@ -2,7 +2,7 @@ resource "aws_s3_bucket" "mybucket" {
   bucket = var.bucket_name
 
   lifecycle {
-    ignore_changes  = ["tags", "tags_all"]
+    #ignore_changes  = ["tags", "tags_all"]
   }  
 }
 
