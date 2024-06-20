@@ -630,5 +630,71 @@ resource "aws_iam_role_policy" "external-secrets-role-policy" {
   })
 }
 
+resource "aws_iam_role" "s3-mountpoint-role" {
+  count = var.namespace == "default" || var.deploy_s3_mountpoint  ? 1 : 0
+  name = "${var.vpc_name}-${var.namespace}-s3-mountpoint-sa"
+  description = "Role for s3 mountpoint service account for ${var.vpc_name}"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      },
+      {
+        Sid = ""
+        Effect = "Allow"
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider_arn}"
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${var.oidc_provider_arn}:sub" = [
+              "system:serviceaccount:kube-system:s3-csi-driver-sa"
+            ]
+            "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+
+  path = "/gen3-service/"
+}
+
+resource "aws_iam_role_policy" "s3-mountpoint-role-policy" {
+  count = var.namespace == "default" || var.deploy_s3_mountpoint ? 1 : 0
+  name = "s3-mountpoint-role-policy"
+  role = aws_iam_role.s3-mountpoint-role[0].id
+
+  policy = jsonencode({
+    
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "s3:ListBucket"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+      {
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:AbortMultipartUpload",
+          "s3:DeleteObject"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 
 # TODO Add ssjdispatcher

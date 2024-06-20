@@ -61,6 +61,12 @@ variable "deploy_external_secrets" {
   default     = false
 }
 
+variable "deploy_s3_mountpoint" {
+  description = "Deploy s3 mountpoints"
+  type        = bool
+  default     = false
+}
+
 variable "dictionary_url" {
   description = "URL to the data dictionary"
   default     = ""
