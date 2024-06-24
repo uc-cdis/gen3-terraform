@@ -23,3 +23,14 @@ resource "aws_secretsmanager_secret_version" "fence_config" {
       })
 }
 
+resource "aws_secretsmanager_secret" "es_user_creds" {
+  name = "${var.vpc_name}_${var.namespace}-aws-es-proxy-creds"
+}
+
+resource "aws_secretsmanager_secret_version" "es_user_creds" {
+  secret_id     = aws_secretsmanager_secret.fence_config.id
+  secret_string = templatefile("${path.module}/aws-user-creds.tftpl", {
+        access_key    = var.es_user_key
+        access_secret = var.es_user_secret
+      })
+}
