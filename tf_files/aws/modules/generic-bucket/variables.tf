@@ -15,6 +15,7 @@ variable "aes_encryption" {
 
 variable "kms_key_id" {
   description = "The KMS key to use for the bucket"
+  default= ""
 }
 
 variable "bucket_lifecycle_configuration" {

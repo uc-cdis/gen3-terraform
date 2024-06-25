@@ -55,6 +55,24 @@ output "config_map_aws_auth" {
   sensitive   = true  
 }
 
+output "eks_cluster_name" {
+  value = module.eks[0].cluster_name
+}
+
+output "eks_cluster_endpoint" {
+  value = module.eks[0].cluster_endpoint
+  sensitive = true
+}
+
+output "eks_cluster_ca_cert" {
+  value = module.eks[0].cluster_certificate_authority_data
+  sensitive   = true
+}
+
+output "eks_oidc_arn" {
+  value = module.eks[0].oidc_provider_arn
+}
+
 ##
 # aws_rds_aurora_cluster
 ##
@@ -79,4 +97,8 @@ output "aurora_cluster_master_password" {
   description = "Aurora cluster master user's password"
   value       = one(module.aurora[*].aurora_cluster_master_password)
   sensitive   = true
+}
+
+output "es_endpoint" {
+  value       = module.commons_vpc_es[0].es_endpoint
 }
