@@ -1,9 +1,9 @@
 module "audit-sqs" {
-  source = "../aws/sqs"
+  source = "../aws/modules/sqs"
   sqs_name = "audit"
 }
 
 module "ssjdispatcher-sqs" {
-  source = "../aws/sqs"
+  source = "../aws/modules/sqs"
   sqs_name = "ssjdispatcher"
 }
