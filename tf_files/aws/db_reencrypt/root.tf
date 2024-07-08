@@ -29,6 +29,7 @@ resource "aws_rds_cluster" "postgresql" {
   engine_mode        	            = var.engine_mode
   skip_final_snapshot	            = false
   final_snapshot_identifier       = "${var.vpc_name}-new-snapshot"
+  snapshot_identifier             =  aws_db_cluster_snapshot.db_snapshot.id
   backup_retention_period         = data.aws_rds_cluster.source_db_instance.backup_retention_period
   preferred_backup_window         = data.aws_rds_cluster.source_db_instance.preferred_backup_window
   db_cluster_parameter_group_name = data.aws_rds_cluster.source_db_instance.db_cluster_parameter_group_name
@@ -52,9 +53,9 @@ resource "aws_rds_cluster_instance" "postgresql" {
 }
 
 # Create a snapshot of the existing RDS instance
-resource "aws_db_snapshot" "db_snapshot" {
-  db_instance_identifier = data.aws_rds_cluster.source_db_instance.id
-  db_snapshot_identifier = local.snapshot_identifier
+resource "aws_db_cluster_snapshot" "db_snapshot" {
+  db_cluster_identifier = data.aws_rds_cluster.source_db_instance.id
+  db_cluster_snapshot_identifier = local.snapshot_identifier
 }
 
 # Copy the snapshot and re-encrypt with the new KMS key
