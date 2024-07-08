@@ -56,7 +56,7 @@ variable "password_length" {
   default     = 12
 }
 
-variable "cluster_instance_class" {
+variable "instance_class" {
   description = "Cluster Instance Class"
   type        = string
   default     = "db.serverless"
