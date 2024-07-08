@@ -4,9 +4,6 @@ terraform {
   }
 }
 
-provider "aws" {}
-
-
 locals {
   snapshot_date       = formatdate("MM-DD-YYYY", timestamp())
   snapshot_identifier = "reencrypt-${local.snapshot_date}"
