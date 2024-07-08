@@ -61,7 +61,3 @@ variable "password_length" {
   description = "The length of the password string"
   default     = 12
 }
-
-variable "db_kms_key_id" {
-  default = ""
-}
