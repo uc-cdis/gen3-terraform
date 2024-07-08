@@ -49,7 +49,6 @@ resource "aws_rds_cluster_instance" "postgresql" {
   instance_class	     = var.instance_class
   engine             	 = data.aws_rds_cluster.source_db_instance.engine
   engine_version     	 = data.aws_rds_cluster.source_db_instance.engine_version
-  kms_key_id           = var.db_kms_key_id
 }
 
 # Create a snapshot of the existing RDS instance
