@@ -45,7 +45,7 @@ resource "aws_rds_cluster" "postgresql" {
 resource "aws_rds_cluster_instance" "postgresql" {
   db_subnet_group_name = aws_rds_cluster.postgresql.db_subnet_group_name
   identifier         	 = "${var.vpc_name}-${var.cluster_instance_identifier}-new"
-  cluster_identifier 	 = aws_rds_cluster.postgresql.id
+  cluster_identifier 	 = aws_rds_cluster.postgresql.cluster_identifier
   instance_class	     = var.instance_class
   engine             	 = data.aws_rds_cluster.source_db_instance.engine
   engine_version     	 = data.aws_rds_cluster.source_db_instance.engine_version
