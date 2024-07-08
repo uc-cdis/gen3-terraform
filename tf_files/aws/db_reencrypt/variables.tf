@@ -8,12 +8,6 @@ variable "db_kms_key_id" {
   default = ""
 }
 
-variable "engine_mode" {
-  type        = string
-  description = "use provisioned for Serverless v2 RDS cluster"
-  default     = "provisioned"
-}
-
 variable "cluster_identifier" {
   description = "Cluster Identifier"
   type        = string
