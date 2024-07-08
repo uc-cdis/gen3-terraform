@@ -18,9 +18,9 @@ resource "random_password" "password" {
 
 resource "aws_rds_cluster" "postgresql" {
   cluster_identifier              = "${var.vpc_name}-${var.cluster_identifier}-new"
-  engine                          = data.aws_db_instance.source_db_instance.engine
-  engine_version	                = data.aws_db_instance.source_db_instance.engine_version
-  db_subnet_group_name	          = data.aws_db_instance.source_db_instance.db_subnet_group_name
+  engine                          = data.aws_rds_cluster.source_db_instance.engine
+  engine_version	                = data.aws_rds_cluster.source_db_instance.engine_version
+  db_subnet_group_name	          = data.aws_rds_cluster.source_db_instance.db_subnet_group_name
   vpc_security_group_ids          = [data.aws_security_group.private.id]
   master_username                 = var.master_username
   master_password	                = random_password.password.result
@@ -29,9 +29,9 @@ resource "aws_rds_cluster" "postgresql" {
   engine_mode        	            = var.engine_mode
   skip_final_snapshot	            = false
   final_snapshot_identifier       = "${var.vpc_name}-new-snapshot"
-  backup_retention_period         = data.aws_db_instance.source_db_instance.backup_retention_period
-  preferred_backup_window         = data.aws_db_instance.source_db_instance.preferred_backup_window
-  db_cluster_parameter_group_name = data.aws_db_instance.source_db_instance.parameter_group_name
+  backup_retention_period         = data.aws_rds_cluster.source_db_instance.backup_retention_period
+  preferred_backup_window         = data.aws_rds_cluster.source_db_instance.preferred_backup_window
+  db_cluster_parameter_group_name = data.aws_rds_cluster.source_db_instance.parameter_group_name
   kms_key_id                      = var.db_kms_key_id 
 
   serverlessv2_scaling_configuration {
@@ -46,9 +46,9 @@ resource "aws_rds_cluster_instance" "postgresql" {
   db_subnet_group_name = aws_rds_cluster.postgresql.db_subnet_group_name
   identifier         	 = "${var.vpc_name}-${var.cluster_instance_identifier}-new"
   cluster_identifier 	 = aws_rds_cluster.postgresql.id
-  instance_class	     = data.aws_db_instance.source_db_instance.instance_class
-  engine             	 = data.aws_db_instance.source_db_instance.engine
-  engine_version     	 = data.aws_db_instance.source_db_instance.engine_version
+  instance_class	     = data.aws_rds_cluster.source_db_instance.instance_class
+  engine             	 = data.aws_rds_cluster.source_db_instance.engine
+  engine_version     	 = data.aws_rds_cluster.source_db_instance.engine_version
   kms_key_id           = var.db_kms_key_id
 }
 

@@ -1,3 +1,3 @@
-data "aws_db_instance" "source_db_instance" {
-  db_instance_identifier = var.db_instance_identifier
+data "aws_rds_cluster" "source_db_instance" {
+  cluster_identifier = var.db_instance_identifier
 }
