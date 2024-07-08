@@ -21,7 +21,7 @@ resource "aws_rds_cluster" "postgresql" {
   engine                          = data.aws_rds_cluster.source_db_instance.engine
   engine_version	                = data.aws_rds_cluster.source_db_instance.engine_version
   db_subnet_group_name	          = data.aws_rds_cluster.source_db_instance.db_subnet_group_name
-  vpc_security_group_ids          = [data.aws_rds_cluster.source_db_instance.vpc_security_group_ids]
+  vpc_security_group_ids          = data.aws_rds_cluster.source_db_instance.vpc_security_group_ids[*]
   master_username                 = var.master_username
   master_password	                = random_password.password.result
   storage_encrypted	              = true
