@@ -53,7 +53,7 @@ resource "aws_rds_cluster_instance" "postgresql" {
 
 # Create a snapshot of the existing RDS instance
 resource "aws_db_snapshot" "db_snapshot" {
-  db_instance_identifier = var.db_instance_identifier
+  db_instance_identifier = data.aws_rds_cluster.source_db_instance.id
   db_snapshot_identifier = local.snapshot_identifier
 }
 
