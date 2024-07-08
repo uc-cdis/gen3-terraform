@@ -21,7 +21,7 @@ resource "aws_rds_cluster" "postgresql" {
   engine                          = data.aws_rds_cluster.source_db_instance.engine
   engine_version	                = data.aws_rds_cluster.source_db_instance.engine_version
   db_subnet_group_name	          = data.aws_rds_cluster.source_db_instance.db_subnet_group_name
-  vpc_security_group_ids          = [data.aws_security_group.private.id]
+  vpc_security_group_ids          = [data.aws_rds_cluster.source_db_instance.vpc_security_group_ids]
   master_username                 = var.master_username
   master_password	                = random_password.password.result
   storage_encrypted	              = true
@@ -31,7 +31,7 @@ resource "aws_rds_cluster" "postgresql" {
   final_snapshot_identifier       = "${var.vpc_name}-new-snapshot"
   backup_retention_period         = data.aws_rds_cluster.source_db_instance.backup_retention_period
   preferred_backup_window         = data.aws_rds_cluster.source_db_instance.preferred_backup_window
-  db_cluster_parameter_group_name = data.aws_rds_cluster.source_db_instance.parameter_group_name
+  db_cluster_parameter_group_name = data.aws_rds_cluster.source_db_instance.db_cluster_parameter_group_name
   kms_key_id                      = var.db_kms_key_id 
 
   serverlessv2_scaling_configuration {
