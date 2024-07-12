@@ -31,7 +31,7 @@ variable "organization_name" {
 
 variable "es_version" {
   description = "What version to use when deploying ES"
-  default     = "6.8"
+  default     = "7.10"
 }
 
 variable "es_linked_role" {
