@@ -23,7 +23,7 @@ module "secrets_manager" {
     username = local.database_username
     password = local.database_password
   })
-  secret_name = "${var.vpc_name}-${var.service}-creds"
+  secret_name = "${var.namespace}-${var.service}-creds"
 
   depends_on = [ null_resource.user_setup ]
 }

@@ -1043,3 +1043,7 @@ variable "commons_log_retention" {
 variable "enable_vpc_endpoints" {
   default = true
 }
+
+variable "deploy_es_role" {
+  default = false
+}
