@@ -27,4 +27,5 @@ module "aurora" {
   backup_retention_period		        = var.backup_retention_period
   preferred_backup_window		        = var.preferred_backup_window
   password_length			              = var.password_length
+  db_kms_key_id			                = var.db_kms_key_id
 }
