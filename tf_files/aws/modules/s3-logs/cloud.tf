@@ -23,7 +23,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "log_bucket" {
   }
 
   lifecycle {
-    ignore_changes = [all]
+    ignore_changes = all
   }
 }
 
