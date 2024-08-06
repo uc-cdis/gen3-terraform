@@ -68,6 +68,10 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "log_bucket" {
       sse_algorithm = "AES256"
     }
   }
+
+  lifecycle {
+    ignore_changes = [all]
+  }
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "log_bucket" {

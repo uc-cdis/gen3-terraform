@@ -21,14 +21,18 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "log_bucket" {
       sse_algorithm = "AES256"
     }
   }
+
+  lifecycle {
+    ignore_changes = [all]
+  }
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "log_bucket" {
   bucket = aws_s3_bucket.log_bucket.id
 
   rule {
-    status  = "Enabled"
-    id      = "log"
+    status = "Enabled"
+    id     = "log"
 
     filter {
       and {
@@ -48,11 +52,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_bucket" {
 }
 
 resource "aws_s3_bucket_public_access_block" "s3-log_bucket_privacy" {
-  bucket                      = aws_s3_bucket.log_bucket.id
-  block_public_acls           = true
-  block_public_policy         = true
-  ignore_public_acls          = true
-  restrict_public_buckets     = true
+  bucket                  = aws_s3_bucket.log_bucket.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 #
@@ -70,7 +74,7 @@ resource "aws_iam_policy" "log_bucket_writer" {
 
 resource "aws_s3_bucket_policy" "log_bucket_writer_by_ct" {
   bucket = aws_s3_bucket.log_bucket.id
-  policy =<<POLICY
+  policy = <<POLICY
 {
   "Version": "2012-10-17",
   "Statement": [
