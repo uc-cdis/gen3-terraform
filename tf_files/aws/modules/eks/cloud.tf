@@ -641,7 +641,7 @@ CONFIGMAPAWSAUTH2
 # instead just publish output variables
 #
 resource "null_resource" "config_setup" {
-   count = var.ci_run ? 0 : 1
+   #count = var.ci_run ? 0 : 1
    triggers = {
     kubeconfig_change = sensitive(templatefile("${path.module}/kubeconfig.tpl", {vpc_name = var.vpc_name, eks_name = aws_eks_cluster.eks_cluster.id, eks_endpoint = aws_eks_cluster.eks_cluster.endpoint, eks_cert = aws_eks_cluster.eks_cluster.certificate_authority.0.data,}))
     configmap_change  = sensitive(local.config-map-aws-auth)

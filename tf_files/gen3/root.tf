@@ -1,32 +1,35 @@
 locals {
   values = templatefile("${path.module}/values.tftpl", {
+      account_id = data.aws_caller_identity.current.account_id
+      namespace = var.namespace
       ambassador_enabled = var.ambassador_enabled
       arborist_enabled = var.arborist_enabled
       argo_enabled = var.argo_enabled
       audit_enabled = var.audit_enabled
+      audit_service_account = aws_iam_role.audit-role[0].arn
       aurora_hostname = var.aurora_hostname
       aurora_username = var.aurora_username
       aurora_password = var.aurora_password
       aws-es-proxy_enabled = var.aws-es-proxy_enabled
       dbgap_enabled = var.dbgap_enabled
       dd_enabled = var.dd_enabled
+      dicom-server_enabled = var.dicom-server_enabled
+      dicom-viewer_enabled = var.dicom-viewer_enabled
       dictionary_url = var.dictionary_url
       dispatcher_job_number = var.dispatcher_job_number
       es_endpoint = var.es_endpoint
-      es_user_key = var.es_user_key
-      es_user_secret =  var.es_user_secret
-      fence_config = var.fence_config_path != "" ? indent(4, file(var.fence_config_path)) : templatefile("${path.module}/fence-config.tftpl", {
-        hostname             = var.hostname
-        google_client_id     = var.google_client_id
-        google_client_secret = var.google_client_secret
-        fence_access_key     = var.fence_access_key
-        fence_secret_key     = var.fence_secret_key
-        upload_buckety       = var.upload_bucket
-      })
+      es_secret_name = aws_secretsmanager_secret.es_user_creds.name
+      fence_config_secret_name = aws_secretsmanager_secret.fence_config.name
       fence_enabled = var.fence_enabled
+      fence_service_account = aws_iam_role.fence-role[0].arn
+      frontend_root = var.gen3ff_enabled ? "gen3ff" : "portal"
       gitops_file = var.gitops_path != "" ? indent(4, file(var.gitops_path)) : "{}"
+      gen3ff_enabled = var.gen3ff_enabled
+      gen3ff_repo = var.gen3ff_repo
+      gen3ff_tag = var.gen3ff_tag
       guppy_enabled = var.guppy_enabled
       hatchery_enabled = var.hatchery_enabled
+      hatchery_service_account = aws_iam_role.hatchery-role[0].arn
       hostname = var.hostname
       indexd_enabled = var.indexd_enabled
       indexd_prefix = var.indexd_prefix
@@ -57,6 +60,7 @@ locals {
 }
 
 resource "helm_release" "gen3" {
+  count      = var.deploy_gen3 ? 1 : 0
   name       = var.namespace
   repository = "http://helm.gen3.org"
   chart      = "gen3"
@@ -69,6 +73,8 @@ resource "helm_release" "gen3" {
 }
 
 resource "local_file" "values" {
+  count    = var.deploy_gen3 ? 1 : 0
   filename = "values.yaml"
   content  = local.values
 }
+
