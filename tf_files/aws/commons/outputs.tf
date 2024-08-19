@@ -46,13 +46,13 @@ output "data-bucket_name" {
 }
 
 output "kubeconfig" {
-  value = module.eks[0].kubeconfig
-  sensitive   = true  
+  value     = module.eks[0].kubeconfig
+  sensitive = true
 }
 
 output "config_map_aws_auth" {
-  value = module.eks[0].config_map_aws_auth
-  sensitive   = true  
+  value     = module.eks[0].config_map_aws_auth
+  sensitive = true
 }
 
 output "eks_cluster_name" {
@@ -71,6 +71,18 @@ output "eks_cluster_ca_cert" {
 
 output "eks_oidc_arn" {
   value = module.eks[0].oidc_provider_arn
+}
+
+output "cluster_oidc_provider_url" {
+  value = module.eks[0].cluster_oidc_provider_url
+}
+
+output "cluster_oidc_provider_arn" {
+  value = module.eks[0].cluster_oidc_provider_arn
+}
+
+output "opensearch_cluster_arn" {
+  value = module.commons_vpc_es[0].es_arn
 }
 
 ##

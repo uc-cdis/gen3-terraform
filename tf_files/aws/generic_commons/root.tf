@@ -5,14 +5,14 @@ terraform {
   }
   required_providers {
     kubectl = {
-      source  = "gavinbunney/kubectl"
+      source = "gavinbunney/kubectl"
     }
   }
 }
 
 provider "aws" {
   profile = "cdistest"
-  region = var.region
+  region  = var.region
 }
 
 provider "kubernetes" {
@@ -57,7 +57,7 @@ provider "kubectl" {
 
 
 locals {
-  azs      = slice(data.aws_availability_zones.available.names, 0, 3)
+  azs = slice(data.aws_availability_zones.available.names, 0, 3)
 
   tags = {
     Name         = var.vpc_name
@@ -155,7 +155,7 @@ module "eks" {
 ################################################################################
 
 module "karpenter" {
-  source  = "terraform-aws-modules/eks/aws//modules/karpenter"
+  source = "terraform-aws-modules/eks/aws//modules/karpenter"
 
   cluster_name           = module.eks.cluster_name
   irsa_oidc_provider_arn = module.eks.oidc_provider_arn
@@ -176,7 +176,7 @@ resource "helm_release" "karpenter" {
   repository_username = data.aws_ecrpublic_authorization_token.token.user_name
   repository_password = data.aws_ecrpublic_authorization_token.token.password
   chart               = "karpenter"
-  version             = "v0.21.1"
+  version             = "v0.27.0"
 
   set {
     name  = "settings.aws.clusterName"
@@ -291,14 +291,14 @@ module "vpc" {
   name = var.vpc_name
   cidr = var.vpc_cidr
 
-  azs              = local.azs
-  private_subnets  = [for k, v in local.azs : cidrsubnet(var.vpc_cidr, 2, k)]
-  public_subnets   = [for k, v in local.azs : cidrsubnet(var.vpc_cidr, 8, k + 192)]
-  intra_subnets    = [for k, v in local.azs : cidrsubnet(var.vpc_cidr, 8, k + 195)]
-  database_subnets = [cidrsubnet(var.vpc_cidr, 8, 198)]
-  create_database_subnet_group  = false
+  azs                          = local.azs
+  private_subnets              = [for k, v in local.azs : cidrsubnet(var.vpc_cidr, 2, k)]
+  public_subnets               = [for k, v in local.azs : cidrsubnet(var.vpc_cidr, 8, k + 192)]
+  intra_subnets                = [for k, v in local.azs : cidrsubnet(var.vpc_cidr, 8, k + 195)]
+  database_subnets             = [cidrsubnet(var.vpc_cidr, 8, 198)]
+  create_database_subnet_group = false
 
-  
+
 
   enable_nat_gateway = true
   single_nat_gateway = true
@@ -324,7 +324,7 @@ module "vpc" {
 resource "aws_db_subnet_group" "database" {
   name        = "${var.vpc_name}-subnet-group"
   description = "Database subnet group for ${var.vpc_name}"
-  subnet_ids  = [ module.vpc.database_subnets[0], module.vpc.intra_subnets[0], module.vpc.intra_subnets[1] ]
+  subnet_ids  = [module.vpc.database_subnets[0], module.vpc.intra_subnets[0], module.vpc.intra_subnets[1]]
 
   tags = local.tags
 }
@@ -333,12 +333,12 @@ resource "aws_db_subnet_group" "database" {
 module "es" {
   source = "git::git@github.com:uc-cdis/cloud-automation.git//tf_files-1.0/aws/commons_vpc_es?ref=44404bf7b3a68c2eff31972a4de3b2d987d7a142"
 
-  vpc_name = var.vpc_name
+  vpc_name       = var.vpc_name
   es_linked_role = false
   depends_on = [
     module.vpc,
     aws_cloudwatch_log_group.main_log_group
-  ]  
+  ]
 }
 
 resource "aws_iam_user" "es_user" {
@@ -350,11 +350,11 @@ resource "aws_iam_user" "es_user" {
 }
 
 resource "aws_iam_access_key" "es_user_key" {
-  user = "${aws_iam_user.es_user.name}"
+  user = aws_iam_user.es_user.name
 }
 
 resource "aws_cloudwatch_log_group" "main_log_group" {
-  name              = "${var.vpc_name}"
+  name              = var.vpc_name
   retention_in_days = "1827"
 
   tags = {
@@ -367,13 +367,13 @@ resource "aws_cloudwatch_log_group" "main_log_group" {
 module "aurora_postgresql_v2" {
   source = "terraform-aws-modules/rds-aurora/aws"
 
-  name              = "${var.vpc_name}-postgres-cluster"
-  engine            = data.aws_rds_engine_version.postgresql.engine
-  engine_mode       = "provisioned"
-  engine_version    = data.aws_rds_engine_version.postgresql.version
-  storage_encrypted = true
-  master_username   = "postgres"
-  master_password   = random_password.master.result
+  name                        = "${var.vpc_name}-postgres-cluster"
+  engine                      = data.aws_rds_engine_version.postgresql.engine
+  engine_mode                 = "provisioned"
+  engine_version              = data.aws_rds_engine_version.postgresql.version
+  storage_encrypted           = true
+  master_username             = "postgres"
+  master_password             = random_password.master.result
   manage_master_user_password = false
 
   vpc_id               = module.vpc.vpc_id
@@ -414,9 +414,9 @@ resource "random_password" "master" {
 
 resource "null_resource" "kubeconfig" {
   provisioner "local-exec" {
-   command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${var.region}"
+    command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${var.region}"
   }
-  depends_on = [ module.eks ]
+  depends_on = [module.eks]
 }
 
 resource "aws_iam_role" "aws_load_balancer_controller" {
@@ -439,7 +439,7 @@ resource "null_resource" "aws_load_balancer_controller" {
   provisioner "local-exec" {
     command = "kubectl apply -k \"github.com/aws/eks-charts/stable/aws-load-balancer-controller/crds?ref=master\" && kubectl create sa aws-load-balancer-controller -n kube-system && kubectl annotate sa -n kube-system aws-load-balancer-controller eks.amazonaws.com/role-arn=${aws_iam_role.aws_load_balancer_controller.arn}"
   }
-  depends_on = [ 
+  depends_on = [
     module.eks,
     aws_iam_role.aws_load_balancer_controller
   ]
@@ -477,7 +477,7 @@ resource "helm_release" "aws_load_balancer_controller" {
     value = "aws-load-balancer-controller"
   }
 
-  depends_on = [ 
+  depends_on = [
     module.eks,
     null_resource.aws_load_balancer_controller
   ]

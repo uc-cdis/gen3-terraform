@@ -13,6 +13,10 @@ resource "aws_s3_bucket" "data_bucket" {
 resource "aws_s3_bucket_server_side_encryption_configuration" "data_bucket" {
   bucket = aws_s3_bucket.data_bucket.bucket
 
+  lifecycle {
+    ignore_changes = all
+  }
+
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "aws:kms"
@@ -27,11 +31,11 @@ resource "aws_s3_bucket_logging" "data_bucket" {
 }
 
 resource "aws_s3_bucket_public_access_block" "data_bucket_privacy" {
-  bucket                      = aws_s3_bucket.data_bucket.id
-  block_public_acls           = true
-  block_public_policy         = true
-  ignore_public_acls          = true
-  restrict_public_buckets     = true
+  bucket                  = aws_s3_bucket.data_bucket.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 ##create an event for SNS
@@ -39,8 +43,8 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = aws_s3_bucket.data_bucket.id
 
   topic {
-    topic_arn     = module.data-bucket-queue.data-bucket_name
-    events        = ["s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload" ]
+    topic_arn = module.data-bucket-queue.data-bucket_name
+    events    = ["s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"]
   }
 }
 
@@ -70,23 +74,23 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_bucket" {
   bucket = aws_s3_bucket.log_bucket.bucket
 
   rule {
-      status  = "Enabled"
-      id      = "log"
+    status = "Enabled"
+    id     = "log"
 
-      filter {
-        and {
-          prefix = "/"
+    filter {
+      and {
+        prefix = "/"
 
-          tags = {
-            rule      = "log"
-            autoclean = "true"
-          }
+        tags = {
+          rule      = "log"
+          autoclean = "true"
         }
       }
+    }
 
-      expiration {
-        days = 120
-      }
+    expiration {
+      days = 120
+    }
   }
 }
 
@@ -102,7 +106,7 @@ resource "aws_s3_bucket_public_access_block" "data_bucket_logs_privacy" {
 ## We want could trail to put additional logs in this log bucket
 resource "aws_s3_bucket_policy" "log_bucket_writer_by_ct" {
   bucket = aws_s3_bucket.log_bucket.id
-  policy =<<POLICY
+  policy = <<POLICY
 {
   "Version": "2012-10-17",
   "Statement": [
