@@ -35,7 +35,7 @@ resource "aws_iam_role" "esproxy-role" {
             "Sid": "",
             "Effect": "Allow",
             "Principal": {
-                "Federated": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:${module.eks[0].oidc_provider_arn}"
+                "Federated": "${module.eks[0].cluster_oidc_provider_arn}"
             },
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
