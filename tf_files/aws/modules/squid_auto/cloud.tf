@@ -68,16 +68,22 @@ resource "aws_route_table_association" "squid_auto0" {
 
 
 # Auto scaling group for squid auto
+resource "aws_launch_template" "squid_auto" {
+  name_prefix   = "${var.env_squid_name}-lt"
+  instance_type = var.squid_instance_type
+  image_id      = data.aws_ami.public_squid_ami.id
+  key_name      = var.ssh_key_name
 
-resource "aws_launch_configuration" "squid_auto" {
-  name_prefix                 = "${var.env_squid_name}_autoscaling_launch_config"
-  image_id                    = data.aws_ami.public_squid_ami.id
-  instance_type               = var.squid_instance_type
-  security_groups             = [aws_security_group.squidauto_in.id, aws_security_group.squidauto_out.id]
-  key_name                    = var.ssh_key_name
-  iam_instance_profile        = aws_iam_instance_profile.squid-auto_role_profile.id
-  associate_public_ip_address = true
-  user_data                   = <<EOF
+  iam_instance_profile {
+    name = aws_iam_instance_profile.squid_auto_role_profile.name
+  }
+
+  network_interfaces {
+    associate_public_ip_address = true
+    security_groups             = [aws_security_group.squidauto_in.id, aws_security_group.squidauto_out.id]
+  }
+
+  user_data = <<EOF
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="BOUNDARY"
 
@@ -177,15 +183,23 @@ CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
 --BOUNDARY--
 EOF
 
-  root_block_device {
-    volume_size = var.squid_instance_drive_size
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      volume_size = var.squid_instance_drive_size
+    }
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      Name = "${var.env_squid_name}"
+    }
   }
 
   lifecycle {
     create_before_destroy = true
   }
-
-  depends_on = [aws_iam_instance_profile.squid-auto_role_profile]
 }
 
 resource "null_resource" "service_depends_on" {
@@ -223,8 +237,12 @@ resource "aws_autoscaling_group" "squid_auto" {
   max_size                = var.cluster_max_size
   min_size                = var.cluster_min_size
   vpc_zone_identifier     = aws_subnet.squid_pub0.*.id
-  launch_configuration    = aws_launch_configuration.squid_auto.name
   depends_on              = [null_resource.service_depends_on, aws_route_table_association.squid_auto0]
+
+  launch_template {
+    id      = aws_launch_template.squid_auto.id
+    version = "$Latest"
+  }
 
   tag {
     key                 = "Name"
