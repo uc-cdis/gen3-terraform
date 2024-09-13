@@ -339,6 +339,7 @@ variable "ha-squid_bootstrap_script" {
 }
 
 variable "ha-squid_extra_vars" {
+  type    = list(string)
   description = "additional variables to pass along with the bootstrapscript"
   default     = ["squid_image=master"]
 }
