@@ -206,19 +206,25 @@ resource "aws_vpc_endpoint_service" "squid_nlb" {
 }
 
 # Auto scaling group for squid nlb
-resource "aws_launch_configuration" "squid_nlb" {
-  name_prefix                 = "${var.env_nlb_name}_autoscaling_launch_config"
-  image_id                    = data.aws_ami.public_squid_ami.id
-  instance_type               = "t3.xlarge"
-  security_groups             = [aws_security_group.squidnlb_in.id, aws_security_group.squidnlb_out.id]
-  key_name                    = var.ssh_key_name
-  iam_instance_profile        = aws_iam_instance_profile.squid-nlb_role_profile.id
-  associate_public_ip_address = true
-  depends_on                  = [aws_iam_instance_profile.squid-nlb_role_profile]
-  user_data                   = <<EOF
+resource "aws_launch_template" "squid_nlb" {
+  name_prefix   = "${var.env_nlb_name}-lt"
+  instance_type = "t3.xlarge"
+  image_id      = data.aws_ami.public_squid_ami.id
+  key_name      = var.ssh_key_name
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.squid-nlb_role_profile.name
+  }
+
+  network_interfaces {
+    associate_public_ip_address = true
+    security_groups             = [aws_security_group.squidnlb_in.id, aws_security_group.squidnlb_out.id]
+  }
+
+  user_data = sensitive(base64encode( <<EOF
 #!/bin/bash
 cd /home/ubuntu
-sudo git clone https://github.com/uc-cdis/cloud-automation.git
+sudo git clone https://github.com/uc-cdis/cloud-automation.gits
 sudo chown -R ubuntu. /home/ubuntu/cloud-automation
 cd /home/ubuntu/cloud-automation
 git pull
@@ -241,14 +247,19 @@ sudo apt-get autoclean
 cd /home/ubuntu
 sudo bash "${var.bootstrap_path}${var.bootstrap_script}" 2>&1 |sudo tee --append /var/log/bootstrapping_script.log
 EOF
-
-  root_block_device {
-    volume_size = 30
+  ))
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      volume_size = 30
+    }
   }
 
   lifecycle {
     create_before_destroy = true
   }
+
+  depends_on = [aws_iam_instance_profile.squid-nlb_role_profile]  
 }
 
 resource "aws_autoscaling_group" "squid_nlb" {
@@ -261,7 +272,11 @@ resource "aws_autoscaling_group" "squid_nlb" {
   min_size             = 1
   target_group_arns    = [aws_lb_target_group.squid_nlb-http.arn, aws_lb_target_group.squid_nlb-sftp.arn]
   vpc_zone_identifier  = [aws_subnet.squid_pub0.id, aws_subnet.squid_pub1.id, aws_subnet.squid_pub2.id, aws_subnet.squid_pub3.id, aws_subnet.squid_pub4.id, aws_subnet.squid_pub5.id]
-  launch_configuration = aws_launch_configuration.squid_nlb.name
+  
+  launch_template {
+    id      = aws_launch_template.squid_nlb.id
+    version = "$Latest"
+  }
 
    tag {
     key                 = "Name"
