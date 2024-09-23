@@ -163,7 +163,7 @@ resource "aws_launch_template" "squid_nlb" {
     security_groups             = [aws_security_group.squidnlb_in.id, aws_security_group.squidnlb_out.id]
   }
 
-  user_data = <<EOF
+  user_data = sensitive(base64encode( <<EOF
 #!/bin/bash
 cd /home/ubuntu
 sudo git clone https://github.com/uc-cdis/cloud-automation.git
@@ -187,6 +187,7 @@ sudo apt-get autoclean
 cd /home/ubuntu
 sudo bash "${var.bootstrap_path}${var.bootstrap_script}" 2>&1 |sudo tee --append /var/log/bootstrapping_script.log
 EOF
+  ))
 
   block_device_mappings {
     device_name = "/dev/xvda"

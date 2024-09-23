@@ -83,7 +83,7 @@ resource "aws_launch_template" "squid_auto" {
     security_groups             = [aws_security_group.squidauto_in.id, aws_security_group.squidauto_out.id]
   }
 
-  user_data = <<EOF
+  user_data = sensitive(base64encode( <<EOF
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="BOUNDARY"
 
@@ -182,6 +182,7 @@ CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
 ) > /var/log/bootstrapping_script_part2.log
 --BOUNDARY--
 EOF
+  ))
 
   block_device_mappings {
     device_name = "/dev/xvda"

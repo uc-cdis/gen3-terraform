@@ -155,7 +155,7 @@ resource "aws_launch_template" "vpn_nlb" {
   key_name      = var.ssh_key_name
 
   iam_instance_profile {
-    name = aws_iam_instance_profile.vpn_nlb_role_profile.name
+    name = aws_iam_instance_profile.vpn-nlb_role_profile.name
   }
 
   network_interfaces {
@@ -163,7 +163,7 @@ resource "aws_launch_template" "vpn_nlb" {
     security_groups             = [aws_security_group.vpnnlb_in.id, aws_security_group.vpnnlb_out.id]
   }
 
-  user_data = <<EOF
+  user_data = sensitive(base64encode( <<EOF
 #!/bin/bash
 
 USER="ubuntu"
@@ -206,6 +206,7 @@ CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
 ) > /var/log/bootstrapping_script.log
 
 EOF
+  ))
 
   block_device_mappings {
     device_name = "/dev/xvda"
