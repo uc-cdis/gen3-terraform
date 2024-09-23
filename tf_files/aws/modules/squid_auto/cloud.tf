@@ -75,7 +75,7 @@ resource "aws_launch_template" "squid_auto" {
   key_name      = var.ssh_key_name
 
   iam_instance_profile {
-    name = aws_iam_instance_profile.squid_auto_role_profile.name
+    name = aws_iam_instance_profile.squid-auto_role_profile.name
   }
 
   network_interfaces {
