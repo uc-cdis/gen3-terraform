@@ -224,7 +224,7 @@ resource "aws_launch_template" "squid_nlb" {
   user_data = sensitive(base64encode( <<EOF
 #!/bin/bash
 cd /home/ubuntu
-sudo git clone https://github.com/uc-cdis/cloud-automation.gits
+sudo git clone https://github.com/uc-cdis/cloud-automation.git
 sudo chown -R ubuntu. /home/ubuntu/cloud-automation
 cd /home/ubuntu/cloud-automation
 git pull
