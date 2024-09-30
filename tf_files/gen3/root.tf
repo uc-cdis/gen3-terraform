@@ -13,6 +13,9 @@ locals {
       aws-es-proxy_enabled = var.aws-es-proxy_enabled
       dbgap_enabled = var.dbgap_enabled
       dd_enabled = var.dd_enabled
+      deploy_external_secrets = var.deploy_external_secrets
+      deploy_grafana = var.deploy_grafana
+      deploy_s3_mountpoint = var.deploy_s3_mountpoint
       dicom-server_enabled = var.dicom-server_enabled
       dicom-viewer_enabled = var.dicom-viewer_enabled
       dictionary_url = var.dictionary_url
