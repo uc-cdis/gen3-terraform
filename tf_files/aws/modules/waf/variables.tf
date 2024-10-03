@@ -1,6 +1,4 @@
-variable "vpc_name" {
-  default = "devplanetv2"
-}
+variable "vpc_name" {}
 
 variable "base_rules" {
   description = "Base AWS Managed Rules"
