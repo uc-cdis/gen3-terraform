@@ -12,12 +12,26 @@ resource "aws_wafv2_web_acl" "waf" {
     content {
       name     = "AWS-${rule.value.managed_rule_group_name}"
       priority = rule.value.priority
+      override_action {
+        none {}
+      }
       statement {
         managed_rule_group_statement {
           vendor_name = "AWS"
           name        = rule.value.managed_rule_group_name
+
+          dynamic "rule_action_override" {
+            for_each = length(rule.value.override_to_count) > 0 ? rule.value.override_to_count : []
+            content {
+              action_to_use {
+                count {}
+              }
+              name = rule_action_override.value
+            }
+          }
         }
       }
+
       visibility_config {
         sampled_requests_enabled   = true
         cloudwatch_metrics_enabled = true
