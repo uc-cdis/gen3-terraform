@@ -34,6 +34,10 @@ resource "aws_rds_cluster" "postgresql" {
     max_capacity = var.serverlessv2_scaling_max_capacity
     min_capacity = var.serverlessv2_scaling_min_capacity
   }
+
+  lifecycle {
+    ignore_changes = [engine_version]
+  }
 }
 
 # Aurora Cluster Instance
@@ -45,6 +49,10 @@ resource "aws_rds_cluster_instance" "postgresql" {
   instance_class	     = var.cluster_instance_class
   engine             	 = aws_rds_cluster.postgresql.engine
   engine_version     	 = aws_rds_cluster.postgresql.engine_version
+
+  lifecycle {
+    ignore_changes = [engine_version]
+  }
 }
 
 

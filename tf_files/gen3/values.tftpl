@@ -56,6 +56,9 @@ dicom-viewer:
   externalSecrets:
     dbcreds: "${vpc_name}_${namespace}-dicom-viewer-creds"
 
+external-secrets:
+  enabled: ${deploy_external_secrets}
+
 fence:
   enabled: ${fence_enabled}
   serviceAccount:
@@ -88,6 +91,9 @@ frontend-framework:
   image:
     repository: ${gen3ff_repo}
     tag: ${gen3ff_tag}
+
+grafana:
+  enabled: ${deploy_grafana}
 
 guppy:
   enabled: ${guppy_enabled}
@@ -182,6 +188,9 @@ requestor:
 
 revproxy:
   enabled: ${revproxy_enabled}
+
+s3-mountpoint:
+  enabled: ${deploy_s3_mountpoint}
 
 sheepdog:
   enabled: ${sheepdog_enabled}

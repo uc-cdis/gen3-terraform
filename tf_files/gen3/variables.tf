@@ -61,6 +61,13 @@ variable "deploy_external_secrets" {
   default     = false
 }
 
+variable "deploy_grafana" {
+  description = "Deploy grafana"
+  type        = bool
+  default     = false
+  
+}
+
 variable "deploy_s3_mountpoint" {
   description = "Deploy s3 mountpoints"
   type        = bool
