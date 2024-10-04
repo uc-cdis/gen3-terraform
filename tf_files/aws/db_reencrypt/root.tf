@@ -58,10 +58,3 @@ resource "aws_db_cluster_snapshot" "db_snapshot" {
   db_cluster_snapshot_identifier = local.snapshot_identifier
 }
 
-# Copy the snapshot and re-encrypt with the new KMS key
-resource "aws_db_snapshot_copy" "db_snapshot_copy" {
-  depends_on                    = [aws_db_cluster_snapshot.db_snapshot]
-  source_db_snapshot_identifier = aws_db_cluster_snapshot.db_snapshot.id
-  target_db_snapshot_identifier = "${local.snapshot_identifier}-copy"
-  kms_key_id                    = var.db_kms_key_id
-}
