@@ -6,7 +6,7 @@ terraform {
 
 locals {
   snapshot_date       = formatdate("MM-DD-YYYY", timestamp())
-  snapshot_identifier = "${var.vpc_name}-${var.cluster_instance_identifier-reencrypt-${local.snapshot_date}"
+  snapshot_identifier = "${var.vpc_name}-${var.cluster_instance_identifier}-reencrypt-${local.snapshot_date}"
 }
 
 resource "random_password" "password" {
