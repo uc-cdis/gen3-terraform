@@ -28,8 +28,8 @@ resource "aws_rds_cluster" "postgresql" {
   apply_immediately               = true
   engine_mode        	            = var.engine_mode
   skip_final_snapshot	            = false
-  final_snapshot_identifier       = "${var.vpc_name}-new-snapshot"
-  snapshot_identifier             =  aws_db_cluster_snapshot.db_snapshot.id
+  final_snapshot_identifier       = "${var.vpc_name}-${var.cluster_instance_identifier}-new-snapshot-${local.snapshot_date}"
+  snapshot_identifier             = aws_db_cluster_snapshot.db_snapshot.id
   backup_retention_period         = data.aws_rds_cluster.source_db_instance.backup_retention_period
   preferred_backup_window         = data.aws_rds_cluster.source_db_instance.preferred_backup_window
   db_cluster_parameter_group_name = data.aws_rds_cluster.source_db_instance.db_cluster_parameter_group_name
