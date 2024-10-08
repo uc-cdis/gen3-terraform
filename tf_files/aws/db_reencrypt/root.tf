@@ -7,6 +7,7 @@ terraform {
 locals {
   snapshot_date       = formatdate("MM-DD-YYYY", timestamp())
   snapshot_identifier = "${var.vpc_name}-${var.cluster_instance_identifier}-reencrypt-${local.snapshot_date}"
+  master_password     = var.master_password != "" ? var.master_password : random_password.password.result
 }
 
 resource "random_password" "password" {
@@ -23,7 +24,7 @@ resource "aws_rds_cluster" "postgresql" {
   db_subnet_group_name	          = data.aws_rds_cluster.source_db_instance.db_subnet_group_name
   vpc_security_group_ids          = data.aws_rds_cluster.source_db_instance.vpc_security_group_ids[*]
   master_username                 = var.master_username
-  master_password	                = random_password.password.result
+  master_password	                = local.master_password
   storage_encrypted	              = true
   apply_immediately               = true
   engine_mode        	            = var.engine_mode

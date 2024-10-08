@@ -38,6 +38,12 @@ variable "master_username" {
   default     = "postgres"
 }
 
+variable "master_password" {
+  description = "Master DB password"
+  type        = string
+  default     = ""
+}
+
 variable "storage_encrypted" {
   description = "Specifies whether storage encryption is enabled"
   type        = bool
