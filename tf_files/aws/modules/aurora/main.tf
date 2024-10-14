@@ -28,7 +28,8 @@ resource "aws_rds_cluster" "postgresql" {
   final_snapshot_identifier       = "${var.vpc_name}-${var.final_snapshot_identifier}"
   backup_retention_period         = var.backup_retention_period
   preferred_backup_window         = var.preferred_backup_window
-  db_cluster_parameter_group_name =  aws_rds_cluster_parameter_group.aurora_cdis_pg.name
+  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.aurora_cdis_pg.name
+  kms_key_id                      = var.db_kms_key_id 
 
   serverlessv2_scaling_configuration {
     max_capacity = var.serverlessv2_scaling_max_capacity
@@ -36,7 +37,7 @@ resource "aws_rds_cluster" "postgresql" {
   }
 
   lifecycle {
-    ignore_changes = [engine_version]
+    ignore_changes  = [kms_key_id, engine_version]
   }
 }
 
