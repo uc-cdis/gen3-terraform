@@ -37,7 +37,7 @@ resource "aws_rds_cluster" "postgresql" {
   }
 
   lifecycle {
-    ignore_changes  = [kms_key_id]
+    ignore_changes  = [kms_key_id, engine_version]
   }
 }
 
@@ -50,6 +50,10 @@ resource "aws_rds_cluster_instance" "postgresql" {
   instance_class	     = var.cluster_instance_class
   engine             	 = aws_rds_cluster.postgresql.engine
   engine_version     	 = aws_rds_cluster.postgresql.engine_version
+
+  lifecycle {
+    ignore_changes = [engine_version]
+  }
 }
 
 

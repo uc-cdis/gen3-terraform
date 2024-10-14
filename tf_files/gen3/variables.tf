@@ -55,6 +55,25 @@ variable "dd_enabled" {
   default     = false
 }
 
+variable "deploy_external_secrets" {
+  description = "Deploy external secrets"
+  type        = bool
+  default     = false
+}
+
+variable "deploy_grafana" {
+  description = "Deploy grafana"
+  type        = bool
+  default     = false
+  
+}
+
+variable "deploy_s3_mountpoint" {
+  description = "Deploy s3 mountpoints"
+  type        = bool
+  default     = false
+}
+
 variable "dictionary_url" {
   description = "URL to the data dictionary"
   default     = ""
@@ -63,6 +82,18 @@ variable "dictionary_url" {
 variable "dispatcher_job_number" {
   description = "Number of dispatcher jobs"
   default     = 10
+}
+
+variable "dicom-server_enabled" {
+  description = "Enable dicom"
+  type        = bool
+  default     = false
+}
+
+variable "dicom-viewer_enabled" {
+  description = "Enable dicom server"
+  type        = bool
+  default     = false
 }
 
 variable "es_endpoint" {
@@ -84,6 +115,22 @@ variable "fence_enabled" {
   description = "Enable fence"
   type        = bool
   default     = true
+}
+
+variable "gen3ff_enabled" {
+  description = "Enable gen3ff"
+  type        = bool
+  default     = false
+}
+
+variable "gen3ff_repo" {
+  description = "Gen3ff repo"
+  default     = "quay.io/cdis/frontend-framework"
+}
+
+variable "gen3ff_tag" {
+  description = "Gen3ff tag"
+  default     = "main"
 }
 
 variable "guppy_enabled" {
@@ -147,7 +194,7 @@ variable "peregrine_enabled" {
 variable "pidgin_enabled" {
   description = "Enable pidgin"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "portal_enabled" {
@@ -165,7 +212,7 @@ variable "public_datasets" {
 variable "requestor_enabled" {
   description = "Enable requestor"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "revproxy_arn" {
@@ -230,7 +277,7 @@ variable "useryaml_s3_path" {
 
 variable "vpc_name" {
   description = "Name of the VPC"
-  default     = "emalinowskiv1"
+  default     = ""
 }
 
 variable "wts_enabled" {
@@ -251,38 +298,46 @@ variable "cluster_name" {
   default = ""
 }
 
+variable "oidc_provider_arn" {
+  default = ""
+}
+
 variable "useryaml_path" {
-  
+  default = ""
 }
 
 variable "gitops_path" {
-  
+  default = ""
 }
 
 variable "fence_config_path" {
-  
+  default = ""
 }
 
 variable "google_client_id" {
-  
+  default = ""
 }
 
 variable "google_client_secret" {
-  
+  default = "" 
 }
 
 variable "fence_access_key" {
-  
+  default = ""
 }
 
 variable "fence_secret_key" {
-
+  default = ""
 }
 
 variable "upload_bucket" {
-  
+  default = ""
 }
 
 variable "namespace" {
-  
+  default = "default"
+}
+
+variable "deploy_gen3" {
+  default = false
 }

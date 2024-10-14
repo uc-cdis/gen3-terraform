@@ -19,7 +19,7 @@ resource "aws_db_instance" "db_fence" {
   db_subnet_group_name        = aws_db_subnet_group.private_group.id
   vpc_security_group_ids      = [module.cdis_vpc.security_group_local_id]
   allow_major_version_upgrade = var.fence_allow_major_version_upgrade
-  final_snapshot_identifier   = "${replace(var.vpc_name,"_", "-")}-fencedb"
+  final_snapshot_identifier   = "${replace(var.vpc_name, "_", "-")}-fencedb"
   maintenance_window          = var.fence_maintenance_window
   backup_retention_period     = var.fence_backup_retention_period
   backup_window               = var.fence_backup_window
@@ -29,9 +29,9 @@ resource "aws_db_instance" "db_fence" {
   max_allocated_storage       = var.fence_max_allocated_storage
 
   tags = {
-    Environment               = var.vpc_name
-    Organization              = var.organization_name
-  } 
+    Environment  = var.vpc_name
+    Organization = var.organization_name
+  }
 
   lifecycle {
     prevent_destroy = true
@@ -56,7 +56,7 @@ resource "aws_db_instance" "db_sheepdog" {
   db_subnet_group_name        = aws_db_subnet_group.private_group.id
   vpc_security_group_ids      = [module.cdis_vpc.security_group_local_id]
   allow_major_version_upgrade = var.sheepdog_allow_major_version_upgrade
-  final_snapshot_identifier   = "${replace(var.vpc_name,"_", "-")}-sheepdogdb"
+  final_snapshot_identifier   = "${replace(var.vpc_name, "_", "-")}-sheepdogdb"
   maintenance_window          = var.sheepdog_maintenance_window
   backup_retention_period     = var.sheepdog_backup_retention_period
   backup_window               = var.sheepdog_backup_window
@@ -66,8 +66,8 @@ resource "aws_db_instance" "db_sheepdog" {
   max_allocated_storage       = var.sheepdog_max_allocated_storage
 
   tags = {
-    Environment               = var.vpc_name
-    Organization              = var.organization_name
+    Environment  = var.vpc_name
+    Organization = var.organization_name
   }
 
   lifecycle {
@@ -93,7 +93,7 @@ resource "aws_db_instance" "db_indexd" {
   db_subnet_group_name        = aws_db_subnet_group.private_group.id
   vpc_security_group_ids      = [module.cdis_vpc.security_group_local_id]
   allow_major_version_upgrade = var.indexd_allow_major_version_upgrade
-  final_snapshot_identifier   = "${replace(var.vpc_name,"_", "-")}-indexddb"
+  final_snapshot_identifier   = "${replace(var.vpc_name, "_", "-")}-indexddb"
   maintenance_window          = var.indexd_maintenance_window
   backup_retention_period     = var.indexd_backup_retention_period
   backup_window               = var.indexd_backup_window
@@ -103,8 +103,8 @@ resource "aws_db_instance" "db_indexd" {
   max_allocated_storage       = var.indexd_max_allocated_storage
 
   tags = {
-    Environment               = var.vpc_name
-    Organization              = var.organization_name
+    Environment  = var.vpc_name
+    Organization = var.organization_name
   }
 
   lifecycle {
@@ -118,7 +118,7 @@ resource "aws_db_instance" "db_indexd" {
 # and https://www.postgresql.org/docs/9.6/static/runtime-config-query.html#RUNTIME-CONFIG-QUERY-ENABLE
 # for detail parameter descriptions
 locals {
-  pg_family_version = replace( var.engine_version ,"/\\.[0-9]/", "" )
+  pg_family_version = replace(var.engine_version, "/\\.[0-9]/", "")
 }
 
 resource "aws_db_parameter_group" "rds-cdis-pg" {
@@ -164,38 +164,38 @@ resource "aws_db_parameter_group" "rds-cdis-pg" {
   }
 
   lifecycle {
-    ignore_changes  = all
+    ignore_changes = all
   }
 }
 
 resource "aws_kms_key" "kube_key" {
-  description                 = "encryption/decryption key for kubernete"
-  enable_key_rotation         = true
+  description         = "encryption/decryption key for kubernete"
+  enable_key_rotation = true
 
   tags = {
-    Environment               = var.vpc_name
-    Organization              = var.organization_name
+    Environment  = var.vpc_name
+    Organization = var.organization_name
   }
 }
 
 resource "aws_kms_alias" "kube_key" {
-  name                        = "alias/${var.vpc_name}-k8s"
-  target_key_id               = aws_kms_key.kube_key.key_id
+  name          = "alias/${var.vpc_name}-k8s"
+  target_key_id = aws_kms_key.kube_key.key_id
 }
 
 resource "aws_key_pair" "automation_dev" {
-  key_name                    = "${var.vpc_name}_automation_dev"
-  public_key                  = var.kube_ssh_key
+  key_name   = "${var.vpc_name}_automation_dev"
+  public_key = var.kube_ssh_key
 }
 
 resource "aws_s3_bucket" "kube_bucket" {
   # S3 buckets are in a global namespace, so dns style naming
-  bucket                      = "kube-${replace(var.vpc_name,"_", "-")}-gen3"
+  bucket = "kube-${replace(var.vpc_name, "_", "-")}-gen3"
 
   tags = {
-    Name                      = "kube-${replace(var.vpc_name,"_", "-")}-gen3"
-    Environment               = var.vpc_name
-    Organization              = var.organization_name
+    Name         = "kube-${replace(var.vpc_name, "_", "-")}-gen3"
+    Environment  = var.vpc_name
+    Organization = var.organization_name
   }
 
   lifecycle {
@@ -211,6 +211,10 @@ resource "aws_s3_bucket" "kube_bucket" {
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "kube_bucket" {
   bucket = aws_s3_bucket.kube_bucket.bucket
+
+  lifecycle {
+    ignore_changes = all
+  }
 
   rule {
     apply_server_side_encryption_by_default {
@@ -233,7 +237,7 @@ resource "aws_s3_bucket_public_access_block" "kube_bucket_privacy" {
 #   modify the permissions there as necessary.  Ugh.
 data "aws_iam_policy_document" "configbucket_reader" {
   statement {
-    actions = ["s3:Get*","s3:List*"]
+    actions   = ["s3:Get*", "s3:List*"]
     effect    = "Allow"
     resources = ["arn:aws:s3:::${var.users_bucket_name}", "arn:aws:s3:::${var.users_bucket_name}/${var.config_folder}/*", "arn:aws:s3:::qualys-agentpackage", "arn:aws:s3:::qualys-agentpackage/*"]
   }

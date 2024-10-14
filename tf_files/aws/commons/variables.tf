@@ -339,6 +339,7 @@ variable "ha-squid_bootstrap_script" {
 }
 
 variable "ha-squid_extra_vars" {
+  type    = list(string)
   description = "additional variables to pass along with the bootstrapscript"
   default     = ["squid_image=master"]
 }
@@ -1042,4 +1043,8 @@ variable "commons_log_retention" {
 
 variable "enable_vpc_endpoints" {
   default = true
+}
+
+variable "deploy_es_role" {
+  default = false
 }

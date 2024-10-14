@@ -148,16 +148,22 @@ resource "aws_lb_listener" "vpn_nlb-ssh" {
 }
 
 # Auto scaling group for VPN nlb
-resource "aws_launch_configuration" "vpn_nlb" {
-  name_prefix                 = "${var.env_vpn_nlb_name}_autoscaling_launch_config"
-  image_id                    = data.aws_ami.public_vpn_ami.id
-  instance_type               = "m5.xlarge"
-  security_groups             = [aws_security_group.vpnnlb_in.id, aws_security_group.vpnnlb_out.id]
-  key_name                    = var.ssh_key_name
-  iam_instance_profile        = aws_iam_instance_profile.vpn-nlb_role_profile.id
-  associate_public_ip_address = true
-  depends_on                  = [aws_iam_instance_profile.vpn-nlb_role_profile]
-  user_data                   = <<EOF
+resource "aws_launch_template" "vpn_nlb" {
+  name_prefix   = "${var.env_vpn_nlb_name}-lt"
+  instance_type = "m5.xlarge"
+  image_id      = data.aws_ami.public_vpn_ami.id
+  key_name      = var.ssh_key_name
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.vpn-nlb_role_profile.name
+  }
+
+  network_interfaces {
+    associate_public_ip_address = true
+    security_groups             = [aws_security_group.vpnnlb_in.id, aws_security_group.vpnnlb_out.id]
+  }
+
+  user_data = sensitive(base64encode( <<EOF
 #!/bin/bash
 
 USER="ubuntu"
@@ -200,14 +206,20 @@ CLOUD_AUTOMATION="$USER_HOME/cloud-automation"
 ) > /var/log/bootstrapping_script.log
 
 EOF
+  ))
 
-root_block_device {
-  volume_size = 30
-}  
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      volume_size = 30
+    }
+  }
 
-lifecycle {
+  lifecycle {
     create_before_destroy = true
   }
+
+  depends_on = [aws_iam_instance_profile.vpn-nlb_role_profile]
 }
 
 resource "aws_autoscaling_group" "vpn_nlb" {
@@ -217,7 +229,11 @@ resource "aws_autoscaling_group" "vpn_nlb" {
   min_size             = 1
   target_group_arns    = [aws_lb_target_group.vpn_nlb-tcp.arn,aws_lb_target_group.vpn_nlb-qr.arn,aws_lb_target_group.vpn_nlb-ssh.arn]
   vpc_zone_identifier  = aws_subnet.vpn_pub0.*.id
-  launch_configuration = aws_launch_configuration.vpn_nlb.name
+  
+  launch_template {
+    id      = aws_launch_template.vpn_nlb.id
+    version = "$Latest"
+  }
 
   tag {
     key                 = "Name"
