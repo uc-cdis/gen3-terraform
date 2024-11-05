@@ -82,7 +82,7 @@ output "cluster_oidc_provider_arn" {
 }
 
 output "opensearch_cluster_arn" {
-  value = module.commons_vpc_es[0].es_arn
+  value = var.deploy_es ? module.commons_vpc_es[0].es_arn : null
 }
 
 ##
@@ -112,7 +112,7 @@ output "aurora_cluster_master_password" {
 }
 
 output "es_endpoint" {
-  value       = module.commons_vpc_es[0].es_endpoint
+  value       = var.deploy_es ? module.commons_vpc_es[0].es_endpoint : null
 }
 
 ##
@@ -121,5 +121,5 @@ output "es_endpoint" {
 
 output "waf_arn" {
   description = "WAF arn - annotate the cluster ingress"
-  value       = module.aws_waf[0].waf_arn
+  value       = var.deploy_waf ? module.aws_waf[0].waf_arn : null
 }
