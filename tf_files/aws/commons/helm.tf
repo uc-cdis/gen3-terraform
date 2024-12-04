@@ -55,3 +55,39 @@ module "gen3_deployment" {
   upload_bucket           = var.upload_bucket
   namespace               = var.namespace
 }
+
+
+# Deploy ArgoCD 
+resource helm_release "argocd" {
+  count      = var.deploy_argocd ? 1 : 0
+  name       = "argocd"
+  chart      = "argo-cd"
+  repository = "https://argoproj.github.io/argo-helm"
+  version = var.argocd_version
+  namespace  = var.namespace
+
+  values = [
+  ]
+}
+
+# Deploy External Secrets Operator
+resource helm_release "external-secrets" {
+  count      = var.deploy_external_secrets_operator ? 1 : 0
+  name       = "external-secrets"
+  chart      = "external-secrets"
+  repository = "https://external-secrets.github.io/kubernetes-external-secrets"
+  version    = var.external_secrets_operator_version
+  namespace  = "external-secrets"
+
+  values = [
+    <<-EOT
+    serviceAccount:
+      create: true
+      name: external-secrets
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+    EOT
+  ]
+}

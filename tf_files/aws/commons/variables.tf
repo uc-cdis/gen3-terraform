@@ -460,6 +460,22 @@ variable "deploy_alarms" {
   default = true
 }
 
+variable "deploy_argocd" {
+  default = true
+}
+
+variable "argocd_version" {
+  default = ""
+}
+
+variable "deploy_external_secrets_operator" {
+  default = true
+}
+
+variable "external_secrets_operator_version" {
+  default = ""
+}
+
 variable "ec2_keyname" {
   default = "someone@uchicago.edu"
 }

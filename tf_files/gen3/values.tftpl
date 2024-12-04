@@ -3,6 +3,10 @@ global:
     enabled: true
     account: ${account_id}
     hatchery_role: ${hatchery_service_account}
+    secretStoreServiceAccount:
+      enabled: true
+      name: external-secrets
+      roleArn: ${external_secrets_operator_iam_role}
 
   dev: false
   postgres:
@@ -56,8 +60,6 @@ dicom-viewer:
   externalSecrets:
     dbcreds: "${vpc_name}_${namespace}-dicom-viewer-creds"
 
-external-secrets:
-  enabled: ${deploy_external_secrets}
 
 fence:
   enabled: ${fence_enabled}
