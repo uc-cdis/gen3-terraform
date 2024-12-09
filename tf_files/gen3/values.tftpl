@@ -39,9 +39,11 @@ argo-wrapper:
 audit:
   enabled: ${audit_enabled}
   serviceAccount:
-    annotations: "eks.amazonaws.com/role-arn: ${audit_service_account}"
+    annotations: 
+      eks.amazonaws.com/role-arn: "${audit_service_account}"
   externalSecrets:
     dbcreds: "${vpc_name}_${namespace}-audit-creds"    
+    createK8sAuditSecret: true
 
 
 aws-es-proxy:
@@ -64,7 +66,8 @@ dicom-viewer:
 fence:
   enabled: ${fence_enabled}
   serviceAccount:
-    annotations: "eks.amazonaws.com/role-arn: ${fence_service_account}"
+    annotations: 
+      eks.amazonaws.com/role-arn: "${fence_service_account}"
    
   externalSecrets:
     fenceJwtKeys: ""
@@ -159,15 +162,19 @@ indexd:
   defaultPrefix: ${indexd_prefix}
   externalSecrets:
     dbcreds: "${vpc_name}_${namespace}-indexd-creds"
+    createK8sServiceCredsSecret: true
 
 
 manifestservice:
   enabled: ${manifestservice_enabled}
+  externalSecrets:
+    createK8sManifestServiceSecret: true
 
 metadata:
   enabled: ${metadata_enabled}
   externalSecrets:
     dbcreds: "${vpc_name}_${namespace}-metadata-creds"
+    createK8sMetadataSecret: true
 
 peregrine:
   enabled: ${peregrine_enabled}
