@@ -5,6 +5,8 @@ global:
     hatchery_role: ${hatchery_service_account}
 
   dev: false
+  externalSecrets:
+    deploy: true
   postgres:
     dbCreate: false
     externalSecret: "${vpc_name}_aurora-master-password"
@@ -35,7 +37,7 @@ argo-wrapper:
 audit:
   enabled: ${audit_enabled}
   serviceAccount:
-    annotations: "eks.amazonaws.com/role-arn: ${audit_service_account}"
+    eks.amazonaws.com/role-arn: ${audit_service_account}
   externalSecrets:
     dbcreds: "${vpc_name}_${namespace}-audit-creds"    
 
@@ -56,13 +58,10 @@ dicom-viewer:
   externalSecrets:
     dbcreds: "${vpc_name}_${namespace}-dicom-viewer-creds"
 
-external-secrets:
-  enabled: ${deploy_external_secrets}
-
 fence:
   enabled: ${fence_enabled}
   serviceAccount:
-    annotations: "eks.amazonaws.com/role-arn: ${fence_service_account}"
+    eks.amazonaws.com/role-arn: ${fence_service_account}
    
   externalSecrets:
     fenceJwtKeys: ""
@@ -178,8 +177,8 @@ pidgin:
 portal:
   enabled: ${portal_enabled}
   gitops:
-  json: | 
-    ${gitops_file}
+    json: | 
+      ${gitops_file}
 
 requestor:
   enabled: ${requestor_enabled}
@@ -199,6 +198,9 @@ sheepdog:
 
 ssjdispatcher:
   enabled: ${ssjdispatcher_enabled}
+
+sower:
+  enabled: ${sowed_enabled}
 
 wts:
   enabled: ${wts_enabled}

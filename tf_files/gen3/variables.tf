@@ -249,6 +249,12 @@ variable "ssjdispatcher_enabled" {
   default     = true
 }
 
+variable "sower_enabled" {
+  description = "Enable sower"
+  type        = bool
+  default     = true
+}
+
 variable "tier_access_level" {
   description = "Tier access level for guppy"
   default     = "private"
