@@ -37,7 +37,7 @@ argo-wrapper:
 audit:
   enabled: ${audit_enabled}
   serviceAccount:
-    annotations: "eks.amazonaws.com/role-arn: ${audit_service_account}"
+    eks.amazonaws.com/role-arn: ${audit_service_account}
   externalSecrets:
     dbcreds: "${vpc_name}_${namespace}-audit-creds"    
 
@@ -61,7 +61,7 @@ dicom-viewer:
 fence:
   enabled: ${fence_enabled}
   serviceAccount:
-    annotations: "eks.amazonaws.com/role-arn: ${fence_service_account}"
+    eks.amazonaws.com/role-arn: ${fence_service_account}
    
   externalSecrets:
     fenceJwtKeys: ""
