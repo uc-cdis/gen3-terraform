@@ -51,6 +51,7 @@ locals {
       slack_send_dbgap = var.slack_send_dbgap
       slack_webhook = var.slack_webhook
       ssjdispatcher_enabled = var.ssjdispatcher_enabled
+      sower_enabled = var.sower_enabled
       tier_access_level = var.tier_access_level
       tier_access_limit = var.tier_access_limit
       usersync_enabled = var.usersync_enabled
