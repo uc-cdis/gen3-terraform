@@ -5,6 +5,8 @@ global:
     hatchery_role: ${hatchery_service_account}
 
   dev: false
+  externalSecrets:
+    deploy: true
   postgres:
     dbCreate: false
     externalSecret: "${vpc_name}_aurora-master-password"
