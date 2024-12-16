@@ -56,9 +56,6 @@ dicom-viewer:
   externalSecrets:
     dbcreds: "${vpc_name}_${namespace}-dicom-viewer-creds"
 
-external-secrets:
-  enabled: ${deploy_external_secrets}
-
 fence:
   enabled: ${fence_enabled}
   serviceAccount:
@@ -178,8 +175,8 @@ pidgin:
 portal:
   enabled: ${portal_enabled}
   gitops:
-  json: | 
-    ${gitops_file}
+    json: | 
+      ${gitops_file}
 
 requestor:
   enabled: ${requestor_enabled}
@@ -199,6 +196,9 @@ sheepdog:
 
 ssjdispatcher:
   enabled: ${ssjdispatcher_enabled}
+
+sower:
+  enabled: ${sowed_enabled}
 
 wts:
   enabled: ${wts_enabled}
