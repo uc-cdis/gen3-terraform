@@ -1,5 +1,5 @@
 BASE_URL: 'https://${hostname}/user'
-ENCRYPTION_KEY: testtest
+
 
 DEBUG: True
 OPENID_CONNECT:
@@ -17,5 +17,8 @@ S3_BUCKETS:
   ${upload_bucket}:
     cred: 'fence-bot'
     region: us-east-1
+
+dbGaP:
+ parent_to_child_studies_mapping: {}
 
 DATA_UPLOAD_BUCKET: '${upload_bucket}'

@@ -4,16 +4,6 @@ variable "hostname" {
   # DNS endpoint of the commons - ex: data.commons.io
 }
 
-variable "kube_bucket_name" {
-  # utility bucket used for config backups or whatever
-  default = ""
-}
-
-variable "logs_bucket_name" {
-  # destination for load-balancer logs
-  default = ""
-}
-
 variable "ssl_certificate_id" {
   # AWS cert manager ARN on AWS,
   # not sure what applies elsewhere

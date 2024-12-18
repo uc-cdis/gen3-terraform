@@ -504,7 +504,7 @@ variable "worker_drive_size" {
 }
 
 variable "eks_version" {
-  default = "1.25"
+  default = "1.31"
 }
 
 variable "workers_subnet_size" {
@@ -663,6 +663,11 @@ variable "es_version" {
 variable "es_linked_role" {
   description = "Whether or no to deploy a linked roll for ES"
   default     = true
+}
+
+
+variable "spot_linked_role" {
+  default = false
 }
 
 ### Aurora

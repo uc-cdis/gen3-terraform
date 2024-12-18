@@ -51,6 +51,7 @@ locals {
       slack_send_dbgap = var.slack_send_dbgap
       slack_webhook = var.slack_webhook
       ssjdispatcher_enabled = var.ssjdispatcher_enabled
+      sower_enabled = var.sower_enabled
       tier_access_level = var.tier_access_level
       tier_access_limit = var.tier_access_limit
       usersync_enabled = var.usersync_enabled
@@ -58,6 +59,7 @@ locals {
       user_yaml = var.useryaml_path != "" ? indent(4, file(var.useryaml_path)) : "{}"
       useryaml_s3_path = var.useryaml_s3_path
       vpc_name = var.vpc_name
+      waf_arn = var.waf_arn
       wts_enabled = var.wts_enabled
     })
 }

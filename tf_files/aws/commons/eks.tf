@@ -6,6 +6,7 @@ module "eks" {
   ec2_keyname                      = var.ec2_keyname
   instance_type                    = var.instance_type
   peering_cidr                     = var.peering_cidr
+  csoc_managed                     = var.csoc_managed
   secondary_cidr_block             = var.secondary_cidr_block
   users_policy                     = var.users_policy
   worker_drive_size                = var.worker_drive_size
@@ -48,5 +49,6 @@ module "eks" {
   ci_run                           = var.ci_run
   eks_public_access                = var.eks_public_access
   enable_vpc_endpoints             = var.enable_vpc_endpoints
+  spot_linked_role                 = var.spot_linked_role
   depends_on                       = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id, module.cdis_vpc.squid_auto]
 }

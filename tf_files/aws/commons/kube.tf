@@ -188,49 +188,6 @@ resource "aws_key_pair" "automation_dev" {
   public_key = var.kube_ssh_key
 }
 
-resource "aws_s3_bucket" "kube_bucket" {
-  # S3 buckets are in a global namespace, so dns style naming
-  bucket = "kube-${replace(var.vpc_name, "_", "-")}-gen3"
-
-  tags = {
-    Name         = "kube-${replace(var.vpc_name, "_", "-")}-gen3"
-    Environment  = var.vpc_name
-    Organization = var.organization_name
-  }
-
-  lifecycle {
-    # allow same bucket between stacks
-    ignore_changes = [tags, bucket]
-  }
-}
-
-#resource "aws_s3_bucket_acl" "kube_bucket" {
-#  bucket = aws_s3_bucket.kube_bucket.id
-#  acl    = "private"
-#}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "kube_bucket" {
-  bucket = aws_s3_bucket.kube_bucket.bucket
-
-  lifecycle {
-    ignore_changes = all
-  }
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "kube_bucket_privacy" {
-  bucket                  = aws_s3_bucket.kube_bucket.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
 
 # user.yaml bucket read policy
 # This bucket is in the 'bionimbus' account -

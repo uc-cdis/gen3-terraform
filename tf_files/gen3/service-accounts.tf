@@ -382,6 +382,7 @@ resource "aws_iam_role_policy" "aws-load-balancer-role-policy" {
           "ec2:DescribeNetworkInterfaces",
           "ec2:DescribeTags",
           "ec2:GetCoipPoolUsage",
+          "ec2:GetSecurityGroupsForVpc",
           "ec2:DescribeCoipPools",
           "elasticloadbalancing:DescribeLoadBalancers",
           "elasticloadbalancing:DescribeLoadBalancerAttributes",
@@ -392,7 +393,8 @@ resource "aws_iam_role_policy" "aws-load-balancer-role-policy" {
           "elasticloadbalancing:DescribeTargetGroups",
           "elasticloadbalancing:DescribeTargetGroupAttributes",
           "elasticloadbalancing:DescribeTargetHealth",
-          "elasticloadbalancing:DescribeTags"
+          "elasticloadbalancing:DescribeTags",
+          "elasticloadbalancing:AddTags"
         ]
         Effect   = "Allow"
         Resource = "*"
@@ -598,7 +600,7 @@ resource "aws_iam_role" "external-secrets-role" {
         Condition = {
           StringEquals = {
             "${var.oidc_provider_arn}:sub" = [
-              "system:serviceaccount:external-secrets:external-secrets"
+              "system:serviceaccount:${var.namespace}:secret-store-sa"
             ]
             "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
           }

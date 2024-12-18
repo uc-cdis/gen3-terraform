@@ -7,8 +7,11 @@ global:
       enabled: true
       name: external-secrets
       roleArn: ${external_secrets_operator_iam_role}
-
+    wafv2:
+      wafAclArn: ${waf_arn}
   dev: false
+  externalSecrets:
+    deploy: true
   postgres:
     dbCreate: false
     externalSecret: "${vpc_name}_aurora-master-password"
@@ -187,8 +190,7 @@ pidgin:
 portal:
   enabled: ${portal_enabled}
   gitops:
-  json: | 
-    ${gitops_file}
+    gen3Bundle: workspace
 
 requestor:
   enabled: ${requestor_enabled}
@@ -208,6 +210,9 @@ sheepdog:
 
 ssjdispatcher:
   enabled: ${ssjdispatcher_enabled}
+
+sower:
+  enabled: ${sowed_enabled}
 
 wts:
   enabled: ${wts_enabled}

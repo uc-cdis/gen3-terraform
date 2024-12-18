@@ -67,6 +67,9 @@ resource helm_release "argocd" {
   namespace  = var.namespace
 
   values = [
+    <<-EOT
+    server.basehref: "/argocd/"
+    EOT
   ]
 }
 

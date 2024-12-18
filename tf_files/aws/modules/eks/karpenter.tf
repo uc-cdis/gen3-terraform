@@ -51,6 +51,12 @@ resource "aws_iam_role" "irsa" {
   force_detach_policies = true
 }
 
+resource "aws_iam_service_linked_role" "ec2_spot" {
+  count = var.use_karpenter && var.spot_linked_role ? 1 : 0
+  aws_service_name = "spot.amazonaws.com"
+  description = "Service-linked role for EC2 Spot Instances"
+}
+
 locals {
   irsa_tag_values = [aws_eks_cluster.eks_cluster.id]
 }
@@ -59,86 +65,60 @@ data "aws_iam_policy_document" "irsa" {
   count = var.use_karpenter ? 1 : 0
 
   statement {
+    sid    = "Karpenter"
     actions = [
-      "ec2:CreateLaunchTemplate",
-      "ec2:CreateFleet",
-      "ec2:CreateTags",
-      "ec2:DescribeLaunchTemplates",
+      "ssm:GetParameter",
+      "iam:PassRole",
+      "iam:*InstanceProfile",
       "ec2:DescribeImages",
-      "ec2:DescribeInstances",
-      "ec2:DescribeSecurityGroups",
+      "ec2:RunInstances",
       "ec2:DescribeSubnets",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeLaunchTemplates",
+      "ec2:DescribeInstances",
       "ec2:DescribeInstanceTypes",
       "ec2:DescribeInstanceTypeOfferings",
       "ec2:DescribeAvailabilityZones",
+      "ec2:DeleteLaunchTemplate",
+      "ec2:CreateTags",
+      "ec2:CreateLaunchTemplate",
+      "ec2:CreateFleet",
       "ec2:DescribeSpotPriceHistory",
-      "iam:PassRole",
       "pricing:GetProducts",
     ]
-
+    effect   = "Allow"
     resources = ["*"]
   }
 
   statement {
-    actions = [
-      "ec2:TerminateInstances",
-      "ec2:DeleteLaunchTemplate",
+    sid      = "Karpenter2"
+    actions  = [
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+      "sqs:ReceiveMessage",
     ]
+    effect   = "Allow"
+    resources = ["arn:aws:sqs:*:${local.account_id}:karpenter-sqs-vpc_name"]
+  }
 
+  statement {
+    sid      = "ConditionalEC2Termination"
+    actions  = ["ec2:TerminateInstances"]
+    effect   = "Allow"
     resources = ["*"]
-
     condition {
-      test     = "StringEquals"
+      test     = "StringLike"
       variable = "ec2:ResourceTag/Name"
       values   = ["*karpenter*"]
     }
   }
 
   statement {
-    actions = ["ec2:RunInstances"]
-    resources = [
-      "arn:aws:ec2:*:${local.account_id}:launch-template/*",
-    ]
-
-    condition {
-      test     = "StringEquals"
-      variable = "ec2:ResourceTag/Name"
-      values   = ["*karpenter*"]
-    }
-  }
-
-  statement {
-    actions = ["ec2:RunInstances"]
-    resources = [
-      "arn:aws:ec2:*::image/*",
-      "arn:aws:ec2:*::snapshot/*",
-      "arn:aws:ec2:*:${local.account_id}:instance/*",
-      "arn:aws:ec2:*:${local.account_id}:spot-instances-request/*",
-      "arn:aws:ec2:*:${local.account_id}:security-group/*",
-      "arn:aws:ec2:*:${local.account_id}:volume/*",
-      "arn:aws:ec2:*:${local.account_id}:network-interface/*",
-      "arn:aws:ec2:*:${local.account_id}:subnet/*",
-    ]
-  }
-
-  statement {
-    actions   = ["ssm:GetParameter"]
-    resources = ["arn:aws:ssm:*:*:parameter/aws/service/*"]
-  }
-
-  statement {
-    actions   = ["eks:DescribeCluster"]
-    resources = ["arn:aws:eks:*:${local.account_id}:cluster/${aws_eks_cluster.eks_cluster.id}"]
-  }
-
-  statement {
-      actions = [
-        "sqs:DeleteMessage",
-        "sqs:GetQueueUrl",
-        "sqs:GetQueueAttributes",
-        "sqs:ReceiveMessage",
-      ]
-      resources = [aws_sqs_queue.this[0].arn]
+    sid      = "VisualEditor0"
+    actions  = ["kms:*"]
+    effect   = "Allow"
+    resources = ["*"]
   }
 }
 
