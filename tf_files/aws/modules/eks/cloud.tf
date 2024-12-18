@@ -489,7 +489,7 @@ resource "aws_security_group_rule" "https_nodes_to_plane" {
 }
 
 # CSOC talk to Control plane
-resource "aws_security_group_rule" "https_nodes_to_plane" {
+resource "aws_security_group_rule" "https_csoc_to_plane" {
   count                    = var.csoc_managed ? 1 : 0
   type                     = "ingress"
   from_port                = 443
