@@ -21,6 +21,10 @@ resource "aws_secretsmanager_secret_version" "fence_config" {
         fence_secret_key     = var.fence_secret_key
         upload_bucket       = var.upload_bucket
       })
+      
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }
 
 resource "aws_secretsmanager_secret" "es_user_creds" {
