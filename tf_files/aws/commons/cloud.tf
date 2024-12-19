@@ -99,13 +99,6 @@ module "cdis_vpc" {
   commons_log_retention          = var.commons_log_retention
 }
 
-# logs bucket for elb logs
-module "elb_logs" {
-  source          = "../modules/s3-logs"
-  log_bucket_name = "logs-${var.vpc_name}-gen3"
-  environment     = var.vpc_name
-}
-
 
 module "config_files" {
   source                        = "../../shared/modules/k8s_configs"
@@ -131,8 +124,6 @@ module "config_files" {
   sheepdog_indexd_password      = var.sheepdog_indexd_password != "" ? var.sheepdog_indexd_password : random_password.sheepdog_indexd_password.result
   sheepdog_oauth2_client_id     = var.sheepdog_oauth2_client_id
   sheepdog_oauth2_client_secret = var.sheepdog_oauth2_client_secret
-  kube_bucket_name              = aws_s3_bucket.kube_bucket.id
-  logs_bucket_name              = module.elb_logs.log_bucket_name
   gitops_path                   = var.gitops_path
   ssl_certificate_id            = var.aws_cert_name
   aws_user_key                  = module.cdis_vpc.es_user_key

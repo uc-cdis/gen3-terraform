@@ -460,6 +460,22 @@ variable "deploy_alarms" {
   default = true
 }
 
+variable "deploy_argocd" {
+  default = true
+}
+
+variable "argocd_version" {
+  default = ""
+}
+
+variable "deploy_external_secrets_operator" {
+  default = true
+}
+
+variable "external_secrets_operator_version" {
+  default = ""
+}
+
 variable "ec2_keyname" {
   default = "someone@uchicago.edu"
 }
@@ -488,7 +504,7 @@ variable "worker_drive_size" {
 }
 
 variable "eks_version" {
-  default = "1.25"
+  default = "1.31"
 }
 
 variable "workers_subnet_size" {
@@ -647,6 +663,11 @@ variable "es_version" {
 variable "es_linked_role" {
   description = "Whether or no to deploy a linked roll for ES"
   default     = true
+}
+
+
+variable "spot_linked_role" {
+  default = false
 }
 
 ### Aurora

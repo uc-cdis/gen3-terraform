@@ -6,6 +6,6 @@ resource "null_resource" "config_setup" {
   }
 
   provisioner "local-exec" {
-    command = "echo \"${templatefile("${path.module}/00configmap.yaml", {vpc_name = var.vpc_name, hostname = var.hostname, kube_bucket = var.kube_bucket_name, logs_bucket = var.logs_bucket_name, revproxy_arn = var.ssl_certificate_id, gitops_path = var.gitops_path})}\" > ${var.vpc_name}_output/00configmap.yaml"
+    command = "echo \"${templatefile("${path.module}/00configmap.yaml", {vpc_name = var.vpc_name, hostname = var.hostname, revproxy_arn = var.ssl_certificate_id, gitops_path = var.gitops_path})}\" > ${var.vpc_name}_output/00configmap.yaml"
   }
 }

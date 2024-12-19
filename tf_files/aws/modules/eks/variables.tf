@@ -8,6 +8,10 @@ variable "csoc_account_id" {
   default = "433568766270"
 }
 
+variable "csoc_managed" {
+  default = false
+}
+
 variable "ec2_keyname" {
   default = "someone@uchicago.edu"
 }
@@ -191,6 +195,10 @@ variable "use_asg" {
 } 
 
 variable "use_karpenter" {
+  default = false
+}
+
+variable "spot_linked_role" {
   default = false
 }
 

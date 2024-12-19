@@ -3,8 +3,15 @@ global:
     enabled: true
     account: ${account_id}
     hatchery_role: ${hatchery_service_account}
-
+    secretStoreServiceAccount:
+      enabled: true
+      name: external-secrets
+      roleArn: ${external_secrets_operator_iam_role}
+    wafv2:
+      wafAclArn: ${waf_arn}
   dev: false
+  externalSecrets:
+    deploy: true
   postgres:
     dbCreate: false
     externalSecret: "${vpc_name}_aurora-master-password"
@@ -35,9 +42,11 @@ argo-wrapper:
 audit:
   enabled: ${audit_enabled}
   serviceAccount:
-    annotations: "eks.amazonaws.com/role-arn: ${audit_service_account}"
+    annotations: 
+      eks.amazonaws.com/role-arn: "${audit_service_account}"
   externalSecrets:
     dbcreds: "${vpc_name}_${namespace}-audit-creds"    
+    createK8sAuditSecret: true
 
 
 aws-es-proxy:
@@ -56,13 +65,12 @@ dicom-viewer:
   externalSecrets:
     dbcreds: "${vpc_name}_${namespace}-dicom-viewer-creds"
 
-external-secrets:
-  enabled: ${deploy_external_secrets}
 
 fence:
   enabled: ${fence_enabled}
   serviceAccount:
-    annotations: "eks.amazonaws.com/role-arn: ${fence_service_account}"
+    annotations: 
+      eks.amazonaws.com/role-arn: "${fence_service_account}"
    
   externalSecrets:
     fenceJwtKeys: ""
@@ -157,15 +165,19 @@ indexd:
   defaultPrefix: ${indexd_prefix}
   externalSecrets:
     dbcreds: "${vpc_name}_${namespace}-indexd-creds"
+    createK8sServiceCredsSecret: true
 
 
 manifestservice:
   enabled: ${manifestservice_enabled}
+  externalSecrets:
+    createK8sManifestServiceSecret: true
 
 metadata:
   enabled: ${metadata_enabled}
   externalSecrets:
     dbcreds: "${vpc_name}_${namespace}-metadata-creds"
+    createK8sMetadataSecret: true
 
 peregrine:
   enabled: ${peregrine_enabled}
@@ -178,8 +190,7 @@ pidgin:
 portal:
   enabled: ${portal_enabled}
   gitops:
-  json: | 
-    ${gitops_file}
+    gen3Bundle: workspace
 
 requestor:
   enabled: ${requestor_enabled}
@@ -199,6 +210,9 @@ sheepdog:
 
 ssjdispatcher:
   enabled: ${ssjdispatcher_enabled}
+
+sower:
+  enabled: ${sower_enabled}
 
 wts:
   enabled: ${wts_enabled}
