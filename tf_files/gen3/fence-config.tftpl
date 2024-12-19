@@ -2,10 +2,24 @@ BASE_URL: 'https://${hostname}/user'
 
 
 DEBUG: True
+
+
+
 OPENID_CONNECT:
   google:
+    discovery_url: ' https://accounts.google.com/.well-known/openid-configuration'  
+    redirect_url: '{{BASE_URL}}/login/google/login/'
+    scope: 'openid email'
     client_id: "${google_client_id}"
     client_secret: "${google_client_secret}"
+
+DEFAULT_LOGIN_IDP: 'google'
+DEFAULT_LOGIN_URL: '{{BASE_URL}}/login/google'
+
+LOGIN_OPTIONS: # [] # !!! remove the empty list to enable login options!
+  - name: 'Login from Google'
+    desc: ''
+    idp: google
 
 AWS_CREDENTIALS:
   'fence-bot':
