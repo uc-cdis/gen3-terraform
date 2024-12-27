@@ -50,5 +50,6 @@ module "eks" {
   eks_public_access                = var.eks_public_access
   enable_vpc_endpoints             = var.enable_vpc_endpoints
   spot_linked_role                 = var.spot_linked_role
+  csoc_account_id                  = var.csoc_account_id
   depends_on                       = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id, module.cdis_vpc.squid_auto]
 }
