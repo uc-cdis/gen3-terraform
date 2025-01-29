@@ -102,11 +102,11 @@ fi
 (
   if [[ $DISTRO == "Amazon Linux" ]]; then
     sudo yum update -y
-    sudo yum install git lsof dracut-fips openssl -y
+    sudo yum install git lsof dracut-fips openssl rsync -y
     sudo /sbin/grubby --update-kernel=ALL --args="fips=1"
   elif [[ $DISTRO == "al2023" ]]; then
     sudo dnf update -y
-    sudo dnf install git lsof docker crypto-policies crypto-policies-scripts -y
+    sudo dnf install git rsync lsof docker crypto-policies crypto-policies-scripts -y
     sudo fips-mode-setup --enable
   fi
 ) > /var/log/bootstrapping_script.log
