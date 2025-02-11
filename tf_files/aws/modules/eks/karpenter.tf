@@ -317,6 +317,11 @@ resource "helm_release" "karpenter" {
     value = aws_sqs_queue.this[0].name
   }
 
+  set {
+    name = "dnsPolicy"
+    value = "Default"
+  }
+
   depends_on = [time_sleep.wait_60_seconds]
 }
 
