@@ -473,7 +473,7 @@ variable "deploy_external_secrets_operator" {
 }
 
 variable "external_secrets_operator_version" {
-  default = ""
+  default = "0.14.0"
 }
 
 variable "ec2_keyname" {
@@ -788,7 +788,7 @@ variable "use_karpenter" {
 }
 
 variable "karpenter_version" {
-  default = "v0.24.0"
+  default = "v0.32.9"
 }
 
 variable "deploy_cloud_trail" {

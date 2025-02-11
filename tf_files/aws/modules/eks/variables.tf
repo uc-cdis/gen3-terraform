@@ -212,7 +212,7 @@ variable "ci_run" {
 }
 
 variable "karpenter_version" {
-  default = "v0.24.0"
+  default = "v0.32.9"
 }
 
 variable "eks_public_access" {
