@@ -398,7 +398,7 @@ resource "kubectl_manifest" "karpenter_node_class" {
     spec:
       amiFamily: AL2
       amiSelectorTerms:
-      - name: {{ index .Values "karpenter-crds" "amiSelectorName" }}
+      - name: ${var.vpc_name}
         owner: "143731057154"
       blockDeviceMappings:
       - deviceName: /dev/xvda
