@@ -59,12 +59,13 @@ module "gen3_deployment" {
 
 # Deploy ArgoCD 
 resource helm_release "argocd" {
-  count      = var.deploy_argocd ? 1 : 0
-  name       = "argocd"
-  chart      = "argo-cd"
-  repository = "https://argoproj.github.io/argo-helm"
-  version = var.argocd_version
-  namespace  = "argocd"
+  count            = var.deploy_argocd ? 1 : 0
+  name             = "argocd"
+  chart            = "argo-cd"
+  repository       = "https://argoproj.github.io/argo-helm"
+  version          = var.argocd_version
+  namespace        = "argocd"
+  create_namespace = true
 
   values = [
     <<-EOT
