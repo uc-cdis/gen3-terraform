@@ -525,27 +525,27 @@ resource "aws_security_group_rule" "nodes_internode_communications" {
 }
 
 # Let's allow the two polls talk to each other
-resource "aws_security_group_rule" "nodes_interpool_communications" {
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  description              = "allow jupyter nodes to talk to the default"
-  security_group_id        = aws_security_group.eks_nodes_sg.id
-  source_security_group_id = module.jupyter_pool[0].nodepool_sg
-}
+# resource "aws_security_group_rule" "nodes_interpool_communications" {
+#   type                     = "ingress"
+#   from_port                = 0
+#   to_port                  = 0
+#   protocol                 = "-1"
+#   description              = "allow jupyter nodes to talk to the default"
+#   security_group_id        = aws_security_group.eks_nodes_sg.id
+#   source_security_group_id = module.jupyter_pool[0].nodepool_sg
+# }
 
 # Let's allow the two polls talk to each other
-resource "aws_security_group_rule" "workflow_nodes_interpool_communications" {
-  count                    = var.deploy_workflow ? 1 : 0
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  description              = "allow workflow nodes to talk to the default"
-  security_group_id        = aws_security_group.eks_nodes_sg.id
-  source_security_group_id = module.workflow_pool[0].nodepool_sg
-}
+# resource "aws_security_group_rule" "workflow_nodes_interpool_communications" {
+#   count                    = var.deploy_workflow ? 1 : 0
+#   type                     = "ingress"
+#   from_port                = 0
+#   to_port                  = 0
+#   protocol                 = "-1"
+#   description              = "allow workflow nodes to talk to the default"
+#   security_group_id        = aws_security_group.eks_nodes_sg.id
+#   source_security_group_id = module.workflow_pool[0].nodepool_sg
+# }
 
 # Create a new iam service linked role that we can grant access to KMS keys in other accounts
 # Needed if we need to bring up custom AMI's that have been encrypted using a kms key
@@ -613,16 +613,6 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
-    - rolearn: ${module.jupyter_pool[0].nodepool_role}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-    - rolearn: ${var.deploy_workflow ? module.workflow_pool[0].nodepool_role : ""}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
 CONFIGMAPAWSAUTH
   cm2 = <<CONFIGMAPAWSAUTH2
 apiVersion: v1
@@ -633,11 +623,6 @@ metadata:
 data:
   mapRoles: |
     - rolearn: ${aws_iam_role.eks_node_role.arn}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-    - rolearn: ${module.jupyter_pool[0].nodepool_role}
       username: system:node:{{EC2PrivateDNSName}}
       groups:
         - system:bootstrappers
