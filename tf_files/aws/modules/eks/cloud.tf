@@ -617,7 +617,7 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
-    - rolearn: ${aws_iam_role.karpenter.arn} 
+    - rolearn: ${aws_iam_role.karpenter[0].arn} 
       groups:                                                                                                                                                                                                                                                                                                                                                              │
         - system:bootstrappers                                                                                                                                                                                                                                                                                                                                               │
         - system:nodes                                                                                                                                                                                                                                                                                                                                                       │
