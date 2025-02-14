@@ -398,7 +398,7 @@ resource "kubectl_manifest" "karpenter_node_class" {
     spec:
       amiFamily: AL2
       amiSelectorTerms:
-      - name: ${var.vpc_name}
+      - name: "EKS-FIPS*"
         owner: "143731057154"
       blockDeviceMappings:
       - deviceName: /dev/xvda
@@ -443,7 +443,7 @@ resource "kubectl_manifest" "karpenter_node_class" {
 
         sudo yum update -y
 
-      --BOUNDARY--   
+        --BOUNDARY--   
   YAML
 
   depends_on = [
