@@ -613,6 +613,12 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
+    - rolearn: ${aws_iam_role.karpenter.arn} 
+      groups:                                                                                                                                                                                                                                                                                                                                                              │
+        - system:bootstrappers                                                                                                                                                                                                                                                                                                                                               │
+        - system:nodes                                                                                                                                                                                                                                                                                                                                                       │
+        - system:node-proxier                                                                                                                                                                                                                                                                                                                                                │                                                                                                                                                                                                                                                                                        │
+      username: system:node:{{SessionName}}
 CONFIGMAPAWSAUTH
   cm2 = <<CONFIGMAPAWSAUTH2
 apiVersion: v1
