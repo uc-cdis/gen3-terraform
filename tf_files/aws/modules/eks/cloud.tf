@@ -672,9 +672,9 @@ resource "null_resource" "config_setup" {
     command = "echo \"${templatefile("${path.module}/init_cluster.sh", { vpc_name = var.vpc_name, kubeconfig_path = "${var.vpc_name}_output_EKS/kubeconfig", auth_configmap = "${var.vpc_name}_output_EKS/aws-auth-cm.yaml"})}\" > ${var.vpc_name}_output_EKS/init_cluster.sh"
   }
 
-  provisioner "local-exec" {
-    command = "bash ${var.vpc_name}_output_EKS/init_cluster.sh"
-  }
+  # provisioner "local-exec" {
+  #   command = "bash ${var.vpc_name}_output_EKS/init_cluster.sh"
+  # }
 
   depends_on = [aws_autoscaling_group.eks_autoscaling_group]
 }
