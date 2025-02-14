@@ -325,128 +325,128 @@ resource "helm_release" "karpenter" {
   depends_on = [time_sleep.wait_60_seconds]
 }
 
-resource "kubectl_manifest" "karpenter_node_pool" {
-  count   = var.use_karpenter ? 1 : 0
+# resource "kubectl_manifest" "karpenter_node_pool" {
+#   count   = var.use_karpenter ? 1 : 0
 
-  yaml_body = <<-YAML
-    ---
-    apiVersion: karpenter.sh/v1beta1
-    kind: NodePool
-    metadata:
-      name: default
-    spec:
-      disruption:
-        consolidateAfter: 30s
-        consolidationPolicy: WhenEmpty
-        expireAfter: "168h"
-      limits:
-        cpu: "1000"
-        memory: 1000Gi
-      template:
-        metadata:
-          labels:
-            role: default
-        spec:
-          kubelet:
-            evictionHard:
-              memory.available: 5%
-            evictionSoft:
-              memory.available: 10%
-            evictionSoftGracePeriod:
-              memory.available: 5m
-            kubeReserved:
-              cpu: 480m
-              ephemeral-storage: 3Gi
-              memory: 1632Mi
-          nodeClassRef:
-            apiVersion: karpenter.k8s.aws/v1beta1
-            kind: EC2NodeClass
-            name: default
-          requirements:
-          - key: karpenter.sh/capacity-type
-            operator: In
-            values:
-            - on-demand
-            - spot
-          - key: kubernetes.io/arch
-            operator: In
-            values:
-            - amd64
-          - key: karpenter.k8s.aws/instance-category
-            operator: In
-            values:
-            - c
-            - m
-            - r
-            - t
-  YAML
+#   yaml_body = <<-YAML
+#     ---
+#     apiVersion: karpenter.sh/v1beta1
+#     kind: NodePool
+#     metadata:
+#       name: default
+#     spec:
+#       disruption:
+#         consolidateAfter: 30s
+#         consolidationPolicy: WhenEmpty
+#         expireAfter: "168h"
+#       limits:
+#         cpu: "1000"
+#         memory: 1000Gi
+#       template:
+#         metadata:
+#           labels:
+#             role: default
+#         spec:
+#           kubelet:
+#             evictionHard:
+#               memory.available: 5%
+#             evictionSoft:
+#               memory.available: 10%
+#             evictionSoftGracePeriod:
+#               memory.available: 5m
+#             kubeReserved:
+#               cpu: 480m
+#               ephemeral-storage: 3Gi
+#               memory: 1632Mi
+#           nodeClassRef:
+#             apiVersion: karpenter.k8s.aws/v1beta1
+#             kind: EC2NodeClass
+#             name: default
+#           requirements:
+#           - key: karpenter.sh/capacity-type
+#             operator: In
+#             values:
+#             - on-demand
+#             - spot
+#           - key: kubernetes.io/arch
+#             operator: In
+#             values:
+#             - amd64
+#           - key: karpenter.k8s.aws/instance-category
+#             operator: In
+#             values:
+#             - c
+#             - m
+#             - r
+#             - t
+#   YAML
 
-  depends_on = [
-    helm_release.karpenter
-  ]
-}
+#   depends_on = [
+#     helm_release.karpenter
+#   ]
+# }
 
-resource "kubectl_manifest" "karpenter_node_class" {
-  count   = var.use_karpenter ? 1 : 0
+# resource "kubectl_manifest" "karpenter_node_class" {
+#   count   = var.use_karpenter ? 1 : 0
 
-  yaml_body = <<-YAML
-    ---
-    apiVersion: karpenter.k8s.aws/v1beta1
-    kind: EC2NodeClass
-    metadata:
-      name: default
-    spec:
-      amiFamily: AL2
-      amiSelectorTerms:
-      - name: {{ index .Values "karpenter-crds" "amiSelectorName" }}
-        owner: "143731057154"
-      blockDeviceMappings:
-      - deviceName: /dev/xvda
-        ebs:
-          deleteOnTermination: true
-          encrypted: true
-          volumeSize: ${var.worker_drive_size}Gi
-          volumeType: gp3
-      metadataOptions:
-        httpEndpoint: enabled
-        httpProtocolIPv6: disabled
-        httpPutResponseHopLimit: 2
-        httpTokens: optional
-      role: eks_${var.vpc_name}_workers_role
+#   yaml_body = <<-YAML
+#     ---
+#     apiVersion: karpenter.k8s.aws/v1beta1
+#     kind: EC2NodeClass
+#     metadata:
+#       name: default
+#     spec:
+#       amiFamily: AL2
+#       amiSelectorTerms:
+#       - name: {{ index .Values "karpenter-crds" "amiSelectorName" }}
+#         owner: "143731057154"
+#       blockDeviceMappings:
+#       - deviceName: /dev/xvda
+#         ebs:
+#           deleteOnTermination: true
+#           encrypted: true
+#           volumeSize: ${var.worker_drive_size}Gi
+#           volumeType: gp3
+#       metadataOptions:
+#         httpEndpoint: enabled
+#         httpProtocolIPv6: disabled
+#         httpPutResponseHopLimit: 2
+#         httpTokens: optional
+#       role: eks_${var.vpc_name}_workers_role
 
-      securityGroupSelectorTerms:
-      - tags:
-          karpenter.sh/discovery: ${var.vpc_name}
+#       securityGroupSelectorTerms:
+#       - tags:
+#           karpenter.sh/discovery: ${var.vpc_name}
 
-      subnetSelectorTerms:
-      - tags:
-          karpenter.sh/discovery: ${var.vpc_name}
+#       subnetSelectorTerms:
+#       - tags:
+#           karpenter.sh/discovery: ${var.vpc_name}
 
-      tags:
-        Environment: ${var.vpc_name}
-        Name: eks-${var.vpc_name}-karpenter
-        karpenter.sh/discovery: ${var.vpc_name}
-        purpose: default
+#       tags:
+#         Environment: ${var.vpc_name}
+#         Name: eks-${var.vpc_name}-karpenter
+#         karpenter.sh/discovery: ${var.vpc_name}
+#         purpose: default
 
-      userData: |
-        MIME-Version: 1.0
-        Content-Type: multipart/mixed; boundary="BOUNDARY"
+#       userData: |
+#         MIME-Version: 1.0
+#         Content-Type: multipart/mixed; boundary="BOUNDARY"
 
-        --BOUNDARY
-        Content-Type: text/x-shellscript; charset="us-ascii"
+#         --BOUNDARY
+#         Content-Type: text/x-shellscript; charset="us-ascii"
 
-        #!/bin/bash -x
-        instanceId=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .instanceId)
-        curl https://raw.githubusercontent.com/uc-cdis/cloud-automation/master/files/authorized_keys/ops_team >> /home/ec2-user/.ssh/authorized_keys
-        echo "$(jq '.registryPullQPS=0' /etc/kubernetes/kubelet/kubelet-config.json)" > /etc/kubernetes/kubelet/kubelet-config.json
-        sysctl -w fs.inotify.max_user_watches=12000
+#         #!/bin/bash -x
+#         instanceId=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .instanceId)
+#         curl https://raw.githubusercontent.com/uc-cdis/cloud-automation/master/files/authorized_keys/ops_team >> /home/ec2-user/.ssh/authorized_keys
+#         echo "$(jq '.registryPullQPS=0' /etc/kubernetes/kubelet/kubelet-config.json)" > /etc/kubernetes/kubelet/kubelet-config.json
+#         sysctl -w fs.inotify.max_user_watches=12000
 
-        sudo yum update -y
+#         sudo yum update -y
 
-      --BOUNDARY--   
-  YAML
+#       --BOUNDARY--   
+#   YAML
 
-  depends_on = [
-    helm_release.karpenter
-  ]
-}
+#   depends_on = [
+#     helm_release.karpenter
+#   ]
+# }
