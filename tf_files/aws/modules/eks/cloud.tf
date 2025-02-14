@@ -618,10 +618,10 @@ data:
         - system:bootstrappers
         - system:nodes
     - rolearn: ${aws_iam_role.karpenter[0].arn} 
-      groups:                                                                                                                                                                                                                                                                                                                                                              │
-        - system:bootstrappers                                                                                                                                                                                                                                                                                                                                               │
-        - system:nodes                                                                                                                                                                                                                                                                                                                                                       │
-        - system:node-proxier                                                                                                                                                                                                                                                                                                                                                │                                                                                                                                                                                                                                                                                        │
+      groups:
+        - system:bootstrappers
+        - system:nodes
+        - system:node-proxier
       username: system:node:{{SessionName}}
 CONFIGMAPAWSAUTH
   cm2 = <<CONFIGMAPAWSAUTH2
