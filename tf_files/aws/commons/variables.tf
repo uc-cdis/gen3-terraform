@@ -465,7 +465,7 @@ variable "deploy_argocd" {
 }
 
 variable "argocd_version" {
-  default = ""
+  default = "7.8.2"
 }
 
 variable "deploy_external_secrets_operator" {
