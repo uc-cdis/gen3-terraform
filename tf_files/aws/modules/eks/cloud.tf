@@ -587,6 +587,10 @@ resource "aws_security_group" "ssh" {
   })
 }
 
+resource "kubectl_manifest" "aws-auth" {
+  yaml_body = local.config-map-aws-auth
+}
+
 
 # NOTE: At this point, your Kubernetes cluster will have running masters and worker nodes, however, the worker nodes will
 # not be able to join the Kubernetes cluster quite yet. The next section has the required Kubernetes configuration to
