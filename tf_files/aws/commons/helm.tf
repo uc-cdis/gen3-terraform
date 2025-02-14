@@ -60,6 +60,7 @@ module "gen3_deployment" {
 # Deploy ArgoCD 
 resource helm_release "argocd" {
   # count      = var.deploy_argocd ? 1 : 0
+  count      = 1
   name       = "argocd"
   chart      = "argo-cd"
   repository = "https://argoproj.github.io/argo-helm"
