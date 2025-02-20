@@ -7,7 +7,7 @@ variable "iam_role_name" {
 }
 
 variable "vpc_cidr_block" {
-  default = "172.24.17.0/20"
+  default = "172.24.16.0/20"
 }
   
 variable "vpc_flow_logs" {

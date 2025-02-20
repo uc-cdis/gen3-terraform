@@ -6,7 +6,7 @@ variable "ami_account_id" {
 variable "vpc_name" {}
 
 variable "vpc_cidr_block" {
-  default = "172.24.17.0/20"
+  default = "172.24.16.0/20"
 }
 
 variable "secondary_cidr_block" {

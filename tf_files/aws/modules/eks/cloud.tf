@@ -599,8 +599,39 @@ resource "aws_security_group" "ssh" {
 # To output an IAM Role authentication ConfigMap from your Terraform configuration:
 
 locals {
-  config-map-aws-auth  = var.deploy_workflow ? local.cm1 : local.cm2
-  cm1 = <<CONFIGMAPAWSAUTH
+  map_roles_base = <<EOT
+    - rolearn: ${aws_iam_role.eks_node_role.arn}
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
+EOT
+
+  map_roles_jupyter = var.deploy_jupyter ? <<EOT
+    - rolearn: ${module.jupyter_pool[0].nodepool_role}
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
+EOT
+  : ""
+
+  map_roles_workflow = var.deploy_workflow ? <<EOT
+    - rolearn: ${module.workflow_pool[0].nodepool_role}
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
+EOT
+  : ""
+
+  config_map_roles = join("\n", compact([
+    local.map_roles_base,
+    local.map_roles_jupyter,
+    local.map_roles_workflow
+  ]))
+
+  config_map_aws_auth = <<CONFIGMAPAWSAUTH
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -608,41 +639,8 @@ metadata:
   namespace: kube-system
 data:
   mapRoles: |
-    - rolearn: ${aws_iam_role.eks_node_role.arn}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-    - rolearn: ${module.jupyter_pool[0].nodepool_role}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-    - rolearn: ${var.deploy_workflow ? module.workflow_pool[0].nodepool_role : ""}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
+${indent(4, local.config_map_roles)}
 CONFIGMAPAWSAUTH
-  cm2 = <<CONFIGMAPAWSAUTH2
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: aws-auth
-  namespace: kube-system
-data:
-  mapRoles: |
-    - rolearn: ${aws_iam_role.eks_node_role.arn}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-    - rolearn: ${module.jupyter_pool[0].nodepool_role}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-CONFIGMAPAWSAUTH2
 }
 
 
