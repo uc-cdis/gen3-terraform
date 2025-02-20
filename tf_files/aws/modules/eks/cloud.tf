@@ -526,6 +526,7 @@ resource "aws_security_group_rule" "nodes_internode_communications" {
 
 # Let's allow the two polls talk to each other
 resource "aws_security_group_rule" "nodes_interpool_communications" {
+  count                   = var.deploy_jupyter ? 1 : 0
   type                     = "ingress"
   from_port                = 0
   to_port                  = 0
