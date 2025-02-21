@@ -47,7 +47,7 @@ There are mandatory variables, and there are a few other optionals that are set 
 | peering_cidr | CIDR of the VPC you want to peer to (adminVM's cidr usually) | string | 10.128.0.0/20 |
 | csoc_managed | If your commons is part of a managed account | boolean | true |
 | peering_vpc_id | VPC id of the one you want peered with the cluster's | string | vpc-e2b51d99 |
-| vpc_cidr_block | CIDR to be used by the cluster's resources | string | 172.24.17.0/20 | 
+| vpc_cidr_block | CIDR to be used by the cluster's resources | string | 172.24.16.0/20 | 
 | availability_zones | AZs for the cluster | list | ["us-east-1a", "us-east-1c", "us-east-1d"] |
 
 
