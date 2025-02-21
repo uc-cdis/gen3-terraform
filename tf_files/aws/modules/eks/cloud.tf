@@ -526,6 +526,7 @@ resource "aws_security_group_rule" "nodes_internode_communications" {
 
 # Let's allow the two polls talk to each other
 resource "aws_security_group_rule" "nodes_interpool_communications" {
+  count                   = var.deploy_jupyter ? 1 : 0
   type                     = "ingress"
   from_port                = 0
   to_port                  = 0
@@ -613,7 +614,7 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
-    - rolearn: ${module.jupyter_pool[0].nodepool_role}
+    - rolearn: ${var.deploy_jupyter ? module.jupyter_pool[0].nodepool_role: ""}
       username: system:node:{{EC2PrivateDNSName}}
       groups:
         - system:bootstrappers
@@ -637,7 +638,7 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
-    - rolearn: ${module.jupyter_pool[0].nodepool_role}
+    - rolearn: ${var.deploy_jupyter ? module.jupyter_pool[0].nodepool_role: ""}
       username: system:node:{{EC2PrivateDNSName}}
       groups:
         - system:bootstrappers

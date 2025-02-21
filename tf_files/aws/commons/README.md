@@ -101,7 +101,7 @@ gdcapi_indexd_password="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 | Name | Description | Type | Default |
 |------|-------------|:----:|:-------:|
 | vpc_name | The name of your commons, it is just a name that will identify your commons' resources in AWS. Must be unique if deploying multiple commons on the same account | string | "Commons1" |
-| vpc_cidr_block | CIDR for your commons to live on. Currently only accepts /20 subnets. | string | "172.24.17.0/20" |
+| vpc_cidr_block | CIDR for your commons to live on. Currently only accepts /20 subnets. | string | "172.24.16.0/20" |
 | aws_cert_name | Certificate that your commons will use, must be already provisioned in AWS Certificate Manager. Recommended to use cert's ARN | string | "AWS-CERTIFICATE-NAME" |
 | csoc_account_id | Account id of the CSOC account | string | "433568766270" |
 | fence_db_size | Volume size for fence database | number | 10 |
