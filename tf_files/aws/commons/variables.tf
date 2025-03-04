@@ -1110,3 +1110,6 @@ variable "additional_rules" {
   default = []
 }
 
+variable "db_kms_key_id" {
+  default = ""
+}
