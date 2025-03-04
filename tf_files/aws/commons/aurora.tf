@@ -19,5 +19,6 @@ module "aurora" {
   preferred_backup_window		        = var.preferred_backup_window
   password_length			              = var.password_length
   secrets_manager_enabled           = var.secrets_manager_enabled
+  db_kms_key_id                     = var.db_kms_key_id
   depends_on                        = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id]
 }
