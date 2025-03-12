@@ -240,7 +240,6 @@ resource "aws_cloudwatch_event_target" "this" {
   arn       = aws_sqs_queue.this[0].arn
 }
 
-
 resource "aws_eks_fargate_profile" "karpenter" {
   count                  = var.use_karpenter ? 1 : 0
   cluster_name           = aws_eks_cluster.eks_cluster.name
@@ -282,7 +281,7 @@ resource "aws_iam_role_policy_attachment" "karpenter-role-policy" {
 }
 
 resource "helm_release" "karpenter" {
-  count               = var.use_karpenter ? 1 : 0
+  count               = var.use_karpenter || var.deploy_karpenter_in_k8s ? 1 : 0
   namespace           = "karpenter"
   create_namespace    = true
   name                = "karpenter"
@@ -326,7 +325,7 @@ resource "helm_release" "karpenter" {
 }
 
 resource "kubectl_manifest" "karpenter_node_pool" {
-  count   = var.use_karpenter ? 1 : 0
+  count   = var.use_karpenter || var.deploy_karpenter_in_k8s ? 1 : 0
 
   yaml_body = <<-YAML
     ---
@@ -387,7 +386,7 @@ resource "kubectl_manifest" "karpenter_node_pool" {
 }
 
 resource "kubectl_manifest" "karpenter_node_class" {
-  count   = var.use_karpenter ? 1 : 0
+  count   = var.use_karpenter || var.deploy_karpenter_in_k8s ? 1 : 0
 
   yaml_body = <<-YAML
     ---
