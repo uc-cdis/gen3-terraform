@@ -85,6 +85,7 @@ data "aws_iam_policy_document" "irsa" {
       "ec2:CreateFleet",
       "ec2:DescribeSpotPriceHistory",
       "pricing:GetProducts",
+      "eks:DescribeCluster"
     ]
     effect   = "Allow"
     resources = ["*"]
