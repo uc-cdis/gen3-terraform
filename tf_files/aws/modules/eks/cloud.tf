@@ -23,7 +23,7 @@ locals{
 }
 
 module "jupyter_pool" {
-  count                         = var.deploy_jupyter ? 1 : 0
+  count                         = ! var.use_karpenter && var.deploy_jupyter ? 1 : 0
   scale_in_protection           = false
   source                        = "../eks-nodepool/"
   ec2_keyname                   = var.ec2_keyname
@@ -51,7 +51,7 @@ module "jupyter_pool" {
 }
 
 module "workflow_pool" {
-  count                         = var.deploy_workflow ? 1 : 0
+  count                         = ! var.use_karpenter && var.deploy_workflow ? 1 : 0
   scale_in_protection           = true
   source                        = "../eks-nodepool/"
   ec2_keyname                   = var.ec2_keyname
