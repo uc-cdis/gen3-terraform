@@ -607,8 +607,7 @@ resource "kubectl_manifest" "aws-auth" {
 
 locals {
   #config-map-aws-auth  = var.deploy_workflow ? local.cm1 : local.cm2
-  config-map-aws-auth = local.cm1
-  cm1 = <<CONFIGMAPAWSAUTH
+  config-map-aws-auth = <<CONFIGMAPAWSAUTH
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -638,20 +637,6 @@ data:
         - system:bootstrappers
         - system:nodes
 CONFIGMAPAWSAUTH
-  cm2 = <<CONFIGMAPAWSAUTH2
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: aws-auth
-  namespace: kube-system
-data:
-  mapRoles: |
-    - rolearn: ${aws_iam_role.eks_node_role.arn}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-CONFIGMAPAWSAUTH2
 }
 
 
