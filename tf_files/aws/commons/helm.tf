@@ -64,7 +64,7 @@ resource helm_release "argocd" {
   chart      = "argo-cd"
   repository = "https://argoproj.github.io/argo-helm"
   version = var.argocd_version
-  namespace  = var.namespace
+  namespace  = "argocd"
 
   values = [
     <<-EOT
@@ -78,7 +78,7 @@ resource helm_release "external-secrets" {
   count      = var.deploy_external_secrets_operator ? 1 : 0
   name       = "external-secrets"
   chart      = "external-secrets"
-  repository = "https://external-secrets.github.io/kubernetes-external-secrets"
+  repository = "https://charts.external-secrets.io"
   version    = var.external_secrets_operator_version
   namespace  = "external-secrets"
 
