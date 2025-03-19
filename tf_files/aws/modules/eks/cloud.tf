@@ -110,19 +110,13 @@ resource "aws_iam_role_policy_attachment" "eks-policy-AmazonEKSServicePolicy" {
   role       = aws_iam_role.eks_control_plane_role.name
 }
 
-# TODO figure out what's going on here. I think we meant to delete it, but the attachment below is dependent on it, so we'll leave it for now
-# logs bucket for elb logs
-module "elb_logs" {
-  source          = "../modules/s3-logs"
-  log_bucket_name = "logs-${var.vpc_name}-gen3"
-  environment     = "${var.vpc_name}"
-}
-
+# It looks like this was an item from the old commons module
+# TODO figure out whether we still need this (in which case we need to transfer over files) or if this can be deleted
 # This one must have been created when we deployed the VPC resources
-resource "aws_iam_role_policy_attachment" "bucket_write" {
-  policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/bucket_writer_logs-${var.vpc_name}-gen3"
-  role       = aws_iam_role.eks_control_plane_role.name
-}
+# resource "aws_iam_role_policy_attachment" "bucket_write" {
+#   policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/bucket_writer_logs-${var.vpc_name}-gen3"
+#   role       = aws_iam_role.eks_control_plane_role.name
+# }
 
 resource "random_shuffle" "az" {
   count = 1

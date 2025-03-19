@@ -31,10 +31,11 @@ resource "aws_iam_role_policy_attachment" "eks-policy-AmazonEKSServicePolicy" {
   role       = aws_iam_role.eks_control_plane_role.name
 }
 
-resource "aws_iam_role_policy_attachment" "bucket_write" {
-  policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/bucket_writer_logs-${var.vpc_name}-gen3"
-  role       = aws_iam_role.eks_control_plane_role.name
-}
+# TODO figure out if we still need this
+# resource "aws_iam_role_policy_attachment" "bucket_write" {
+#   policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/bucket_writer_logs-${var.vpc_name}-gen3"
+#   role       = aws_iam_role.eks_control_plane_role.name
+# }
 
 # Amazon SSM Policy 
 resource "aws_iam_role_policy_attachment" "eks-policy-AmazonSSMManagedInstanceCore" {
