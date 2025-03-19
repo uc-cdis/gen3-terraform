@@ -604,7 +604,8 @@ resource "kubectl_manifest" "aws-auth" {
 # To output an IAM Role authentication ConfigMap from your Terraform configuration:
 
 locals {
-  config-map-aws-auth  = var.deploy_workflow ? local.cm1 : local.cm2
+  #config-map-aws-auth  = var.deploy_workflow ? local.cm1 : local.cm2
+  config-map-aws-auth = local.cm1
   cm1 = <<CONFIGMAPAWSAUTH
 apiVersion: v1
 kind: ConfigMap
@@ -619,11 +620,21 @@ data:
         - system:bootstrappers
         - system:nodes
     - rolearn: ${aws_iam_role.karpenter[0].arn} 
+      username: system:node:{{SessionName}}
       groups:
         - system:bootstrappers
         - system:nodes
         - system:node-proxier
-      username: system:node:{{SessionName}}
+    - rolearn: ${var.deploy_workflow ? module.workflow_pool[0].nodepool_role : ""}
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
+    - rolearn: ${var.deploy_jupyter ? module.jupyter_pool[0].nodepool_role : ""}
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
 CONFIGMAPAWSAUTH
   cm2 = <<CONFIGMAPAWSAUTH2
 apiVersion: v1
