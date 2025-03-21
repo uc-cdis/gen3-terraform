@@ -198,6 +198,15 @@ variable "use_karpenter" {
   default = false
 }
 
+variable "deploy_karpenter_in_k8s" {
+  default = false
+  description = "Allows you to enable the Karpenter Helm chart and associated resources without deploying the other parts of karpenter (i.e. the roles, permissions, and SQS queue)"
+}
+
+variable "karpenter_version" {
+  default = "v0.32.9"
+}
+
 variable "spot_linked_role" {
   default = false
 }
@@ -209,10 +218,6 @@ variable "scale_in_protection" {
 
 variable "ci_run" {
   default = false
-}
-
-variable "karpenter_version" {
-  default = "v0.24.0"
 }
 
 variable "eks_public_access" {

@@ -13,9 +13,10 @@ calico_yaml="https://raw.githubusercontent.com/aws/amazon-vpc-cni-k8s/v$${calico
 
 
 #KUBECTL=$(bash which kubectl)
-if ! $(command -v kubectl) --kubeconfig "${kubeconfig_path}" get daemonsets -n kube-system calico-node > /dev/null 2>&1; then
-  $(command -v kubectl) --kubeconfig "${kubeconfig_path}" apply -f $${calico_yaml}
-fi
+# TODO Figure out if we actually need this. I think we can hold off on calico until ArgoCD is up and running
+# if ! $(command -v kubectl) --kubeconfig "${kubeconfig_path}" get daemonsets -n kube-system calico-node > /dev/null 2>&1; then
+#   $(command -v kubectl) --kubeconfig "${kubeconfig_path}" apply -f $${calico_yaml}
+# fi
 
 if ! $(command -v kubectl) --kubeconfig "${kubeconfig_path}" get configmap -n kube-system aws-auth > /dev/null 2>&1; then
   $(command -v kubectl) --kubeconfig "${kubeconfig_path}" apply -f "${auth_configmap}"
