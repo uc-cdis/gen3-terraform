@@ -1079,6 +1079,10 @@ variable "deploy_waf" {
   default = false
 }
 
+variable "k8s_bootstrap" {
+  default = true
+  description = "If set to true, creates resources for bootstrapping a kubernetes cluster (such as karpenter configs and helm releases)"
+}
 variable "base_rules" {
   description = "Base AWS Managed Rules"
   type = list(object({
