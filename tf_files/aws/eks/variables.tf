@@ -210,3 +210,9 @@ variable "eks_public_access" {
 variable "enable_vpc_endpoints" {
   default = true
 }
+
+variable "k8s_boostrap" {
+  default = false
+  description = "If set to true, creates resources for bootstrapping a kubernetes cluster (such as karpenter configs and helm releases)"
+}
+
