@@ -211,7 +211,7 @@ variable "enable_vpc_endpoints" {
   default = true
 }
 
-variable "k8s_boostrap" {
+variable "k8s_bootstrap" {
   default = false
   description = "If set to true, creates resources for bootstrapping a kubernetes cluster (such as karpenter configs and helm releases)"
 }
