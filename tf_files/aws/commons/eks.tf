@@ -52,6 +52,6 @@ module "eks" {
   enable_vpc_endpoints             = var.enable_vpc_endpoints
   spot_linked_role                 = var.spot_linked_role
   csoc_account_id                  = var.csoc_account_id
-  k8s_bootstrap                    = var.k8s_bootstrap
+  k8s_bootstrap_resources          = var.k8s_bootstrap_resources
   depends_on                       = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id, module.cdis_vpc.squid_auto]
 }

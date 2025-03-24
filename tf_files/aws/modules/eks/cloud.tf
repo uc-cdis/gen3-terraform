@@ -591,7 +591,7 @@ resource "aws_security_group" "ssh" {
 }
 
 resource "kubectl_manifest" "aws-auth" {
-  count = var.k8s_bootstrap ? 1 : 0
+  count = var.k8s_bootstrap_resources ? 1 : 0
   yaml_body = local.config-map-aws-auth
 }
 

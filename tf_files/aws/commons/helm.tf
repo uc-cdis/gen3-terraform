@@ -59,7 +59,7 @@ module "gen3_deployment" {
 
 # Deploy ArgoCD 
 resource helm_release "argocd" {
-  count            = var.k8s_bootstrap && var.deploy_argocd ? 1 : 0
+  count            = var.k8s_bootstrap_resources && var.deploy_argocd ? 1 : 0
   name             = "argocd"
   chart            = "argo-cd"
   repository       = "https://argoproj.github.io/argo-helm"
@@ -76,7 +76,7 @@ resource helm_release "argocd" {
 
 # Deploy External Secrets Operator
 resource helm_release "external-secrets" {
-  count      = var.k8s_bootstrap && var.deploy_external_secrets_operator ? 1 : 0
+  count      = var.k8s_bootstrap_resources && var.deploy_external_secrets_operator ? 1 : 0
   name       = "external-secrets"
   chart      = "external-secrets"
   repository = "https://charts.external-secrets.io"

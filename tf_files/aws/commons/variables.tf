@@ -1079,7 +1079,7 @@ variable "deploy_waf" {
   default = false
 }
 
-variable "k8s_bootstrap" {
+variable "k8s_bootstrap_resources" {
   default = true
   description = "If set to true, creates resources for bootstrapping a kubernetes cluster (such as karpenter configs and helm releases)"
 }
