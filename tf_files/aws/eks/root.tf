@@ -61,4 +61,5 @@ module "eks" {
   karpernter_version               = var.karpernter_version
   eks_public_access                = var.eks_public_access
   enable_vpc_endpoints             = var.enable_vpc_endpoints
+  k8s_bootstrap_resources          = var.k8s_bootstrap_resources
 }

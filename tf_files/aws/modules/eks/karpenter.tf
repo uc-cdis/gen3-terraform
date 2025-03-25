@@ -282,7 +282,7 @@ resource "aws_iam_role_policy_attachment" "karpenter-role-policy" {
 }
 
 resource "helm_release" "karpenter" {
-  count               = var.use_karpenter || var.deploy_karpenter_in_k8s ? 1 : 0
+  count               = var.k8s_bootstrap_resources && (var.use_karpenter || var.deploy_karpenter_in_k8s) ? 1 : 0
   namespace           = "karpenter"
   create_namespace    = true
   name                = "karpenter"
@@ -326,7 +326,7 @@ resource "helm_release" "karpenter" {
 }
 
 resource "kubectl_manifest" "karpenter_node_pool" {
-  count   = var.use_karpenter || var.deploy_karpenter_in_k8s ? 1 : 0
+  count   = var.k8s_bootstrap_resources && (var.use_karpenter || var.deploy_karpenter_in_k8s) ? 1 : 0
 
   yaml_body = <<-YAML
     ---
@@ -387,7 +387,7 @@ resource "kubectl_manifest" "karpenter_node_pool" {
 }
 
 resource "kubectl_manifest" "karpenter_node_class" {
-  count   = var.use_karpenter || var.deploy_karpenter_in_k8s ? 1 : 0
+  count   = var.k8s_bootstrap_resources && (var.use_karpenter || var.deploy_karpenter_in_k8s) ? 1 : 0
 
   yaml_body = <<-YAML
     ---
