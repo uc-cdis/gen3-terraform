@@ -771,6 +771,10 @@ variable "password_length" {
   default     = 32
 }
 
+variable "db_kms_key_id" {
+  default = ""
+}
+
 variable "deploy_aurora" {
   default = false
 }
