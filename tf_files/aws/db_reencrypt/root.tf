@@ -40,6 +40,10 @@ resource "aws_rds_cluster" "postgresql" {
     max_capacity = var.serverlessv2_scaling_max_capacity
     min_capacity = var.serverlessv2_scaling_min_capacity
   }
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 # Aurora Cluster Instance
@@ -51,11 +55,18 @@ resource "aws_rds_cluster_instance" "postgresql" {
   instance_class	     = var.instance_class
   engine             	 = data.aws_rds_cluster.source_db_instance.engine
   engine_version     	 = data.aws_rds_cluster.source_db_instance.engine_version
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 # Create a snapshot of the existing RDS instance
 resource "aws_db_cluster_snapshot" "db_snapshot" {
   db_cluster_identifier = data.aws_rds_cluster.source_db_instance.id
   db_cluster_snapshot_identifier = local.snapshot_identifier
+  lifecycle {
+    ignore_changes = all
+  }
 }
 

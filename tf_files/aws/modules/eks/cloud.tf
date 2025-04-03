@@ -110,11 +110,13 @@ resource "aws_iam_role_policy_attachment" "eks-policy-AmazonEKSServicePolicy" {
   role       = aws_iam_role.eks_control_plane_role.name
 }
 
+# It looks like this was an item from the old commons module
+# TODO figure out whether we still need this (in which case we need to transfer over files) or if this can be deleted
 # This one must have been created when we deployed the VPC resources
-resource "aws_iam_role_policy_attachment" "bucket_write" {
-  policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/bucket_writer_logs-${var.vpc_name}-gen3"
-  role       = aws_iam_role.eks_control_plane_role.name
-}
+# resource "aws_iam_role_policy_attachment" "bucket_write" {
+#   policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/bucket_writer_logs-${var.vpc_name}-gen3"
+#   role       = aws_iam_role.eks_control_plane_role.name
+# }
 
 resource "random_shuffle" "az" {
   count = 1
@@ -526,6 +528,7 @@ resource "aws_security_group_rule" "nodes_internode_communications" {
 
 # Let's allow the two polls talk to each other
 resource "aws_security_group_rule" "nodes_interpool_communications" {
+  count                    = var.deploy_jupyter ? 1 : 0
   type                     = "ingress"
   from_port                = 0
   to_port                  = 0
@@ -587,6 +590,11 @@ resource "aws_security_group" "ssh" {
   })
 }
 
+resource "kubectl_manifest" "aws-auth" {
+  count = var.k8s_bootstrap_resources ? 1 : 0
+  yaml_body = local.config-map-aws-auth
+}
+
 
 # NOTE: At this point, your Kubernetes cluster will have running masters and worker nodes, however, the worker nodes will
 # not be able to join the Kubernetes cluster quite yet. The next section has the required Kubernetes configuration to
@@ -599,8 +607,8 @@ resource "aws_security_group" "ssh" {
 # To output an IAM Role authentication ConfigMap from your Terraform configuration:
 
 locals {
-  config-map-aws-auth  = var.deploy_workflow ? local.cm1 : local.cm2
-  cm1 = <<CONFIGMAPAWSAUTH
+  #config-map-aws-auth  = var.deploy_workflow ? local.cm1 : local.cm2
+  config-map-aws-auth = <<CONFIGMAPAWSAUTH
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -613,36 +621,23 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
-    - rolearn: ${module.jupyter_pool[0].nodepool_role}
-      username: system:node:{{EC2PrivateDNSName}}
+    - rolearn: ${aws_iam_role.karpenter[0].arn} 
+      username: system:node:{{SessionName}}
       groups:
         - system:bootstrappers
         - system:nodes
+        - system:node-proxier
     - rolearn: ${var.deploy_workflow ? module.workflow_pool[0].nodepool_role : ""}
       username: system:node:{{EC2PrivateDNSName}}
       groups:
         - system:bootstrappers
         - system:nodes
+    - rolearn: ${var.deploy_jupyter ? module.jupyter_pool[0].nodepool_role : ""}
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
 CONFIGMAPAWSAUTH
-  cm2 = <<CONFIGMAPAWSAUTH2
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: aws-auth
-  namespace: kube-system
-data:
-  mapRoles: |
-    - rolearn: ${aws_iam_role.eks_node_role.arn}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-    - rolearn: ${module.jupyter_pool[0].nodepool_role}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-CONFIGMAPAWSAUTH2
 }
 
 
@@ -672,9 +667,9 @@ resource "null_resource" "config_setup" {
     command = "echo \"${templatefile("${path.module}/init_cluster.sh", { vpc_name = var.vpc_name, kubeconfig_path = "${var.vpc_name}_output_EKS/kubeconfig", auth_configmap = "${var.vpc_name}_output_EKS/aws-auth-cm.yaml"})}\" > ${var.vpc_name}_output_EKS/init_cluster.sh"
   }
 
-  provisioner "local-exec" {
-    command = "bash ${var.vpc_name}_output_EKS/init_cluster.sh"
-  }
+  # provisioner "local-exec" {
+  #   command = "bash ${var.vpc_name}_output_EKS/init_cluster.sh"
+  # }
 
   depends_on = [aws_autoscaling_group.eks_autoscaling_group]
 }

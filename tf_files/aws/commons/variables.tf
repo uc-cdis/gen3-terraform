@@ -465,7 +465,7 @@ variable "deploy_argocd" {
 }
 
 variable "argocd_version" {
-  default = ""
+  default = "7.8.2"
 }
 
 variable "deploy_external_secrets_operator" {
@@ -473,7 +473,7 @@ variable "deploy_external_secrets_operator" {
 }
 
 variable "external_secrets_operator_version" {
-  default = ""
+  default = "0.14.0"
 }
 
 variable "ec2_keyname" {
@@ -791,8 +791,13 @@ variable "use_karpenter" {
   default = false
 }
 
+variable "deploy_karpenter_in_k8s" {
+  default = false
+  description = "Allows you to enable the Karpenter Helm chart and associated resources without deploying the other parts of karpenter (i.e. the roles, permissions, and SQS queue)"
+}
+
 variable "karpenter_version" {
-  default = "v0.24.0"
+  default = "v0.32.9"
 }
 
 variable "deploy_cloud_trail" {
@@ -1078,6 +1083,10 @@ variable "deploy_waf" {
   default = false
 }
 
+variable "k8s_bootstrap_resources" {
+  default = true
+  description = "If set to true, creates resources for bootstrapping a kubernetes cluster (such as karpenter configs and helm releases)"
+}
 variable "base_rules" {
   description = "Base AWS Managed Rules"
   type = list(object({
