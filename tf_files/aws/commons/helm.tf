@@ -82,6 +82,7 @@ resource helm_release "external-secrets" {
   repository = "https://charts.external-secrets.io"
   version    = var.external_secrets_operator_version
   namespace  = "external-secrets"
+  create_namespace = true
 
   values = [
     <<-EOT
