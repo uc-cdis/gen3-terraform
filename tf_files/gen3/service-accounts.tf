@@ -600,7 +600,7 @@ resource "aws_iam_role" "external-secrets-role" {
         Condition = {
           StringEquals = {
             "${var.oidc_provider_arn}:sub" = [
-              "system:serviceaccount:${var.namespace}:secret-store-sa"
+              "system:serviceaccount:${var.namespace}:external-secrets"
             ]
             "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
           }
