@@ -32,7 +32,7 @@ resource "aws_secretsmanager_secret" "es_user_creds" {
 }
 
 resource "aws_secretsmanager_secret_version" "es_user_creds" {
-  secret_id     = aws_secretsmanager_secret.fence_config.id
+  secret_id     = aws_secretsmanager_secret.es_user_creds.id
   secret_string = templatefile("${path.module}/aws-user-creds.tftpl", {
         access_key    = var.es_user_key
         access_secret = var.es_user_secret
