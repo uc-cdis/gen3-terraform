@@ -282,7 +282,7 @@ resource "aws_iam_role_policy_attachment" "karpenter-role-policy" {
 }
 
 resource "helm_release" "karpenter" {
-  count               = var.k8s_bootstrap_resources && (var.use_karpenter || var.deploy_karpenter_in_k8s) ? 1 : 0
+  count               = var.k8s_bootstrap_resources && var.use_karpenter && var.deploy_karpenter_in_k8s ? 1 : 0
   namespace           = "karpenter"
   create_namespace    = true
   name                = "karpenter"
@@ -323,10 +323,14 @@ resource "helm_release" "karpenter" {
   }
 
   depends_on = [time_sleep.wait_60_seconds]
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "kubectl_manifest" "karpenter_node_pool" {
-  count   = var.k8s_bootstrap_resources && (var.use_karpenter || var.deploy_karpenter_in_k8s) ? 1 : 0
+  count   = var.k8s_bootstrap_resources && var.use_karpenter && var.deploy_karpenter_in_k8s ? 1 : 0
 
   yaml_body = <<-YAML
     ---
@@ -384,10 +388,14 @@ resource "kubectl_manifest" "karpenter_node_pool" {
   depends_on = [
     helm_release.karpenter
   ]
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "kubectl_manifest" "karpenter_node_class" {
-  count   = var.k8s_bootstrap_resources && (var.use_karpenter || var.deploy_karpenter_in_k8s) ? 1 : 0
+  count   = var.k8s_bootstrap_resources && var.use_karpenter && var.deploy_karpenter_in_k8s ? 1 : 0
 
   yaml_body = <<-YAML
     ---
@@ -449,4 +457,8 @@ resource "kubectl_manifest" "karpenter_node_class" {
   depends_on = [
     helm_release.karpenter
   ]
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
