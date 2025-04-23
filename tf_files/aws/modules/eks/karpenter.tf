@@ -323,6 +323,10 @@ resource "helm_release" "karpenter" {
   }
 
   depends_on = [time_sleep.wait_60_seconds]
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "kubectl_manifest" "karpenter_node_pool" {
@@ -384,6 +388,10 @@ resource "kubectl_manifest" "karpenter_node_pool" {
   depends_on = [
     helm_release.karpenter
   ]
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "kubectl_manifest" "karpenter_node_class" {
@@ -449,4 +457,8 @@ resource "kubectl_manifest" "karpenter_node_class" {
   depends_on = [
     helm_release.karpenter
   ]
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
