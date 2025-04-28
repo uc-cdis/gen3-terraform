@@ -133,3 +133,7 @@ variable "fips_ami_kms" {
 variable "fips" {
   default = false
 }
+
+variable "squid_ami_id" {
+  default = ""
+}

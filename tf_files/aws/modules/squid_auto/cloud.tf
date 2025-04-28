@@ -52,6 +52,21 @@ resource "aws_iam_role_policy_attachment" "eks-policy-AmazonSSMManagedInstanceCo
   role       = aws_iam_role.squid-auto_role.id
 }
 
+resource "aws_ssm_parameter" "squid_ami" {
+  name        = "/gen3/squid-ami-${var.env_vpc_name}"
+  description = "Squid AMI id for ASG Launch Template"
+  type        = "String"
+  data_type   = "aws:ec2:image" 
+  value       = var.squid_ami_id
+  overwrite   = true
+
+  tags = {
+    Environment  = var.env_squid_name
+    Organization = var.organization_name
+  }
+  
+}  
+
 resource "aws_iam_instance_profile" "squid-auto_role_profile" {
   name = "${var.env_vpc_name}_squid-auto_role_profile"
   role = aws_iam_role.squid-auto_role.id
@@ -71,7 +86,7 @@ resource "aws_route_table_association" "squid_auto0" {
 resource "aws_launch_template" "squid_auto" {
   name_prefix   = "${var.env_squid_name}-lt"
   instance_type = var.squid_instance_type
-  image_id      = data.aws_ami.public_squid_ami.id
+  image_id      = "resolve:ssm:/gen3/squid-ami-${var.env_vpc_name}"  # fetches AMI id at launch time 
   key_name      = var.ssh_key_name
 
   iam_instance_profile {

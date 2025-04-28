@@ -116,3 +116,7 @@ variable "customer_id" {
 variable "slack_webhook" {
   default = ""
 }
+
+variable "squid_ami_id" {
+  default = ""
+}
