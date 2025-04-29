@@ -341,3 +341,101 @@ resource "aws_security_group" "squidauto_out" {
     Organization = var.organization_name
   }
 }
+
+# pull in region & account for ARN construction
+data "aws_region"          "current" {}
+data "aws_caller_identity" "current" {}
+
+# archive the Python file
+data "archive_file" "squid_ami_updater_zip" {
+  type        = "zip"
+  source_file = "${path.module}/index.py"
+  output_path = "${path.module}/squid_ami_updater.zip"
+}
+
+# assume-role policy for Lambda
+data "aws_iam_policy_document" "squid_ami_updater_assume" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role" "squid_ami_updater_role" {
+  name               = "${var.env_squid_name}-squid-ami-updater-role"
+  assume_role_policy = data.aws_iam_policy_document.squid_ami_updater_assume.json
+}
+
+# CloudWatch-Logs permissions
+resource "aws_iam_role_policy_attachment" "squid_ami_updater_basic" {
+  role       = aws_iam_role.squid_ami_updater_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# inline policy to DescribeImages and update the SSM parameter
+data "aws_iam_policy_document" "squid_ami_updater_inline" {
+  statement {
+    effect    = "Allow"
+    actions   = ["ec2:DescribeImages"]
+    resources = ["*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["ssm:PutParameter", "ssm:DeleteParameter"]
+    resources = [
+      "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/gen3/squid-ami-${var.env_vpc_name}"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "squid_ami_updater_policy" {
+  name   = "${var.env_squid_name}-squid-ami-updater-policy"
+  policy = data.aws_iam_policy_document.squid_ami_updater_inline.json
+}
+
+resource "aws_iam_role_policy_attachment" "squid_ami_updater_attach" {
+  role       = aws_iam_role.squid_ami_updater_role.name
+  policy_arn = aws_iam_policy.squid_ami_updater_policy.arn
+}
+
+# Lambda function
+resource "aws_lambda_function" "squid_ami_updater" {
+  filename         = data.archive_file.squid_ami_updater_zip.output_path
+  function_name    = "${var.env_squid_name}-squid-ami-updater"
+  handler          = "index.handler"
+  runtime          = "python3.9"
+  role             = aws_iam_role.squid_ami_updater_role.arn
+  source_code_hash = data.archive_file.squid_ami_updater_zip.output_base64sha256
+
+  environment {
+    variables = {
+      SOURCE_AMI_ACCOUNT = var.ami_account_id
+      AMI_NAME_PATTERN   = var.image_name_search_criteria
+      ENV_VPC_NAME       = var.env_vpc_name
+    }
+  }
+}
+
+# schedule via EventBridge
+resource "aws_cloudwatch_event_rule" "squid_ami_updater_schedule" {
+  name                = "${var.env_squid_name}-squid-ami-updater-schedule"
+  schedule_expression = var.refresh_schedule_cron
+}
+
+resource "aws_cloudwatch_event_target" "squid_ami_updater_target" {
+  rule      = aws_cloudwatch_event_rule.squid_ami_updater_schedule.name
+  target_id = "squidAmiUpdater"
+  arn       = aws_lambda_function.squid_ami_updater.arn
+}
+
+resource "aws_lambda_permission" "squid_ami_updater_permission" {
+  statement_id  = "AllowEventBridgeInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.squid_ami_updater.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.squid_ami_updater_schedule.arn
+}
