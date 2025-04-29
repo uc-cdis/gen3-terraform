@@ -342,10 +342,6 @@ resource "aws_security_group" "squidauto_out" {
   }
 }
 
-# pull in region & account for ARN construction
-data "aws_region"          "current" {}
-data "aws_caller_identity" "current" {}
-
 # archive the Python file
 data "archive_file" "squid_ami_updater_zip" {
   type        = "zip"
