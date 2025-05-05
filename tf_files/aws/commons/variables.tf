@@ -783,6 +783,12 @@ variable "deploy_rds" {
   default = true
 }
 
+variable "deploy_rds_check_lambda" {
+  description = "Deploy the lambda function to check the RDS cluster"
+  type        = bool
+  default     = false
+}
+
 variable "use_asg" {
   default = true
 } 
