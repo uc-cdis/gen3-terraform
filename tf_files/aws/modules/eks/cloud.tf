@@ -490,6 +490,18 @@ resource "aws_security_group_rule" "https_nodes_to_plane" {
   description              = "from the workers to the control plane"
 }
 
+# Nodes to Control plan(for fargate pods)
+resource "aws_security_group_rule" "https_plane_to_nodes" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_eks_cluster.eks_cluster.vpc_config[0].cluster_security_group_id
+  source_security_group_id = aws_security_group.eks_nodes_sg.id
+  depends_on               = [aws_security_group.eks_nodes_sg, aws_security_group.eks_control_plane_sg]
+  description              = "from workers to control plane for fargate pods"
+}
+
 # CSOC talk to Control plane
 resource "aws_security_group_rule" "https_csoc_to_plane" {
   count                    = var.csoc_managed ? 1 : 0
