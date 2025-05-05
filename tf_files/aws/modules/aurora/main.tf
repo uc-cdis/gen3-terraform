@@ -197,7 +197,7 @@ resource "aws_lambda_function" "rds_upgrade_checker" {
   role             = aws_iam_role.lambda_rds_check_role[0].arn
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.13"
-  source_code_hash = filebase64sha256("${path.module}/lambda_function_payload.zip")
+  source_code_hash = data.archive_file.lambda_function.output_base64sha256
   timeout          = 60
   memory_size      = 128
 }
