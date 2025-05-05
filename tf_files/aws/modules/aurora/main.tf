@@ -162,7 +162,7 @@ resource "aws_iam_role" "lambda_rds_check_role" {
 resource "aws_iam_role_policy" "lambda_rds_check_policy" {
   count = var.deploy_rds_check_lambda ? 1 : 0
   name  = "lambda-rds-check-policy"
-  role  = aws_iam_role.lambda_rds_check_role.id
+  role  = aws_iam_role.lambda_rds_check_role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -194,7 +194,7 @@ resource "aws_lambda_function" "rds_upgrade_checker" {
   count            = var.deploy_rds_check_lambda ? 1 : 0
   filename         = "lambda_function_payload.zip" 
   function_name    = "rds-upgrade-checker"
-  role             = aws_iam_role.lambda_rds_check_role.arn
+  role             = aws_iam_role.lambda_rds_check_role[0].arn
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.13"
   source_code_hash = filebase64sha256("lambda_function_payload.zip")
@@ -210,16 +210,16 @@ resource "aws_cloudwatch_event_rule" "rds_upgrade_schedule" {
 
 resource "aws_cloudwatch_event_target" "lambda_target" {
   count     = var.deploy_rds_check_lambda ? 1 : 0
-  rule      = aws_cloudwatch_event_rule.rds_upgrade_schedule.name
+  rule      = aws_cloudwatch_event_rule.rds_upgrade_schedule[0].name
   target_id = "lambda"
-  arn       = aws_lambda_function.rds_upgrade_checker.arn
+  arn       = aws_lambda_function.rds_upgrade_checker[0].arn
 }
 
 resource "aws_lambda_permission" "allow_eventbridge" {
   count         = var.deploy_rds_check_lambda ? 1 : 0
   statement_id  = "AllowExecutionFromEventBridge"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.rds_upgrade_checker.function_name
+  function_name = aws_lambda_function.rds_upgrade_checker[0].function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.rds_upgrade_schedule.arn
+  source_arn    = aws_cloudwatch_event_rule.rds_upgrade_schedule[0].arn
 }
