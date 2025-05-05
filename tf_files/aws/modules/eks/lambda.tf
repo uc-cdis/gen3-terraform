@@ -87,7 +87,7 @@ resource "aws_lambda_function" "gw_checks" {
   description      = "Checks for internet access from the worker nodes subnets"
   depends_on       = [aws_cloudwatch_log_group.gwl_group]
   source_code_hash = data.archive_file.lambda_function.output_base64sha256
-  runtime          = "python3.8"
+  runtime          = "python3.13"
 
   vpc_config {
     subnet_ids         = flatten([aws_subnet.eks_private.*.id])
