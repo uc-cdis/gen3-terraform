@@ -169,7 +169,8 @@ data "aws_iam_policy_document" "without_resources" {
       "ec2:DescribeSubnets",
       "ec2:DescribeRouteTables",
       "ec2:DescribeInstanceAttribute",
-      "ec2:ModifyInstanceAttribute"
+      "ec2:ModifyInstanceAttribute",
+      "ec2:TerminateInstances"
     ]
     effect = "Allow"
     resources = ["*"]
