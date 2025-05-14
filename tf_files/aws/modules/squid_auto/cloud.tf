@@ -91,6 +91,8 @@ Content-Type: multipart/mixed; boundary="BOUNDARY"
 Content-Type: text/x-shellscript; charset="us-ascii"
 
 #!/bin/bash
+EC2_INSTANCE_ID="`wget -q -O - http://169.254.169.254/latest/meta-data/instance-id`"
+aws ec2 modify-instance-attribute --no-source-dest-check --instance-id $EC2_INSTANCE_ID --region ${data.aws_region.current.name}
 DISTRO=$(awk -F '[="]*' '/^NAME/ { print $2 }' < /etc/os-release)
 USER="ubuntu"
 if [[ $DISTRO == "Amazon Linux" ]]; then
