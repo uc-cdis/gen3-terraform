@@ -27,7 +27,7 @@ resource "aws_iam_role" "external-secrets-role" {
         Sid = ""
         Effect = "Allow"
         Principal = {
-          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider_id}"
+          Federated = "arn:aws:iam::${var.account_id}:oidc-provider/${var.oidc_provider_id}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {

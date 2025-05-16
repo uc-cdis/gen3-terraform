@@ -3,3 +3,7 @@ variable commons_name {
 }
 
 variable oidc_provider_id {}
+
+variable account_id {
+  description = "AWS account ID to use"
+}
