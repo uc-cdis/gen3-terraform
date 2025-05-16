@@ -1,3 +1,15 @@
+terraform {
+  backend "s3" {
+    encrypt = "true"
+  }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
 resource "aws_iam_role" "external-secrets-role" {
   name = "${var.commons_name}-external-secrets-sa"
   description = "Role for external-secrets service account for ${var.commons_name}"
@@ -15,15 +27,15 @@ resource "aws_iam_role" "external-secrets-role" {
         Sid = ""
         Effect = "Allow"
         Principal = {
-          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider_arn}"
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider_id}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "${var.oidc_provider_arn}:sub" = [
+            "${var.oidc_provider_id}:sub" = [
               "system:serviceaccount:${var.commons_name}:external-secrets"
             ]
-            "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
+            "${var.oidc_provider_id}:aud" = "sts.amazonaws.com"
           }
         }
       }
