@@ -64,9 +64,3 @@ resource "aws_iam_role_policy" "external-secrets-role-policy" {
     ]
   })
 }
-
-
-resource "aws_iam_role_policy_attachment" "external-secrets-role-policy-attachment" {
-  role = aws_iam_role.external-secrets-role.name
-  policy_arn = aws_iam_role_policy.external-secrets-role-policy.arn
-}
