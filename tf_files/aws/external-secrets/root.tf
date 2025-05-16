@@ -41,8 +41,6 @@ resource "aws_iam_role" "external-secrets-role" {
       }
     ]
   })
-
-  path = "/gen3-service/"
 }
 
 
