@@ -27,7 +27,7 @@ resource "aws_iam_role" "external-secrets-role" {
         Sid = ""
         Effect = "Allow"
         Principal = {
-          Federated = "arn:aws:iam::${var.account_id}:oidc-provider/${var.oidc_provider_id}"
+          Federated = "arn:aws:iam::${var.account_number}:oidc-provider/${var.oidc_provider_id}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
@@ -48,7 +48,7 @@ resource "aws_iam_role" "external-secrets-role" {
 
 resource "aws_iam_role_policy" "external-secrets-role-policy" {
   name = "external-secrets-role-policy"
-  role = aws_iam_role.external-secrets-role[0].id
+  role = aws_iam_role.external-secrets-role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
