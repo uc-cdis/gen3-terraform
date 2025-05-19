@@ -27,15 +27,15 @@ resource "aws_iam_role" "external-secrets-role" {
         Sid = ""
         Effect = "Allow"
         Principal = {
-          Federated = "arn:aws:iam::${var.account_number}:oidc-provider/${var.oidc_provider_id}"
+          Federated = "arn:aws:iam::${var.account_number}:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/${var.oidc_provider_id}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "${var.oidc_provider_id}:sub" = [
+            "oidc.eks.us-east-1.amazonaws.com/id/${var.oidc_provider_id}:sub" = [
               "system:serviceaccount:${var.commons_name}-helm:secret-store-sa"
             ]
-            "${var.oidc_provider_id}:aud" = "sts.amazonaws.com"
+            "oidc.eks.us-east-1.amazonaws.com/id/${var.oidc_provider_id}:aud" = "sts.amazonaws.com"
           }
         }
       }
