@@ -113,7 +113,7 @@ resource "aws_cloudwatch_event_rule" "gw_checks_rule" {
   count               = var.ha_squid ? 1 : 0
   name                = "${var.vpc_name}-GW-checks-job"
   description         = "Check if the gateway is working every minute"
-  schedule_expression = "rate(5 minute)"
+  schedule_expression = "rate(5 minutes)"
   
   tags = {
     Environment  = var.vpc_name
