@@ -10,11 +10,40 @@ terraform {
   }
 }
 
+locals {
+  default_trust_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      },
+      {
+        Sid    = ""
+        Effect = "Allow"
+        Principal = {
+          Federated = "arn:aws:iam::${var.aws_account_id}:oidc-provider/oidc.eks.${var.aws_region}.amazonaws.com/id/${var.eks_cluster_oidc_id}"
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "oidc.eks.${var.aws_region}.amazonaws.com/id/${var.eks_cluster_oidc_id}:sub" = "system:serviceaccount:${var.kubernetes_namespace}:${var.kubernetes_service_account}"
+            "oidc.eks.${var.aws_region}.amazonaws.com/id/${var.eks_cluster_oidc_id}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+}
+
 
 module "iam_role" {
   source                         = "../modules/iam-role"
   role_name                      = var.role_name
-  role_assume_role_policy        = var.role_assume_role_policy
+  role_assume_role_policy        = var.role_assume_role_policy != "" var.role_assume_role_policy : local.default_trust_policy
   role_tags                      = var.role_tags
   role_force_detach_policies     = var.role_force_detach_policies
   role_description               = var.role_description
@@ -25,7 +54,7 @@ module "iam_role_policy" {
   policy_name                    = var.policy_name
   policy_path                    = var.policy_path
   policy_description             = var.policy_description
-  policy_json                    = var.policy_path
+  policy_json                    = var.policy_json
 }
 
 resource "aws_iam_role_policy_attachment" "attach_policy" {
