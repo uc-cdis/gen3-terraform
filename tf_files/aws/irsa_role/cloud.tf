@@ -30,5 +30,5 @@ module "iam_role_policy" {
 
 resource "aws_iam_role_policy_attachment" "attach_policy" {
   role       = module.iam_role.role_id
-  policy_arn = module.iam_role_policy.policy_arn
+  policy_arn = module.iam_role_policy.arn
 }
