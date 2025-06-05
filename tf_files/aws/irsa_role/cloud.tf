@@ -25,7 +25,7 @@ module "iam_role_policy" {
   policy_name                    = var.policy_name
   policy_path                    = var.policy_path
   policy_description             = var.policy_description
-  policy_json                    = var.policy_path
+  policy_json                    = var.policy_json
 }
 
 resource "aws_iam_role_policy_attachment" "attach_policy" {
