@@ -12,6 +12,11 @@ terraform {
     kubectl = {
       source  = "gavinbunney/kubectl"
     }    
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.8.0"
+    }
+
   }
 }
 
@@ -23,7 +28,7 @@ provider "kubernetes" {
     api_version = "client.authentication.k8s.io/v1beta1"
     command     = "aws"
     # This requires the awscli to be installed locally where Terraform is executed
-    args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name, "--role-arn", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.iam_role_name}"]
+    args = concat(["eks", "get-token", "--cluster-name", module.eks.0.cluster_name], var.iam_role_name != "" ? ["--role-arn", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.iam_role_name}"] : [])
   }
 }
 
@@ -36,7 +41,7 @@ provider "helm" {
       api_version = "client.authentication.k8s.io/v1beta1"
       command     = "aws"
       # This requires the awscli to be installed locally where Terraform is executed
-      args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name, "--role-arn", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.iam_role_name}"]
+      args = concat(["eks", "get-token", "--cluster-name", module.eks.0.cluster_name], var.iam_role_name != "" ? ["--role-arn", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.iam_role_name}"] : [])
     }
   }
 }
@@ -51,7 +56,7 @@ provider "kubectl" {
     api_version = "client.authentication.k8s.io/v1beta1"
     command     = "aws"
     # This requires the awscli to be installed locally where Terraform is executed
-    args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name, "--role-arn", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.iam_role_name}"]
+    args = concat(["eks", "get-token", "--cluster-name", module.eks.0.cluster_name], var.iam_role_name != "" ? ["--role-arn", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.iam_role_name}"] : [])
   }
 }
 
