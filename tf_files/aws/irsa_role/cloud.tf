@@ -43,7 +43,7 @@ locals {
 module "iam_role" {
   source                         = "../modules/iam-role"
   role_name                      = var.role_name
-  role_assume_role_policy        = (var.role_assume_role_policy != "" var.role_assume_role_policy : local.default_trust_policy)
+  role_assume_role_policy        = (var.role_assume_role_policy != "" ? var.role_assume_role_policy : local.default_trust_policy)
   role_tags                      = var.role_tags
   role_force_detach_policies     = var.role_force_detach_policies
   role_description               = var.role_description
