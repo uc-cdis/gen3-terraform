@@ -11,8 +11,8 @@ variable aws_region {
   default     = "us-east-1"
 }
 
-variable eks_cluster_oidc_id {
-  description = "The OIDC provider ID for the cluster you are creating a role in"
+variable eks_cluster_oidc_arn {
+  description = "The OIDC provider ARN for the cluster you are creating a role in"
 }
 
 variable kubernetes_namespace {

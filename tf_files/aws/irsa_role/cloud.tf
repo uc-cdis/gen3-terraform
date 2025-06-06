@@ -25,13 +25,13 @@ locals {
         Sid    = ""
         Effect = "Allow"
         Principal = {
-          Federated = "arn:aws:iam::${var.aws_account_id}:oidc-provider/oidc.eks.${var.aws_region}.amazonaws.com/id/${var.eks_cluster_oidc_id}"
+          Federated = "${var.eks_cluster_oidc_arn}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "oidc.eks.${var.aws_region}.amazonaws.com/id/${var.eks_cluster_oidc_id}:sub" = "system:serviceaccount:${var.kubernetes_namespace}:${var.kubernetes_service_account}"
-            "oidc.eks.${var.aws_region}.amazonaws.com/id/${var.eks_cluster_oidc_id}:aud" = "sts.amazonaws.com"
+            "${var.eks_cluster_oidc_arn}:sub" = "system:serviceaccount:${var.kubernetes_namespace}:${var.kubernetes_service_account}"
+            "${var.eks_cluster_oidc_arn}:aud" = "sts.amazonaws.com"
           }
         }
       }
