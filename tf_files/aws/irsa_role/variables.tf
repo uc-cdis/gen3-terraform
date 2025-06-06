@@ -49,6 +49,7 @@ variable "policy_name" {
 
 variable "policy_path" {
   description = "Path in which to create the policy."
+  default     = "/"
 }
 
 variable "policy_description" {
