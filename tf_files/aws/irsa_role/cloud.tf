@@ -25,7 +25,7 @@ locals {
         Sid    = ""
         Effect = "Allow"
         Principal = {
-          Federated = "${var.eks_cluster_oidc_arn}"
+          Federated = "arn:aws:iam::${var.aws_account_id}:oidc-provider/${var.eks_cluster_oidc_arn}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
