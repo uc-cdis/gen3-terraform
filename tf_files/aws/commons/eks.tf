@@ -47,6 +47,9 @@ module "eks" {
   use_karpenter                    = var.use_karpenter
   karpenter_version                = var.karpenter_version
   deploy_karpenter_in_k8s          = var.deploy_karpenter_in_k8s
+  karpenter_ami_family             = var.karpenter_ami_family
+  karpenter_ami_name               = var.karpenter_ami_name
+  karpenter_ami_owner              = var.karpenter_ami_owner
   ci_run                           = var.ci_run
   eks_public_access                = var.eks_public_access
   enable_vpc_endpoints             = var.enable_vpc_endpoints
