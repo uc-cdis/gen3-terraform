@@ -806,6 +806,31 @@ variable "karpenter_version" {
   default = "v0.32.9"
 }
 
+
+variable "karpenter_ami_family" {
+  description = "Optional AMI family for Karpenter node class"
+  type        = string
+  default     = "AL2"
+  nullable    = false
+
+  validation {
+    condition     = length(var.karpenter_ami_family) > 0
+    error_message = "karpenter_ami_family must not be an empty string."
+  }
+}
+
+variable "karpenter_ami_name" {
+  description = "Optional AMI name pattern for Karpenter node class"
+  type        = string
+  default     = "EKS-FIPS*"
+}
+
+variable "karpenter_ami_owner" {
+  description = "Optional AMI owner for Karpenter node class"
+  type        = string
+  default     = "143731057154"
+}
+
 variable "deploy_cloud_trail" {
   default = true
 }
