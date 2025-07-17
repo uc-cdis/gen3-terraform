@@ -13,5 +13,5 @@ variable "excluded_dbs" {
 variable "daily_backups_enabled" {
   description = "Whether or not the daily backups that are retained for 7 days are preserved"
   type        = bool
-  default     = true
+  default     = false
 }
