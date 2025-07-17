@@ -184,6 +184,7 @@ resource "aws_kms_alias" "kube_key" {
 }
 
 resource "aws_key_pair" "automation_dev" {
+  count      = var.kube_ssh_key != "" ? 1 : 0
   key_name   = "${var.vpc_name}_automation_dev"
   public_key = var.kube_ssh_key
 }
