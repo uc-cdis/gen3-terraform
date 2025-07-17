@@ -150,10 +150,12 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.gw.id
   }
 
-  route {
-    #from the commons vpc to the csoc vpc via the peering connection
-    cidr_block                = var.peering_cidr
-    vpc_peering_connection_id = aws_vpc_peering_connection.vpcpeering.id
+  dynamic "route" {
+    for_each = var.csoc_managed ? [1] : []
+    content {
+      cidr_block                = var.peering_cidr
+      vpc_peering_connection_id = aws_vpc_peering_connection.vpcpeering[0].id
+    }
   }
 
   tags = {
@@ -163,7 +165,6 @@ resource "aws_route_table" "public" {
   }
 
   lifecycle {
-    # ignore changes
     ignore_changes = all
   }
 }
@@ -179,14 +180,15 @@ resource "aws_eip" "nat_gw" {
   }
 }
 
-
 resource "aws_default_route_table" "default" {
   default_route_table_id = aws_vpc.main.default_route_table_id
 
-  route {
-    #from the commons vpc to the csoc vpc via the peering connection
-    cidr_block                = var.peering_cidr
-    vpc_peering_connection_id = aws_vpc_peering_connection.vpcpeering.id
+  dynamic "route" {
+    for_each = var.csoc_managed ? [1] : []
+    content {
+      cidr_block                = var.peering_cidr
+      vpc_peering_connection_id = aws_vpc_peering_connection.vpcpeering[0].id
+    }
   }
 
   tags = {
@@ -267,6 +269,7 @@ resource "aws_route53_zone" "main" {
 
 # this is for vpc peering
 resource "aws_vpc_peering_connection" "vpcpeering" {
+  count         = var.csoc_managed ? 1 : 0
   peer_owner_id = var.csoc_managed ? var.csoc_account_id : data.aws_caller_identity.current.account_id
   peer_vpc_id   = var.peering_vpc_id
   vpc_id        = aws_vpc.main.id
