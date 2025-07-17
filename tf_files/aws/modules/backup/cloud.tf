@@ -31,6 +31,8 @@ resource "aws_backup_selection" "daily" {
   resources = [
     "arn:aws:rds:*"
   ]
+
+  not_resources = var.excluded_dbs
 }
 
 
@@ -55,6 +57,8 @@ resource "aws_backup_selection" "monthly" {
   resources = [
     "arn:aws:rds:*"
   ]
+
+  not_resources = var.excluded_dbs
 }
 
 resource "aws_backup_plan" "yearly" {
@@ -78,6 +82,8 @@ resource "aws_backup_selection" "yearly" {
   resources = [
     "arn:aws:rds:*"
   ]
+
+  not_resources = var.excluded_dbs
 }
 
 

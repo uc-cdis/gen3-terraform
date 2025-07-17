@@ -3,3 +3,9 @@ variable "retention_period" {
   type        = number
   default     = 7
 }
+
+variable "excluded_dbs" {
+  description = "A list of DB ARNs to be EXCLUDED from this backup"
+  type        = list
+  default     = []
+}
