@@ -11,5 +11,9 @@ terraform {
 
 
 module "backup" {
-    source   = "../modules/backup"
+  source   = "../modules/backup"
+
+  retention_period      = var.retention_period
+  excluded_dbs          = var.excluded_dbs
+  daily_backups_enabled = var.daily_backups_enabled
 }
