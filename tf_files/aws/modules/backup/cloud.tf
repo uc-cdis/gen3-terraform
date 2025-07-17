@@ -11,6 +11,7 @@ resource "aws_kms_key" "backup_key" {
 
 resource "aws_backup_plan" "daily" {
   name = "rds-daily-backup-plan"
+  count = var.daily_backups_enabled ? 1 : 0
 
   rule {
     rule_name         = "daily-backup-rule"
