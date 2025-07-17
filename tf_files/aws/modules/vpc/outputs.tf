@@ -43,7 +43,7 @@ output "ssh_key_name" {
 }
 
 output "vpc_peering_id" {
-  value = aws_vpc_peering_connection.vpcpeering.id
+  value = aws_vpc_peering_connection.vpcpeering[0].id
 }
 
 output "es_user_key" {

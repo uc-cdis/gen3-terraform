@@ -72,12 +72,7 @@ resource "aws_launch_template" "squid_auto" {
   name_prefix   = "${var.env_squid_name}-lt"
   instance_type = var.squid_instance_type
   image_id      = data.aws_ami.public_squid_ami.id
-  dynamic "key_name" {
-    for_each = var.ssh_key_name != "" ? [var.ssh_key_name] : []
-    content {
-      key_name = key_name.value
-    }
-  }
+  key_name      = var.ssh_key_name != "" ? var.ssh_key_name : null
 
   iam_instance_profile {
     name = aws_iam_instance_profile.squid-auto_role_profile.name

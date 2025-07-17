@@ -180,6 +180,7 @@ resource "aws_eip" "nat_gw" {
   }
 }
 
+
 resource "aws_default_route_table" "default" {
   default_route_table_id = aws_vpc.main.default_route_table_id
 
@@ -290,7 +291,7 @@ resource "aws_route" "default_csoc" {
   count                     = var.csoc_managed ? 0 : 1
   route_table_id            = data.aws_route_tables.control_routing_table[count.index].id
   destination_cidr_block    = var.vpc_cidr_block
-  vpc_peering_connection_id = aws_vpc_peering_connection.vpcpeering.id
+  vpc_peering_connection_id = aws_vpc_peering_connection.vpcpeering[0].id
 }
 
 ##to be used by arranger when accessing the ES
