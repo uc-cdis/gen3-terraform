@@ -11,6 +11,7 @@ resource "aws_kms_key" "backup_key" {
 
 resource "aws_backup_plan" "daily" {
   name = "rds-daily-backup-plan"
+  count = var.daily_backups_enabled ? 1 : 0
 
   rule {
     rule_name         = "daily-backup-rule"
@@ -26,11 +27,14 @@ resource "aws_backup_plan" "daily" {
 resource "aws_backup_selection" "daily" {
   name          = "rds-daily-backup-selection"
   iam_role_arn  = aws_iam_role.backup_role.arn
-  plan_id = aws_backup_plan.daily.id
+  plan_id = aws_backup_plan.daily[0].id
+  count = var.daily_backups_enabled ? 1 : 0
 
   resources = [
     "arn:aws:rds:*"
   ]
+
+  not_resources = var.excluded_dbs
 }
 
 
@@ -55,6 +59,8 @@ resource "aws_backup_selection" "monthly" {
   resources = [
     "arn:aws:rds:*"
   ]
+
+  not_resources = var.excluded_dbs
 }
 
 resource "aws_backup_plan" "yearly" {
@@ -78,6 +84,8 @@ resource "aws_backup_selection" "yearly" {
   resources = [
     "arn:aws:rds:*"
   ]
+
+  not_resources = var.excluded_dbs
 }
 
 
