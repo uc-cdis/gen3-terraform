@@ -216,6 +216,7 @@ resource "aws_route_table" "eks_private" {
 
 
 resource "aws_route" "for_peering" {
+  count                     = var.csoc_managed ? 1 : 0
   route_table_id            = aws_route_table.eks_private.id
   destination_cidr_block    = var.peering_cidr
   vpc_peering_connection_id = data.aws_vpc_peering_connection.pc.id
