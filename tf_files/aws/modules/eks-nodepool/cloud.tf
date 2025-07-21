@@ -402,3 +402,15 @@ resource "aws_security_group" "ssh" {
     "karpenter.sh/discovery" = "${var.vpc_name}-${var.nodepool}"
   }
 }
+
+resource "aws_eks_access_entry" "node_pool" {
+  cluster_name  = var.vpc_name
+  principal_arn = aws_iam_role.eks_node_role.arn
+
+  kubernetes_groups = [
+    "system:bootstrappers",
+    "system:nodes",
+  ]
+
+  user_name = "system:node:{{EC2PrivateDNSName}}"
+}

@@ -290,6 +290,10 @@ resource "aws_eks_cluster" "eks_cluster" {
   role_arn = aws_iam_role.eks_control_plane_role.arn
   version  = var.eks_version
 
+  access_config {
+      authentication_mode = "API_AND_CONFIG_MAP"
+  }
+
   vpc_config {
     subnet_ids              = flatten([aws_subnet.eks_private[*].id])
     security_group_ids      = [aws_security_group.eks_control_plane_sg.id]
@@ -603,88 +607,30 @@ resource "aws_security_group" "ssh" {
   })
 }
 
-resource "kubectl_manifest" "aws-auth" {
-  count = var.k8s_bootstrap_resources ? 1 : 0
-  yaml_body = local.config-map-aws-auth
+resource "aws_eks_access_entry" "eks_node" {
+  cluster_name  = aws_eks_cluster.eks_cluster.name
+  principal_arn = aws_iam_role.eks_node_role.arn
+
+  kubernetes_groups = [
+    "system:bootstrappers",
+    "system:nodes",
+  ]
+
+  user_name = "system:node:{{EC2PrivateDNSName}}"
 }
 
+resource "aws_eks_access_entry" "karpenter" {
+  count         = var.use_karpenter ? 1 : 0
+  cluster_name  = aws_eks_cluster.eks_cluster.name
+  principal_arn = aws_iam_role.karpenter[0].arn
 
-# NOTE: At this point, your Kubernetes cluster will have running masters and worker nodes, however, the worker nodes will
-# not be able to join the Kubernetes cluster quite yet. The next section has the required Kubernetes configuration to
-# enable the worker nodes to join the cluster.
+  kubernetes_groups = [
+    "system:bootstrappers",
+    "system:nodes",
+    "system:node-proxier",
+  ]
 
-# Required Kubernetes Configuration to Join Worker Nodes
-# The EKS service does not provide a cluster-level API parameter or resource to automatically configure the underlying
-# Kubernetes cluster to allow worker nodes to join the cluster via AWS IAM role authentication.
-
-# To output an IAM Role authentication ConfigMap from your Terraform configuration:
-
-locals {
-  #config-map-aws-auth  = var.deploy_workflow ? local.cm1 : local.cm2
-  config-map-aws-auth = <<CONFIGMAPAWSAUTH
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: aws-auth
-  namespace: kube-system
-data:
-  mapRoles: |
-    - rolearn: ${aws_iam_role.eks_node_role.arn}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-    - rolearn: ${aws_iam_role.karpenter[0].arn} 
-      username: system:node:{{SessionName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-        - system:node-proxier
-    - rolearn: ${var.deploy_workflow ? module.workflow_pool[0].nodepool_role : ""}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-    - rolearn: ${var.deploy_jupyter ? module.jupyter_pool[0].nodepool_role : ""}
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-CONFIGMAPAWSAUTH
-}
-
-
-
-#--------------------------------------------------------------
-# We need to have the kubeconfigfile somewhere, even if it is temporaty so we can execute stuff agains the freshly create EKS cluster
-# Legacy stuff ...
-# We want to move away from generating output files, and
-# instead just publish output variables
-#
-resource "null_resource" "config_setup" {
-   #count = var.ci_run ? 0 : 1
-   triggers = {
-    kubeconfig_change = sensitive(templatefile("${path.module}/kubeconfig.tpl", {vpc_name = var.vpc_name, eks_name = aws_eks_cluster.eks_cluster.id, eks_endpoint = aws_eks_cluster.eks_cluster.endpoint, eks_cert = aws_eks_cluster.eks_cluster.certificate_authority.0.data,}))
-    configmap_change  = sensitive(local.config-map-aws-auth)
-  }
-
-  provisioner "local-exec" {
-    command = "mkdir -p ${var.vpc_name}_output_EKS; echo '${templatefile("${path.module}/kubeconfig.tpl", {vpc_name = var.vpc_name, eks_name = aws_eks_cluster.eks_cluster.id, eks_endpoint = aws_eks_cluster.eks_cluster.endpoint, eks_cert = aws_eks_cluster.eks_cluster.certificate_authority.0.data,})}' >${var.vpc_name}_output_EKS/kubeconfig"
-  }
-
-  provisioner "local-exec" {
-    command = "echo \"${local.config-map-aws-auth}\" > ${var.vpc_name}_output_EKS/aws-auth-cm.yaml"
-  }
-
-  provisioner "local-exec" {
-    command = "echo \"${templatefile("${path.module}/init_cluster.sh", { vpc_name = var.vpc_name, kubeconfig_path = "${var.vpc_name}_output_EKS/kubeconfig", auth_configmap = "${var.vpc_name}_output_EKS/aws-auth-cm.yaml"})}\" > ${var.vpc_name}_output_EKS/init_cluster.sh"
-  }
-
-  # provisioner "local-exec" {
-  #   command = "bash ${var.vpc_name}_output_EKS/init_cluster.sh"
-  # }
-
-  depends_on = [aws_autoscaling_group.eks_autoscaling_group]
+  user_name = "system:node:{{SessionName}}"
 }
 
 #--------------------------------------------------------------

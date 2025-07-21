@@ -3,11 +3,6 @@ output "kubeconfig" {
   sensitive = true
 }
 
-output "config_map_aws_auth" {
-  value     = local.config-map-aws-auth
-  sensitive = true
-}
-
 output "cluster_endpoint" {
   value     = aws_eks_cluster.eks_cluster.endpoint
   sensitive = true
