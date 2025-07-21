@@ -15,3 +15,9 @@ variable "daily_backups_enabled" {
   type        = bool
   default     = true
 }
+
+variable "region" {
+  description = "The AWS region in which backups should live"
+  type        = string
+  default     = "us-east-1"
+}
