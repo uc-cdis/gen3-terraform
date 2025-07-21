@@ -26,7 +26,7 @@ module "jupyter_pool" {
   count                         = var.deploy_jupyter ? 1 : 0
   scale_in_protection           = false
   source                        = "../eks-nodepool/"
-  ec2_keyname                   = var.ec2_keyname ? var.ec2_keyname : null
+  ec2_keyname                   = var.ec2_keyname != null && var.ec2_keyname != "" ? var.ec2_keyname : null
   users_policy                  = var.users_policy
   nodepool                      = "jupyter"
   vpc_name                      = var.vpc_name
@@ -54,7 +54,7 @@ module "workflow_pool" {
   count                         = var.deploy_workflow ? 1 : 0
   scale_in_protection           = true
   source                        = "../eks-nodepool/"
-  ec2_keyname                   = var.ec2_keyname ? var.ec2_keyname : null
+  ec2_keyname                   = var.ec2_keyname != null && var.ec2_keyname != "" ? var.ec2_keyname : null
   users_policy                  = var.users_policy
   nodepool                      = "workflow"
   vpc_name                      = var.vpc_name

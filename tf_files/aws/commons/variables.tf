@@ -476,7 +476,9 @@ variable "external_secrets_operator_version" {
   default = "0.14.0"
 }
 
-variable "ec2_keyname" {}
+variable "ec2_keyname" {
+  default = null
+}
 
 variable "instance_type" {
   default = "t3.large"

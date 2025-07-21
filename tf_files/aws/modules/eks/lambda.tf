@@ -90,7 +90,7 @@ resource "aws_lambda_function" "gw_checks" {
   runtime          = "python3.13"
 
   vpc_config {
-    subnet_ids         = flatten([aws_subnet.eks_private.*.id])
+    subnet_ids         = flatten([aws_subnet.eks_public.*.id])
     security_group_ids = [aws_security_group.eks_nodes_sg.id]
   }
 
@@ -98,6 +98,8 @@ resource "aws_lambda_function" "gw_checks" {
     variables = {
       vpc_name    = var.vpc_name
       domain_test = var.domain_test
+      http_proxy  = "http://cloud-proxy.internal.io"
+      https_proxy = "http://cloud-proxy.internal.io"
     }
   }
 
