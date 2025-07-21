@@ -1127,3 +1127,8 @@ variable "additional_rules" {
   default = []
 }
 
+variable "force_delete_bucket" {
+  description = "Force delete S3 buckets"
+  type = bool
+  default = false
+}

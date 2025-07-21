@@ -37,6 +37,7 @@ module "data-bucket" {
   cloudwatchlogs_group = aws_cloudwatch_log_group.main_log_group.arn
   environment          = var.vpc_name
   deploy_cloud_trail   = var.deploy_cloud_trail
+  force_delete_bucket  = var.force_delete_bucket
 }
 
 module "fence-bot-user" {

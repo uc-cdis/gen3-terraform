@@ -145,3 +145,8 @@ variable "commons_log_retention" {
   description = "value in days for the cloudwatch log retention period"
   default = "3650"
 }
+
+variable "force_delete_bucket" {
+  description = "Force delete the data bucket"
+  default     = false
+}

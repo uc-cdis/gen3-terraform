@@ -2,6 +2,7 @@
 ## The actual data bucket
 resource "aws_s3_bucket" "data_bucket" {
   bucket = "${var.vpc_name}-data-bucket"
+  force_destroy = var.force_delete_bucket
 
   tags = {
     Name        = "${var.vpc_name}-data-bucket"
