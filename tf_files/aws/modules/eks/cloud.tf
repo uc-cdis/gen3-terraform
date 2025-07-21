@@ -26,7 +26,7 @@ module "jupyter_pool" {
   count                         = var.deploy_jupyter ? 1 : 0
   scale_in_protection           = false
   source                        = "../eks-nodepool/"
-  ec2_keyname                   = var.ec2_keyname
+  ec2_keyname                   = var.ec2_keyname ? var.ec2_keyname : null
   users_policy                  = var.users_policy
   nodepool                      = "jupyter"
   vpc_name                      = var.vpc_name
@@ -54,7 +54,7 @@ module "workflow_pool" {
   count                         = var.deploy_workflow ? 1 : 0
   scale_in_protection           = true
   source                        = "../eks-nodepool/"
-  ec2_keyname                   = var.ec2_keyname
+  ec2_keyname                   = var.ec2_keyname ? var.ec2_keyname : null
   users_policy                  = var.users_policy
   nodepool                      = "workflow"
   vpc_name                      = var.vpc_name
@@ -434,7 +434,7 @@ resource "aws_iam_role_policy_attachment" "asg_access" {
 
 # This one must have been created when we deployed the VPC resources
 resource "aws_iam_role_policy_attachment" "bucket_read" {
-  policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/bucket_reader_cdis-gen3-users_${var.users_policy}"
+  policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/bucket_reader_cdis-gen3-users_${var.vpc_name}"
   role       = aws_iam_role.eks_node_role.name
 }
 

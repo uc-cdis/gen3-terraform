@@ -104,7 +104,7 @@ variable "hostname" {
 }
 
 variable "kube_ssh_key" {
-  default = ""
+  default = "ssh-rsa createAKey"
 }
 
 /* A list of ssh keys that will be added to
@@ -476,9 +476,7 @@ variable "external_secrets_operator_version" {
   default = "0.14.0"
 }
 
-variable "ec2_keyname" {
-  default = "someone@uchicago.edu"
-}
+variable "ec2_keyname" {}
 
 variable "instance_type" {
   default = "t3.large"

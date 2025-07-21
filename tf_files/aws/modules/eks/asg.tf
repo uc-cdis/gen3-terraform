@@ -18,7 +18,7 @@ resource "aws_launch_template" "eks_launch_template" {
   name_prefix   = "eks-${var.vpc_name}"
   image_id      = local.ami
   instance_type = var.instance_type
-  key_name      = var.ec2_keyname
+  key_name      = var.ec2_keyname ? var.ec2_keyname : null
 
   iam_instance_profile {
     name = aws_iam_instance_profile.eks_node_instance_profile.name
