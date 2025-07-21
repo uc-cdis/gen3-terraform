@@ -8,6 +8,7 @@ resource "aws_kms_key" "backup_key" {
   description             = "KMS key for encrypting RDS backups"
   deletion_window_in_days = 10
   enable_key_rotation     = true
+  region                  = var.region
 }
 
 resource "aws_backup_plan" "daily" {
