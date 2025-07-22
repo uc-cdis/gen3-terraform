@@ -28,14 +28,14 @@ ephemeral "aws_eks_cluster_auth" "eks_cluster" {
 provider "kubernetes" {
   host                   = module.eks.0.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.0.cluster_certificate_authority_data)
-  token                  = data.aws_eks_cluster_auth.eks_cluster.token
+  token                  = ephemeral.aws_eks_cluster_auth.eks_cluster.token
 }
 
 provider "helm" {
   kubernetes {
     host                   = module.eks.0.cluster_endpoint
     cluster_ca_certificate = base64decode(module.eks.0.cluster_certificate_authority_data)
-    token                  = data.aws_eks_cluster_auth.eks_cluster.token
+    token                  = ephemeral.aws_eks_cluster_auth.eks_cluster.token
   }
 }
 
@@ -44,7 +44,7 @@ provider "kubectl" {
   host                   = module.eks.0.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.0.cluster_certificate_authority_data)
   load_config_file       = false
-  token                  = data.aws_eks_cluster_auth.eks_cluster.token
+  token                  = ephemeral.aws_eks_cluster_auth.eks_cluster.token
 }
 
 provider "aws" {}
