@@ -408,8 +408,8 @@ resource "aws_eks_access_entry" "node_pool" {
   principal_arn = aws_iam_role.eks_node_role.arn
 
   kubernetes_groups = [
-    "system:bootstrappers",
-    "system:nodes",
+    "bootstrappers",
+    "nodes",
   ]
 
   user_name = "system:node:{{EC2PrivateDNSName}}"

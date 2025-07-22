@@ -612,8 +612,8 @@ resource "aws_eks_access_entry" "eks_node" {
   principal_arn = aws_iam_role.eks_node_role.arn
 
   kubernetes_groups = [
-    "system:bootstrappers",
-    "system:nodes",
+    "bootstrappers",
+    "nodes",
   ]
 
   user_name = "system:node:{{EC2PrivateDNSName}}"
@@ -625,9 +625,9 @@ resource "aws_eks_access_entry" "karpenter" {
   principal_arn = aws_iam_role.karpenter[0].arn
 
   kubernetes_groups = [
-    "system:bootstrappers",
-    "system:nodes",
-    "system:node-proxier",
+    "bootstrappers",
+    "nodes",
+    "node-proxier",
   ]
 
   user_name = "system:node:{{SessionName}}"
