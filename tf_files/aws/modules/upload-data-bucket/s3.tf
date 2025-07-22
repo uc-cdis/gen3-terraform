@@ -53,6 +53,7 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
 ## Log bucket, where access to the avobe bucket will be logged
 resource "aws_s3_bucket" "log_bucket" {
   bucket = "${var.vpc_name}-data-bucket-logs"
+  force_destroy = var.force_delete_bucket
 
   tags = {
     Name        = var.vpc_name
