@@ -406,11 +406,14 @@ resource "aws_security_group" "ssh" {
 resource "aws_eks_access_entry" "node_pool" {
   cluster_name  = var.vpc_name
   principal_arn = aws_iam_role.eks_node_role.arn
+}
 
-  kubernetes_groups = [
-    "bootstrappers",
-    "nodes",
-  ]
+resource "aws_eks_access_policy_association" "eks_node" {
+  cluster_name  = var.vpc_name
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  principal_arn = aws_iam_role.eks_node_role.arn
 
-  user_name = "node:{{EC2PrivateDNSName}}"
+  access_scope {
+    type       = "cluster"
+  }
 }

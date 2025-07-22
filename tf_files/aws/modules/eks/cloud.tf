@@ -610,27 +610,16 @@ resource "aws_security_group" "ssh" {
 resource "aws_eks_access_entry" "eks_node" {
   cluster_name  = aws_eks_cluster.eks_cluster.name
   principal_arn = aws_iam_role.eks_node_role.arn
-
-  kubernetes_groups = [
-    "bootstrappers",
-    "nodes",
-  ]
-
-  user_name = "node:{{EC2PrivateDNSName}}"
 }
 
-resource "aws_eks_access_entry" "karpenter" {
-  count         = var.use_karpenter ? 1 : 0
+resource "aws_eks_access_policy_association" "eks_node" {
   cluster_name  = aws_eks_cluster.eks_cluster.name
-  principal_arn = aws_iam_role.karpenter[0].arn
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  principal_arn = aws_iam_role.eks_node_role.arn
 
-  kubernetes_groups = [
-    "bootstrappers",
-    "nodes",
-    "node-proxier",
-  ]
-
-  user_name = "node:{{SessionName}}"
+  access_scope {
+    type       = "cluster"
+  }
 }
 
 #--------------------------------------------------------------
