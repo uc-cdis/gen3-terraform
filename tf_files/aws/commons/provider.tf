@@ -19,22 +19,29 @@ terraform {
   }
 }
 
-
-ephemeral "aws_eks_cluster_auth" "eks_cluster" {
-  name       = var.vpc_name
-}
-
 provider "kubernetes" {
   host                   = module.eks.0.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.0.cluster_certificate_authority_data)
-  token                  = ephemeral.aws_eks_cluster_auth.eks_cluster.token
+
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    # This requires the awscli to be installed locally where Terraform is executed
+    args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name, "--role-arn", "${data.aws_caller_identity.current.arn}"]
+  }
 }
 
 provider "helm" {
   kubernetes {
     host                   = module.eks.0.cluster_endpoint
     cluster_ca_certificate = base64decode(module.eks.0.cluster_certificate_authority_data)
-    token                  = ephemeral.aws_eks_cluster_auth.eks_cluster.token
+
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "aws"
+      # This requires the awscli to be installed locally where Terraform is executed
+      args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name, "--role-arn", "${data.aws_caller_identity.current.arn}"]
+    }
   }
 }
 
@@ -43,7 +50,13 @@ provider "kubectl" {
   host                   = module.eks.0.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.0.cluster_certificate_authority_data)
   load_config_file       = false
-  token                  = ephemeral.aws_eks_cluster_auth.eks_cluster.token
+
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    # This requires the awscli to be installed locally where Terraform is executed
+    args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name, "--role-arn", "${data.aws_caller_identity.current.arn}"]
+  }
 }
 
 provider "aws" {}
