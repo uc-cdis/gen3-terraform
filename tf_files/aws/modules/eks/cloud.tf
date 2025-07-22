@@ -616,7 +616,7 @@ resource "aws_eks_access_entry" "eks_node" {
     "nodes",
   ]
 
-  user_name = "system:node:{{EC2PrivateDNSName}}"
+  user_name = "node:{{EC2PrivateDNSName}}"
 }
 
 resource "aws_eks_access_entry" "karpenter" {
@@ -630,7 +630,7 @@ resource "aws_eks_access_entry" "karpenter" {
     "node-proxier",
   ]
 
-  user_name = "system:node:{{SessionName}}"
+  user_name = "node:{{SessionName}}"
 }
 
 #--------------------------------------------------------------

@@ -412,5 +412,5 @@ resource "aws_eks_access_entry" "node_pool" {
     "nodes",
   ]
 
-  user_name = "system:node:{{EC2PrivateDNSName}}"
+  user_name = "node:{{EC2PrivateDNSName}}"
 }
