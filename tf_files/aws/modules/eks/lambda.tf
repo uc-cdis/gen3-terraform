@@ -98,8 +98,6 @@ resource "aws_lambda_function" "gw_checks" {
     variables = {
       vpc_name    = var.vpc_name
       domain_test = var.domain_test
-      http_proxy  = "http://cloud-proxy.internal.io"
-      https_proxy = "http://cloud-proxy.internal.io"
     }
   }
 

@@ -292,6 +292,7 @@ resource "aws_eks_cluster" "eks_cluster" {
 
   access_config {
       authentication_mode = "API_AND_CONFIG_MAP"
+      bootstrap_cluster_creator_admin_permissions = true
   }
 
   vpc_config {
@@ -616,6 +617,21 @@ resource "aws_eks_access_policy_association" "eks_node" {
   cluster_name  = aws_eks_cluster.eks_cluster.name
   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
   principal_arn = aws_iam_role.eks_node_role.arn
+
+  access_scope {
+    type       = "cluster"
+  }
+}
+
+resource "aws_eks_access_entry" "current_role" {
+  cluster_name  = aws_eks_cluster.eks_cluster.name
+  principal_arn = data.aws_caller_identity.current.arn
+}
+
+resource "aws_eks_access_policy_association" "current_role" {
+  cluster_name  = aws_eks_cluster.eks_cluster.name
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  principal_arn = data.aws_caller_identity.current.arn
 
   access_scope {
     type       = "cluster"
