@@ -22,7 +22,6 @@ terraform {
 
 ephemeral "aws_eks_cluster_auth" "eks_cluster" {
   name       = var.vpc_name
-  depends_on = [module.eks]
 }
 
 provider "kubernetes" {
