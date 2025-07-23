@@ -57,6 +57,17 @@ module "gen3_deployment" {
 }
 
 
+resource "null_resource" "wait_for_eks" {
+  provisioner "local-exec" {
+    command = <<EOT
+    for i in {1..30}; do
+      aws eks describe-cluster --name ${var.vpc_name} && break
+      sleep 10
+    done
+    EOT
+  }
+}
+
 # Deploy ArgoCD 
 resource helm_release "argocd" {
   count            = var.k8s_bootstrap_resources && var.deploy_argocd ? 1 : 0
@@ -66,6 +77,7 @@ resource helm_release "argocd" {
   version          = var.argocd_version
   namespace        = "argocd"
   create_namespace = true
+  depends_on       = [ null_resource.wait_for_eks ]
 
   values = [
     <<-EOT
@@ -76,13 +88,14 @@ resource helm_release "argocd" {
 
 # Deploy External Secrets Operator
 resource helm_release "external-secrets" {
-  count      = var.k8s_bootstrap_resources && var.deploy_external_secrets_operator ? 1 : 0
-  name       = "external-secrets"
-  chart      = "external-secrets"
-  repository = "https://charts.external-secrets.io"
-  version    = var.external_secrets_operator_version
-  namespace  = "external-secrets"
+  count            = var.k8s_bootstrap_resources && var.deploy_external_secrets_operator ? 1 : 0
+  name             = "external-secrets"
+  chart            = "external-secrets"
+  repository       = "https://charts.external-secrets.io"
+  version          = var.external_secrets_operator_version
+  namespace        = "external-secrets"
   create_namespace = true
+  depends_on       = [ null_resource.wait_for_eks ]
 
   values = [
     <<-EOT

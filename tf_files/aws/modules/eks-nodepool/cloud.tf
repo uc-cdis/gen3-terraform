@@ -403,16 +403,29 @@ resource "aws_security_group" "ssh" {
   }
 }
 
+resource "null_resource" "wait_for_eks" {
+  provisioner "local-exec" {
+    command = <<EOT
+    for i in {1..30}; do
+      aws eks describe-cluster --name ${var.vpc_name} && break
+      sleep 10
+    done
+    EOT
+  }
+}
+
 resource "aws_eks_access_entry" "node_pool" {
   cluster_name  = var.vpc_name
   principal_arn = aws_iam_role.eks_node_role.arn
+  depends_on    = [ null_resource.wait_for_eks ]
 }
 
 resource "aws_eks_access_policy_association" "eks_node" {
   cluster_name  = var.vpc_name
   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
   principal_arn = aws_iam_role.eks_node_role.arn
-
+  depends_on    = [ null_resource.wait_for_eks ]
+  
   access_scope {
     type       = "cluster"
   }
