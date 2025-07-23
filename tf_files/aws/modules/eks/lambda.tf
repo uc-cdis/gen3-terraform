@@ -89,10 +89,10 @@ resource "aws_lambda_function" "gw_checks" {
   source_code_hash = data.archive_file.lambda_function.output_base64sha256
   runtime          = "python3.13"
 
-  vpc_config {
-    subnet_ids         = flatten([aws_subnet.eks_public.*.id])
-    security_group_ids = [aws_security_group.eks_nodes_sg.id]
-  }
+  #vpc_config {
+  #  subnet_ids         = flatten([aws_subnet.eks_public.*.id])
+  #  security_group_ids = [aws_security_group.eks_nodes_sg.id]
+  #}
 
   environment {
     variables = {
