@@ -405,9 +405,6 @@ resource "kubectl_manifest" "karpenter_node_class" {
       name: default
     spec:
       amiFamily: AL2
-      amiSelectorTerms:
-      - name: "EKS-FIPS*"
-        owner: "143731057154"
       blockDeviceMappings:
       - deviceName: /dev/xvda
         ebs:

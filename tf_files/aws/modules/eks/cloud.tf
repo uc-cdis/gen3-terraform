@@ -623,21 +623,6 @@ resource "aws_eks_access_policy_association" "eks_node" {
   }
 }
 
-resource "aws_eks_access_entry" "current_role" {
-  cluster_name  = aws_eks_cluster.eks_cluster.name
-  principal_arn = data.aws_caller_identity.current.arn
-}
-
-resource "aws_eks_access_policy_association" "current_role" {
-  cluster_name  = aws_eks_cluster.eks_cluster.name
-  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-  principal_arn = data.aws_caller_identity.current.arn
-
-  access_scope {
-    type       = "cluster"
-  }
-}
-
 #--------------------------------------------------------------
 # let's work towards EKS IAM-ServiceAccount integration
 
