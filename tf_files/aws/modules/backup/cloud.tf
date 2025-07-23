@@ -27,6 +27,7 @@ resource "aws_kms_key" "cross_region_backup_key" {
 resource "aws_backup_plan" "daily" {
   name = "rds-daily-backup-plan"
   count = var.daily_backups_enabled ? 1 : 0
+  region = var.cross_region_destination
 
   rule {
     rule_name         = "daily-backup-rule"
@@ -55,6 +56,7 @@ resource "aws_backup_selection" "daily" {
 
 resource "aws_backup_plan" "monthly" {
   name = "rds-monthly-backup-plan"
+  region = var.cross_region_destination
 
   rule {
     rule_name         = "monthly-backup-rule"
@@ -80,6 +82,7 @@ resource "aws_backup_selection" "monthly" {
 
 resource "aws_backup_plan" "yearly" {
   name = "rds-yearly-backup-plan"
+  region = var.cross_region_destination
 
   rule {
     rule_name         = "yearly-backup-rule"
