@@ -30,7 +30,7 @@ resource "aws_backup_plan" "daily" {
 
   rule {
     rule_name         = "daily-backup-rule"
-    target_vault_name = aws_backup_vault.rds_backup_vault.name
+    target_vault_name = aws_backup_vault.rds_cross_region_backup_vault.name
     schedule          = "cron(0 2 * * ? *)" # Daily at 2 AM UTC
     lifecycle {
       delete_after = 7 # Retain for 7 days
@@ -58,7 +58,7 @@ resource "aws_backup_plan" "monthly" {
 
   rule {
     rule_name         = "monthly-backup-rule"
-    target_vault_name = aws_backup_vault.rds_backup_vault.name
+    target_vault_name = aws_backup_vault.rds_cross_region_backup_vault.name
     schedule          = "cron(0 3 1 * ? *)" # Monthly on the 1st at 3 AM UTC
     lifecycle {
       delete_after = 365 # Retain for 365 days (1 year)
@@ -83,7 +83,7 @@ resource "aws_backup_plan" "yearly" {
 
   rule {
     rule_name         = "yearly-backup-rule"
-    target_vault_name = aws_backup_vault.rds_backup_vault.name
+    target_vault_name = aws_backup_vault.rds_cross_region_backup_vault.name
     schedule          = "cron(0 4 1 1 ? *)" # Yearly on January 1st at 4 AM UTC
     lifecycle {
       delete_after = 1825 # Retain for 1825 days (5 years)
