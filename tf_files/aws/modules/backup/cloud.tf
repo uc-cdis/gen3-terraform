@@ -5,7 +5,7 @@ resource "aws_backup_vault" "rds_backup_vault" {
 }
 
 resource "aws_backup_vault" "rds_cross_region_backup_vault" {
-  name        = "rds-backup-vault"
+  name        = "rds-cross-region-backup-vault"
   kms_key_arn = aws_kms_key.cross_region_backup_key.arn
   region      = var.cross_region_destination
 }
