@@ -32,6 +32,7 @@ module "jupyter_pool" {
   vpc_name                      = var.vpc_name
   csoc_cidr                     = var.peering_cidr
   eks_cluster_endpoint          = aws_eks_cluster.eks_cluster.endpoint
+  eks_cluster_name              = aws_eks_cluster.eks_cluster.id
   eks_cluster_ca                = aws_eks_cluster.eks_cluster.certificate_authority.0.data
   eks_private_subnets           = aws_subnet.eks_private.*.id
   control_plane_sg              = aws_security_group.eks_control_plane_sg.id
@@ -60,6 +61,7 @@ module "workflow_pool" {
   vpc_name                      = var.vpc_name
   csoc_cidr                     = var.peering_cidr
   eks_cluster_endpoint          = aws_eks_cluster.eks_cluster.endpoint
+  eks_cluster_name              = aws_eks_cluster.eks_cluster.id
   eks_cluster_ca                = aws_eks_cluster.eks_cluster.certificate_authority.0.data
   eks_private_subnets           = local.eks_priv_subnets
   control_plane_sg              = aws_security_group.eks_control_plane_sg.id

@@ -32,6 +32,10 @@ variable "eks_cluster_endpoint" {
   default = ""
 }
 
+variable "eks_cluster_name" {
+  default = ""
+}
+
 variable "eks_private_subnets" {}
 
 variable "control_plane_sg" {}
