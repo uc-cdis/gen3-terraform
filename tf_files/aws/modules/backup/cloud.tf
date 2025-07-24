@@ -1,7 +1,6 @@
 resource "aws_backup_vault" "rds_backup_vault" {
   name        = "rds-backup-vault"
   kms_key_arn = aws_kms_key.backup_key.arn
-  region      = "us-east-1"
 }
 
 resource "aws_backup_vault" "rds_cross_region_backup_vault" {
