@@ -61,76 +61,74 @@ resource "aws_backup_selection" "daily" {
 }
 
 
-# resource "aws_backup_plan" "monthly" {
-#   name = "rds-monthly-backup-plan"
+resource "aws_backup_plan" "monthly" {
+  name = "rds-monthly-backup-plan"
 
-#   rule {
-#     rule_name         = "monthly-backup-rule"
-#     target_vault_name = aws_backup_vault.rds_backup_vault.name
-#     schedule          = "cron(0 3 1 * ? *)" # Monthly on the 1st at 3 AM UTC
-#     lifecycle {
-#       delete_after = 365 # Retain for 365 days (1 year)
-#     }
+  rule {
+    rule_name         = "monthly-backup-rule"
+    target_vault_name = aws_backup_vault.rds_backup_vault.name
+    schedule          = "cron(0 3 1 * ? *)" # Monthly on the 1st at 3 AM UTC
+    lifecycle {
+      delete_after = 365 # Retain for 365 days (1 year)
+    }
 
-#     copy_action {
-#       lifecycle {
-#         delete_after = 365 # Retain for 7 days
-#       }
+    copy_action {
+      lifecycle {
+        delete_after = 365 # Retain for 7 days
+      }
 
-#       destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
-#     }
-#   }
-# }
+      destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
+    }
+  }
+}
 
-# resource "aws_backup_selection" "monthly" {
-#   name          = "rds-monthly-backup-selection"
-#   iam_role_arn  = aws_iam_role.backup_role.arn
-#   plan_id       = aws_backup_plan.monthly.id
-#   region = var.cross_region_destination
+resource "aws_backup_selection" "monthly" {
+  name          = "rds-monthly-backup-selection"
+  iam_role_arn  = aws_iam_role.backup_role.arn
+  plan_id       = aws_backup_plan.monthly.id
+  region = var.cross_region_destination
 
-#   resources = [
-#     "arn:aws:rds:*"
-#   ]
+  resources = [
+    "arn:aws:rds:*"
+  ]
 
-#   not_resources = var.excluded_dbs
-# }
+  not_resources = var.excluded_dbs
+}
 
-# resource "aws_backup_plan" "yearly" {
-#   name = "rds-yearly-backup-plan"
-#   region = var.cross_region_destination
+resource "aws_backup_plan" "yearly" {
+  name = "rds-yearly-backup-plan"
+  region = var.cross_region_destination
 
-#   rule {
-#     rule_name         = "yearly-backup-rule"
-#     target_vault_name = aws_backup_vault.rds_backup_vault.name
-#     schedule          = "cron(0 4 1 1 ? *)" # Yearly on January 1st at 4 AM UTC
-#     lifecycle {
-#       delete_after = 1825 # Retain for 1825 days (5 years)
-#     }
+  rule {
+    rule_name         = "yearly-backup-rule"
+    target_vault_name = aws_backup_vault.rds_backup_vault.name
+    schedule          = "cron(0 4 1 1 ? *)" # Yearly on January 1st at 4 AM UTC
+    lifecycle {
+      delete_after = 1825 # Retain for 1825 days (5 years)
+    }
 
-#     copy_action {
-#       lifecycle {
-#         delete_after = 1825 # Retain for 7 days
-#       }
+    copy_action {
+      lifecycle {
+        delete_after = 1825 # Retain for 7 days
+      }
 
-#       destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
-#     }
-#   }
-# }
+      destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
+    }
+  }
+}
 
-# resource "aws_backup_selection" "yearly" {
-#   name          = "rds-yearly-backup-selection"
-#   iam_role_arn  = aws_iam_role.backup_role.arn
-#   plan_id       = aws_backup_plan.yearly.id
-#   region = var.cross_region_destination
+resource "aws_backup_selection" "yearly" {
+  name          = "rds-yearly-backup-selection"
+  iam_role_arn  = aws_iam_role.backup_role.arn
+  plan_id       = aws_backup_plan.yearly.id
+  region = var.cross_region_destination
 
-#   resources = [
-#     "arn:aws:rds:*"
-#   ]
+  resources = [
+    "arn:aws:rds:*"
+  ]
 
-#   not_resources = var.excluded_dbs
-# }
-
-
+  not_resources = var.excluded_dbs
+}
 
 resource "aws_iam_role" "backup_role" {
   name               = "rds-backup-role"
