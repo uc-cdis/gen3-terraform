@@ -27,15 +27,22 @@ resource "aws_kms_key" "cross_region_backup_key" {
 resource "aws_backup_plan" "daily" {
   name = "rds-daily-backup-plan"
   count = var.daily_backups_enabled ? 1 : 0
-  region = var.cross_region_destination
 
   rule {
     rule_name         = "daily-backup-rule"
-    target_vault_name = aws_backup_vault.rds_cross_region_backup_vault.name
+    target_vault_name = aws_backup_vault.rds_backup_vault.name
     schedule          = "cron(0 2 * * ? *)" # Daily at 2 AM UTC
     lifecycle {
       delete_after = 7 # Retain for 7 days
     }
+  }
+
+  copy_action = {
+    lifecycle {
+      delete_after = 7 # Retain for 7 days
+    }
+
+    destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
   }
 }
 
@@ -44,7 +51,6 @@ resource "aws_backup_selection" "daily" {
   name          = "rds-daily-backup-selection"
   iam_role_arn  = aws_iam_role.backup_role.arn
   plan_id = aws_backup_plan.daily[0].id
-  region = var.cross_region_destination
   count = var.daily_backups_enabled ? 1 : 0
 
   resources = [
@@ -57,15 +63,22 @@ resource "aws_backup_selection" "daily" {
 
 resource "aws_backup_plan" "monthly" {
   name = "rds-monthly-backup-plan"
-  region = var.cross_region_destination
 
   rule {
     rule_name         = "monthly-backup-rule"
-    target_vault_name = aws_backup_vault.rds_cross_region_backup_vault.name
+    target_vault_name = aws_backup_vault.rds_backup_vault.name
     schedule          = "cron(0 3 1 * ? *)" # Monthly on the 1st at 3 AM UTC
     lifecycle {
       delete_after = 365 # Retain for 365 days (1 year)
     }
+  }
+
+  copy_action = {
+    lifecycle {
+      delete_after = 365 # Retain for 7 days
+    }
+
+    destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
   }
 }
 
@@ -88,11 +101,19 @@ resource "aws_backup_plan" "yearly" {
 
   rule {
     rule_name         = "yearly-backup-rule"
-    target_vault_name = aws_backup_vault.rds_cross_region_backup_vault.name
+    target_vault_name = aws_backup_vault.rds_backup_vault.name
     schedule          = "cron(0 4 1 1 ? *)" # Yearly on January 1st at 4 AM UTC
     lifecycle {
       delete_after = 1825 # Retain for 1825 days (5 years)
     }
+  }
+
+  copy_action = {
+    lifecycle {
+      delete_after = 7 # Retain for 7 days
+    }
+
+    destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
   }
 }
 
