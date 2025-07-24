@@ -29,6 +29,7 @@ module "squid-auto" {
   customer_id                    = var.customer_id
   slack_webhook                  = var.slack_webhook
   fips                           = var.fips
+  ha_squid_single_instance       = var.ha_squid_single_instance 
 }
 
 module "data-bucket" {

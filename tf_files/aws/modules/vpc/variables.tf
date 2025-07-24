@@ -150,3 +150,8 @@ variable "force_delete_bucket" {
   description = "Force delete the data bucket"
   default     = false
 }
+
+variable "ha_squid_single_instance" {
+  description = "If true, deploy a single instance of squid in an autoscaling group"
+  default     = false
+}

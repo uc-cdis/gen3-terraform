@@ -230,3 +230,8 @@ variable "k8s_bootstrap_resources" {
   default = false
   description = "If set to true, creates resources for bootstrapping a kubernetes cluster (such as karpenter configs and helm releases)"
 }
+
+variable "ha_squid_single_instance" {
+  description = "If true, deploy a single instance of squid in an autoscaling group"
+  default     = false
+}

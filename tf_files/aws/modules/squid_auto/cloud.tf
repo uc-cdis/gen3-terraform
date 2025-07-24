@@ -1,6 +1,7 @@
 locals{
   cidrs  = var.secondary_cidr_block != "" ? [var.env_vpc_cidr, var.peering_cidr, var.secondary_cidr_block] : [var.env_vpc_cidr, var.peering_cidr]
   cidrs2 = var.secondary_cidr_block != "" ? [var.env_vpc_cidr, var.secondary_cidr_block] : [var.env_vpc_cidr]
+  bootstrap_script = var.ha_squid_single_instance ? "squid_running_on_docker_single_instance.sh" : var.bootstrap_script
 }
 
 #Launching the public subnets for the squid VMs
@@ -141,7 +142,7 @@ fi
   fi
   cd $USER_HOME
 
-  bash "${var.bootstrap_path}${var.bootstrap_script}" "cwl_group=${var.env_log_group};${join(";",var.extra_vars)}" 2>&1
+  bash "${var.bootstrap_path}${local.bootstrap_script}" "cwl_group=${var.env_log_group};${join(";",var.extra_vars)}" 2>&1
   cd $CLOUD_AUTOMATION
   git checkout master
 ) > /var/log/bootstrapping_script.log
@@ -199,9 +200,9 @@ resource "aws_kms_grant" "kms" {
 resource "aws_autoscaling_group" "squid_auto" {
   name                    = var.env_squid_name
   service_linked_role_arn = aws_iam_service_linked_role.squidautoscaling.arn
-  desired_capacity        = var.cluster_desired_capasity
-  max_size                = var.cluster_max_size
-  min_size                = var.cluster_min_size
+  desired_capacity        = var.ha_squid_single_instance ? 1 : var.cluster_desired_capasity
+  max_size                = var.ha_squid_single_instance ? 1 : var.cluster_max_size
+  min_size                = var.ha_squid_single_instance ? 1 : var.cluster_min_size
   vpc_zone_identifier     = aws_subnet.squid_pub0.*.id
   depends_on              = [null_resource.service_depends_on, aws_route_table_association.squid_auto0]
 
