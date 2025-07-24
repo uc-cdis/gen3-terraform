@@ -38,7 +38,7 @@ resource "aws_backup_plan" "daily" {
   }
 
   copy_action = {
-    lifecycle {
+    lifecycle = {
       delete_after = 7 # Retain for 7 days
     }
 
@@ -74,7 +74,7 @@ resource "aws_backup_plan" "monthly" {
   }
 
   copy_action = {
-    lifecycle {
+    lifecycle = {
       delete_after = 365 # Retain for 7 days
     }
 
@@ -109,8 +109,8 @@ resource "aws_backup_plan" "yearly" {
   }
 
   copy_action = {
-    lifecycle {
-      delete_after = 7 # Retain for 7 days
+    lifecycle = {
+      delete_after = 1825 # Retain for 7 days
     }
 
     destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
