@@ -35,14 +35,14 @@ resource "aws_backup_plan" "daily" {
     lifecycle {
       delete_after = 7 # Retain for 7 days
     }
-  }
 
-  copy_action = {
-    lifecycle = {
-      delete_after = 7 # Retain for 7 days
+    copy_action = {
+      lifecycle = {
+        delete_after = 7 # Retain for 7 days
+      }
+
+      destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
     }
-
-    destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
   }
 }
 
@@ -71,14 +71,14 @@ resource "aws_backup_plan" "monthly" {
     lifecycle {
       delete_after = 365 # Retain for 365 days (1 year)
     }
-  }
 
-  copy_action = {
-    lifecycle = {
-      delete_after = 365 # Retain for 7 days
+    copy_action = {
+      lifecycle = {
+        delete_after = 365 # Retain for 7 days
+      }
+
+      destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
     }
-
-    destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
   }
 }
 
@@ -106,14 +106,14 @@ resource "aws_backup_plan" "yearly" {
     lifecycle {
       delete_after = 1825 # Retain for 1825 days (5 years)
     }
-  }
 
-  copy_action = {
-    lifecycle = {
-      delete_after = 1825 # Retain for 7 days
+    copy_action = {
+      lifecycle = {
+        delete_after = 1825 # Retain for 7 days
+      }
+
+      destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
     }
-
-    destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
   }
 }
 
