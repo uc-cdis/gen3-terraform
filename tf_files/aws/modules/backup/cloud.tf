@@ -85,7 +85,6 @@ resource "aws_backup_selection" "monthly" {
   name          = "rds-monthly-backup-selection"
   iam_role_arn  = aws_iam_role.backup_role.arn
   plan_id       = aws_backup_plan.monthly.id
-  region = var.cross_region_destination
 
   resources = [
     "arn:aws:rds:*"
@@ -96,7 +95,6 @@ resource "aws_backup_selection" "monthly" {
 
 resource "aws_backup_plan" "yearly" {
   name = "rds-yearly-backup-plan"
-  region = var.cross_region_destination
 
   rule {
     rule_name         = "yearly-backup-rule"
@@ -120,7 +118,6 @@ resource "aws_backup_selection" "yearly" {
   name          = "rds-yearly-backup-selection"
   iam_role_arn  = aws_iam_role.backup_role.arn
   plan_id       = aws_backup_plan.yearly.id
-  region = var.cross_region_destination
 
   resources = [
     "arn:aws:rds:*"
