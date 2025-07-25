@@ -83,7 +83,7 @@ resource helm_release "external-secrets" {
   version          = var.external_secrets_operator_version
   namespace        = "external-secrets"
   create_namespace = true
-  depends_on       = [ module.eks.karpenter_deployed : module.eks.0.cluster_name ]
+  depends_on       = [ module.eks.karpenter_deployed, module.eks.0.cluster_name ]
 
   values = [
     <<-EOT
