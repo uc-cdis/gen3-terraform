@@ -1,5 +1,5 @@
 module "arborist-db" {
-  count                   = var.arborist_enabled ? 1 : 0
+  count                   = var.arborist_enabled && var.provision_dbs ? 1 : 0
   source                  = "../aws/aurora_db"
   vpc_name                = var.vpc_name
   service                 = "arborist"
@@ -10,7 +10,7 @@ module "arborist-db" {
 }
 
 module "argo-db" {
-  count                   = var.argo_enabled ? 1 : 0
+  count                   = var.argo_enabled && var.provision_dbs ? 1 : 0
   source                  = "../aws/aurora_db"
   vpc_name                = var.vpc_name
   service                 = "argo"
@@ -21,7 +21,7 @@ module "argo-db" {
 }
 
 module "audit-db" {
-  count                   = var.audit_enabled ? 1 : 0
+  count                   = var.audit_enabled && var.provision_dbs ? 1 : 0
   source                  = "../aws/aurora_db"
   vpc_name                = var.vpc_name
   service                 = "audit"
@@ -32,7 +32,7 @@ module "audit-db" {
 }
 
 module "dicom-viewer-db" {
-  count                   = var.dicom-viewer_enabled ? 1 : 0
+  count                   = var.dicom-viewer_enabled && var.provision_dbs ? 1 : 0
   source                  = "../aws/aurora_db"
   vpc_name                = var.vpc_name
   service                 = "dicom"
@@ -43,7 +43,7 @@ module "dicom-viewer-db" {
 }
 
 module "dicom-server-db" {
-  count                   = var.dicom-server_enabled ? 1 : 0
+  count                   = var.dicom-server_enabled && var.provision_dbs ? 1 : 0
   source                  = "../aws/aurora_db"
   vpc_name                = var.vpc_name
   service                 = "dicom-server"
@@ -54,7 +54,7 @@ module "dicom-server-db" {
 }
 
 module "fence-db" {
-  count                   = var.fence_enabled ? 1 : 0
+  count                   = var.fence_enabled && var.provision_dbs ? 1 : 0
   source                  = "../aws/aurora_db"
   vpc_name                = var.vpc_name
   service                 = "fence"
@@ -65,7 +65,7 @@ module "fence-db" {
 }
 
 module "indexd-db" {
-  count                   = var.indexd_enabled ? 1 : 0
+  count                   = var.indexd_enabled && var.provision_dbs ? 1 : 0
   source                  = "../aws/aurora_db"
   vpc_name                = var.vpc_name
   service                 = "indexd"
@@ -76,7 +76,7 @@ module "indexd-db" {
 }
 
 module "metadata-db" {
-  count                   = var.metadata_enabled ? 1 : 0
+  count                   = var.metadata_enabled && var.provision_dbs ? 1 : 0
   source                  = "../aws/aurora_db"
   vpc_name                = var.vpc_name
   service                 = "metadata"
@@ -87,7 +87,7 @@ module "metadata-db" {
 }
 
 module "requestor-db" {
-  count                   = var.requestor_enabled ? 1 : 0
+  count                   = var.requestor_enabled && var.provision_dbs ? 1 : 0
   source                  = "../aws/aurora_db"
   vpc_name                = var.vpc_name
   service                 = "requestor"
@@ -98,7 +98,7 @@ module "requestor-db" {
 }
 
 module "sheepdog-db" {
-  count                   = var.sheepdog_enabled ? 1 : 0
+  count                   = var.sheepdog_enabled && var.provision_dbs ? 1 : 0
   source                  = "../aws/aurora_db"
   vpc_name                = var.vpc_name
   service                 = "sheepdog"
@@ -109,7 +109,7 @@ module "sheepdog-db" {
 }
 
 module "wts-db" {
-  count                   = var.wts_enabled ? 1 : 0
+  count                   = var.wts_enabled && var.provision_dbs ? 1 : 0
   source                  = "../aws/aurora_db"
   vpc_name                = var.vpc_name
   service                 = "wts"
