@@ -65,7 +65,7 @@ resource helm_release "argocd" {
   version          = var.argocd_version
   namespace        = "argocd"
   create_namespace = true
-  depends_on       = [ var.k8s_bootstrap_resources && var.use_karpenter && var.deploy_karpenter_in_k8s ? module.eks.karpenter_deployed : module.eks.0.cluster_name ]
+  depends_on       = [ module.eks.karpenter_deployed, module.eks.0.cluster_name ]
 
   values = [
     <<-EOT
@@ -83,7 +83,7 @@ resource helm_release "external-secrets" {
   version          = var.external_secrets_operator_version
   namespace        = "external-secrets"
   create_namespace = true
-  depends_on       = [ var.k8s_bootstrap_resources && var.use_karpenter && var.deploy_karpenter_in_k8s ? module.eks.karpenter_deployed : module.eks.0.cluster_name ]
+  depends_on       = [ module.eks.karpenter_deployed : module.eks.0.cluster_name ]
 
   values = [
     <<-EOT
