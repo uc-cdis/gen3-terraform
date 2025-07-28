@@ -352,7 +352,7 @@ variable "deploy_gen3" {
   default = false
 }
 
-variable "provision_dbs" {
-  description = "Whether to provision databases or not. Requires connectivity to RDS cluster."
+variable "create_dbs" {
+  description = "Whether to create databases or not. Requires connectivity to RDS cluster."
   default = false
 }
