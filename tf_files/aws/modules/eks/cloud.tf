@@ -613,16 +613,7 @@ resource "aws_security_group" "ssh" {
 resource "aws_eks_access_entry" "eks_node" {
   cluster_name  = aws_eks_cluster.eks_cluster.name
   principal_arn = aws_iam_role.eks_node_role.arn
-}
-
-resource "aws_eks_access_policy_association" "eks_node" {
-  cluster_name  = aws_eks_cluster.eks_cluster.name
-  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-  principal_arn = aws_iam_role.eks_node_role.arn
-
-  access_scope {
-    type       = "cluster"
-  }
+  type          = "EC2_LINUX"
 }
 
 #--------------------------------------------------------------

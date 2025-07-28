@@ -13,7 +13,7 @@ global:
   externalSecrets:
     deploy: true
   postgres:
-    dbCreate: false
+    dbCreate: true
     externalSecret: "${vpc_name}_aurora-master-password"
   environment: "${vpc_name}"
   hostname: "${hostname}"
