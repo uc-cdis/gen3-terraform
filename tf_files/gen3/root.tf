@@ -67,7 +67,7 @@ locals {
 resource "helm_release" "gen3" {
   count      = var.deploy_gen3 ? 1 : 0
   name       = var.namespace
-  repository = "http://helm.gen3.org"
+  repository = "https://helm.gen3.org"
   chart      = "gen3"
   namespace  = var.namespace
   create_namespace = true
