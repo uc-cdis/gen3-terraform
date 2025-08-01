@@ -79,7 +79,27 @@ resource "helm_release" "gen3" {
 
 resource "local_file" "values" {
   count    = var.deploy_gen3 ? 1 : 0
-  filename = "values.yaml"
+  filename = "./gitops-repo/${var.vpc_name}/${var.hostname}/values.yaml"
   content  = local.values
+  depends_on = [null_resource.config_setup, helm_release.gen3]
 }
 
+resource "null_resource" "config_setup" {
+
+  provisioner "local-exec" {
+    command = "cp -rf ${path.module}/gitops-repo ./; cp ${path.module}/users-repo ./; mkdir -p ./gitops-repo/${var.vpc_name}/${var.hostname}; cp ${path.module}/gitops-repo/${var.vpc_name}/cluster-level-resources/cluster-values.yaml ./gitops-repo/${var.vpc_name}/cluster-level-resources/cluster-values.yaml; cp ${path.module}/users-repo/users/user.yaml ./users-repo/users/user.yaml"
+  }
+
+  provisioner "local-exec" {
+    command = "echo \"${templatefile("${path.module}/user-yaml-push.tftpl", {useryaml_s3_path = var.useryaml_s3_path})}\" > ./users-repo/.github/workflows/user-yaml-push.yaml"
+  }
+
+  provisioner "local-exec" {
+    command = "echo \"${templatefile("${path.module}/cluster-values.tftpl", {vpc_name = var.vpc_name, account_number = data.aws_caller_identity.current.account_id})}\" > ./gitops-repo/${var.vpc_name}/cluster-level-resources/cluster-values.yaml"
+  }
+
+  provisioner "local-exec" {
+    command = "echo \"${templatefile("${path.module}/app.tftpl", {vpc_name = var.vpc_name, hostname = var.hostname, namespace = var.namespace})}\" > ./gitops-repo/00configmap.yaml"
+  }
+
+}
