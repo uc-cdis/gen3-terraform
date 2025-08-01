@@ -24,7 +24,7 @@ locals {
       es_secret_name = aws_secretsmanager_secret.es_user_creds.name
       fence_config_secret_name = aws_secretsmanager_secret.fence_config.name
       fence_enabled = var.fence_enabled
-      fence_jwt_keys = aws_secretsmanager_secret.fence_jwt_keys.name
+      fence_jwt_keys = aws_secretsmanager_secret.fence-jwt-keys.name
       fence_service_account = var.fence_enabled ? aws_iam_role.fence-role[0].arn : null
       frontend_root = var.gen3ff_enabled ? "gen3ff" : "portal"
       gitops_file = var.gitops_path != "" ? indent(4, file(var.gitops_path)) : "{}"
@@ -53,7 +53,6 @@ locals {
       slack_send_dbgap = var.slack_send_dbgap
       slack_webhook = var.slack_webhook
       ssjdispatcher_enabled = var.ssjdispatcher_enabled
-      ssjdispatcher_service_account = var.ssjdispatcher_enabled ? aws_iam_role.ssjdispatcher-role[0].arn : null
       sower_enabled = var.sower_enabled
       tier_access_level = var.tier_access_level
       tier_access_limit = var.tier_access_limit

@@ -137,7 +137,7 @@ hatchery:
         args:
         - "--NotebookApp.base_url=/lw-workspace/proxy/"
         - "--NotebookApp.default_url=/lab"
-        - "--NotebookApp.password=''"
+        - "--NotebookApp.password=''" #pragma: allowlist secret
         - "--NotebookApp.token=''"
         - "--NotebookApp.shutdown_no_activity_timeout=5400"
         - "--NotebookApp.quit_button=False"
@@ -167,6 +167,9 @@ indexd:
 
 manifestservice:
   enabled: ${manifestservice_enabled}
+  serviceAccount:
+    annotations: 
+      eks.amazonaws.com/role-arn: "${manifestservice_service_account}"  
   externalSecrets:
     createK8sManifestServiceSecret: true
 
