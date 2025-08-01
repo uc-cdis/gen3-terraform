@@ -44,42 +44,6 @@ module "cdis_vpc" {
   force_delete_bucket            = var.force_delete_bucket
 }
 
-
-module "config_files" {
-  source                        = "../../shared/modules/k8s_configs"
-  vpc_name                      = var.vpc_name
-  db_fence_address              = local.db_fence_address
-  db_fence_password             = var.db_password_fence != "" ? var.db_password_fence : random_password.fence_password.result
-  db_fence_name                 = var.fence_database_name
-  db_sheepdog_address           = local.db_sheepdog_address
-  db_sheepdog_username          = var.sheepdog_db_username
-  db_sheepdog_password          = var.db_password_sheepdog != "" ? var.db_password_sheepdog : random_password.sheepdog_password.result
-  db_sheepdog_name              = var.sheepdog_database_name
-  db_peregrine_address          = local.db_peregrine_address
-  db_peregrine_password         = var.db_password_peregrine != "" ? var.db_password_peregrine : random_password.peregrine_password.result
-  db_indexd_address             = local.db_indexd_address
-  db_indexd_username            = var.indexd_db_username
-  db_indexd_password            = var.db_password_indexd != "" ? var.db_password_indexd : random_password.indexd_password.result
-  db_indexd_name                = var.indexd_database_name
-  hostname                      = var.hostname
-  google_client_secret          = var.google_client_secret
-  google_client_id              = var.google_client_id
-  hmac_encryption_key           = var.hmac_encryption_key != "" ? var.hmac_encryption_key : base64encode(random_password.hmac_encryption_key.result)
-  sheepdog_secret_key           = var.sheepdog_secret_key  != "" ? var.sheepdog_secret_key : random_password.sheepdog_secret_key.result
-  sheepdog_indexd_password      = var.sheepdog_indexd_password != "" ? var.sheepdog_indexd_password : random_password.sheepdog_indexd_password.result
-  sheepdog_oauth2_client_id     = var.sheepdog_oauth2_client_id
-  sheepdog_oauth2_client_secret = var.sheepdog_oauth2_client_secret
-  gitops_path                   = var.gitops_path
-  ssl_certificate_id            = var.aws_cert_name
-  aws_user_key                  = module.cdis_vpc.es_user_key
-  aws_user_key_id               = module.cdis_vpc.es_user_key_id
-  indexd_prefix                 = var.indexd_prefix
-  mailgun_api_key               = var.mailgun_api_key
-  mailgun_api_url               = var.mailgun_api_url
-  mailgun_smtp_host             = var.mailgun_smtp_host
-
-}
-
 module "csoc_peering_connection" {
   source = "../modules/csoc_peering"
   count  = var.csoc_peering ? 1 : 0

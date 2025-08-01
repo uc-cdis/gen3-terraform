@@ -12,10 +12,10 @@ jobs:
         echo Event name: $${{ github.event_name }}
         if [[ $${{ github.event_name }} = "pull_request" || $${{ github.event_name }} = "pull_request_target" ]]; then
           is_fork=`curl --header "Authorization: token $${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/$${{ github.event.repository.full_name }}/pulls/$${{github.event.number}} | jq -r .head.repo.fork`
-          echo Is this a fork? $$is_fork
-          if [ $$is_fork = "true" ]; then
+          echo Is this a fork? $is_fork
+          if [ $is_fork = "true" ]; then
             labels=`curl -s --header "Authorization: token $${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/$${{ github.event.repository.full_name }}/issues/$${{github.event.number}}/labels | jq -r '.[].name'`
-            echo Labels: $$labels
+            echo Labels: $labels
             if [[ ! " $${labels[*]} " =~ "safe to test" ]]; then
               echo "ERROR: PRs from forks must be labeled with 'safe to test' to run the CI"
               exit 1
@@ -37,8 +37,8 @@ jobs:
         cd $${{ github.event.repository.name }}
         if [ $${{ github.event_name }} = "push" ]; then
           branch=$${GITHUB_REF#refs/*/}
-          echo Push event: checking out branch $$branch
-          git checkout $$branch
+          echo Push event: checking out branch $branch
+          git checkout $branch
         else # this is a pull request
           echo Pull request event: checking out branch from PR $${{github.event.number}}
           git fetch origin pull/$${{github.event.number}}/head:localbranch
@@ -64,13 +64,13 @@ jobs:
         rm lint.py
 
         # run the tests
-        changed_files=$$(git diff --name-only HEAD..$${{ github.event.pull_request.base.sha }})
+        changed_files=$(git diff --name-only HEAD..$${{ github.event.pull_request.base.sha }})
         # user_yamls=()
-        for file in $$changed_files; do
-          if [[ "$$file" == *user.yaml ]]; then
-            # TODO do `user_yamls+=$$file` here and `gen3users validate $$user_yamls` after
+        for file in $changed_files; do
+          if [[ "$file" == *user.yaml ]]; then
+            # TODO do `user_yamls+=$file` here and `gen3users validate $user_yamls` after
             # the `for` statement to validate all at once. Need to split `user_yamls` correctly
-            gen3users validate $$file
+            gen3users validate $file
           fi
         done
     - name: Install AWS CLI
@@ -82,7 +82,7 @@ jobs:
         cd $${{ github.event.repository.name }}
         git checkout main
         git pull
-        aws s3 cp users/user.yaml s3://${useryaml_s3_path} --recursive --region us-east-1
+        aws s3 cp users/user.yaml ${useryaml_s3_path} --recursive --region us-east-1
       env:
         AWS_ACCESS_KEY_ID: $${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: $${{ secrets.AWS_SECRET_ACCESS_KEY }}

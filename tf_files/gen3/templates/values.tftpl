@@ -2,7 +2,7 @@ global:
   aws:
     enabled: true
     account: ${account_id}
-    hatchery_role: ${hatchery_service_account}
+    hatchery_role: "${hatchery_service_account}"
     secretStoreServiceAccount:
       enabled: true
       name: external-secrets
@@ -74,7 +74,7 @@ fence:
       eks.amazonaws.com/role-arn: "${fence_service_account}"
    
   externalSecrets:
-    fenceJwtKeys: ""
+    fenceJwtKeys: "${fence_jwt_keys}"
     fenceConfig: ${fence_config_secret_name}
     fenceGoogleAppCredsSecret: ""
     fenceGoogleStorageCredsSecret: ""  
@@ -82,10 +82,6 @@ fence:
     createK8sGoogleAppSecrets: true
     createK8sFenceConfigSecret: true
     dbcreds: "${vpc_name}-${namespace}-fence-creds"    
-
-
-  USER_YAML: |
-    ${user_yaml}
 
   usersync:
     usersync: ${usersync_enabled}
@@ -198,9 +194,6 @@ requestor:
 
 revproxy:
   enabled: ${revproxy_enabled}
-
-s3-mountpoint:
-  enabled: ${deploy_s3_mountpoint}
 
 sheepdog:
   enabled: ${sheepdog_enabled}
