@@ -13,7 +13,7 @@ variable "arborist_enabled" {
 variable "argo_enabled" {
   description = "Enable argo"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "audit_enabled" {
@@ -136,7 +136,7 @@ variable "gen3ff_tag" {
 variable "guppy_enabled" {
   description = "Enable guppy"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "hatchery_enabled" {
@@ -246,13 +246,13 @@ variable "slack_webhook" {
 variable "ssjdispatcher_enabled" {
   description = "Enable ssjdispatcher"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "sower_enabled" {
   description = "Enable sower"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "tier_access_level" {

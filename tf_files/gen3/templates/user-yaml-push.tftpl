@@ -82,7 +82,7 @@ jobs:
         cd $${{ github.event.repository.name }}
         git checkout main
         git pull
-        aws s3 cp users/user.yaml ${useryaml_s3_path} --recursive --region us-east-1
+        aws s3 cp users/dev/user.yaml ${useryaml_s3_path} --recursive --region us-east-1
       env:
         AWS_ACCESS_KEY_ID: $${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: $${{ secrets.AWS_SECRET_ACCESS_KEY }}

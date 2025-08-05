@@ -3,7 +3,13 @@ BASE_URL: 'https://${hostname}/user'
 
 DEBUG: True
 
+ARBORIST: 'http://arborist-service'
 
+INDEXD: 'http://indexd-service'
+
+HTTP_PROXY:
+  host: 'cloud-proxy.internal.io'
+  port: 3128
 
 OPENID_CONNECT:
   google:

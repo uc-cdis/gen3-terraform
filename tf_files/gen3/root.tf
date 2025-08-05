@@ -67,7 +67,7 @@ locals {
 
 resource "helm_release" "gen3" {
   count      = var.deploy_gen3 ? 1 : 0
-  name       = var.namespace
+  name       = "gen3-${var.namespace}"
   repository = "https://helm.gen3.org"
   chart      = "gen3"
   namespace  = var.namespace
@@ -108,6 +108,14 @@ resource "local_file" "app_yaml" {
     vpc_name  = var.vpc_name,
     hostname  = var.hostname,
     namespace = var.namespace
+  })
+  depends_on = [null_resource.config_setup, helm_release.gen3]
+}
+
+resource "local_file" "app_yaml" {
+  filename = "./gitops-repo/${var.vpc_name}/cluster-level-resources/app.yaml"
+  content  = templatefile("${path.module}/templates/cluster-app.tftpl", {
+    vpc_name  = var.vpc_name
   })
   depends_on = [null_resource.config_setup, helm_release.gen3]
 }

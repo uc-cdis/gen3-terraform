@@ -1,14 +1,14 @@
 global:
   aws:
     enabled: true
-    account: ${account_id}
+    account: "${account_id}"
     hatchery_role: "${hatchery_service_account}"
     secretStoreServiceAccount:
       enabled: true
       name: external-secrets
-      roleArn: ${external_secrets_operator_iam_role}
+      roleArn: "${external_secrets_operator_iam_role}"
     wafv2:
-      wafAclArn: ${waf_arn}
+      wafAclArn: "${waf_arn}"
   dev: false
   externalSecrets:
     deploy: true
@@ -22,9 +22,8 @@ global:
   portalApp: gitops
   publicDataSets: ${public_datasets}
   tierAccessLevel: "${tier_access_level}"
-  tierAccessLimit: ${tier_access_limit}
-  netPolicy: 
-    enabled: ${netpolicy_enabled}
+  tierAccessLimit: "${tier_access_limit}"
+  netPolicy:    enabled: ${netpolicy_enabled}
   dispatcherJobNum: "${dispatcher_job_number}"
   frontendRoot: "${frontend_root}"
   ddEnabled: ${dd_enabled}
@@ -43,16 +42,15 @@ argo-wrapper:
 audit:
   enabled: ${audit_enabled}
   serviceAccount:
-    annotations: 
-      eks.amazonaws.com/role-arn: "${audit_service_account}"
+    annotations:      eks.amazonaws.com/role-arn: "${audit_service_account}"
   externalSecrets:
-    dbcreds: "${vpc_name}-${namespace}-audit-creds"    
+    dbcreds: "${vpc_name}-${namespace}-audit-creds"
     createK8sAuditSecret: true
 
 
 aws-es-proxy:
   enabled: ${aws-es-proxy_enabled}
-  esEndpoint: ${es_endpoint}
+  esEndpoint: "${es_endpoint}"
   externalSecrets:
     awsCreds: "${es_secret_name}"
 
@@ -70,18 +68,18 @@ dicom-viewer:
 fence:
   enabled: ${fence_enabled}
   serviceAccount:
-    annotations: 
+    annotations:
       eks.amazonaws.com/role-arn: "${fence_service_account}"
-   
+
   externalSecrets:
     fenceJwtKeys: "${fence_jwt_keys}"
-    fenceConfig: ${fence_config_secret_name}
+    fenceConfig: "${fence_config_secret_name}"
     fenceGoogleAppCredsSecret: ""
-    fenceGoogleStorageCredsSecret: ""  
+    fenceGoogleStorageCredsSecret: ""
     createK8sJwtKeysSecret: true
     createK8sGoogleAppSecrets: true
     createK8sFenceConfigSecret: true
-    dbcreds: "${vpc_name}-${namespace}-fence-creds"    
+    dbcreds: "${vpc_name}-${namespace}-fence-creds"
 
   usersync:
     usersync: ${usersync_enabled}
@@ -94,8 +92,8 @@ fence:
 frontend-framework:
   enabled: ${gen3ff_enabled}
   image:
-    repository: ${gen3ff_repo}
-    tag: ${gen3ff_tag}
+    repository: "${gen3ff_repo}"
+    tag: "${gen3ff_tag}"
 
 grafana:
   enabled: ${deploy_grafana}
@@ -159,7 +157,7 @@ hatchery:
 
 indexd:
   enabled: ${indexd_enabled}
-  defaultPrefix: ${indexd_prefix}
+  defaultPrefix: "${indexd_prefix}"
   externalSecrets:
     dbcreds: "${vpc_name}-${namespace}-indexd-creds"
     createK8sServiceCredsSecret: true
@@ -168,8 +166,8 @@ indexd:
 manifestservice:
   enabled: ${manifestservice_enabled}
   serviceAccount:
-    annotations: 
-      eks.amazonaws.com/role-arn: "${manifestservice_service_account}"  
+    annotations:
+      eks.amazonaws.com/role-arn: "${manifestservice_service_account}"
   externalSecrets:
     createK8sManifestServiceSecret: true
 
@@ -213,3 +211,4 @@ wts:
   enabled: ${wts_enabled}
   externalSecrets:
     dbcreds: "${vpc_name}-${namespace}-wts-creds"
+    createK8sWtsSecret: true

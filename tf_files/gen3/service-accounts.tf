@@ -315,7 +315,7 @@ resource "aws_iam_role_policy" "manifestservice-role-policy" {
 
 resource "aws_iam_role" "aws-load-balancer-controller-role" {
   count = var.namespace == "default" ? 1 : 0
-  name = "${var.vpc_name}-aws-load-balancer-controller-sa"
+  name = "${var.vpc_name}--${var.namespace}--ingress"
   description = "Role for ALB controller service account for ${var.vpc_name}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"

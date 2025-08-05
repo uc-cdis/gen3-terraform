@@ -803,7 +803,7 @@ variable "deploy_karpenter_in_k8s" {
 }
 
 variable "karpenter_version" {
-  default = "v0.32.9"
+  default = "1.0.8"
 }
 
 variable "deploy_cloud_trail" {
