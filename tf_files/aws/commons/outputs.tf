@@ -50,11 +50,6 @@ output "kubeconfig" {
   sensitive = true
 }
 
-output "config_map_aws_auth" {
-  value     = module.eks[0].config_map_aws_auth
-  sensitive = true
-}
-
 output "eks_cluster_name" {
   value = module.eks[0].cluster_name
 }

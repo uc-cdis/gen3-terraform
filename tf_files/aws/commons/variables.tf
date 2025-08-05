@@ -104,7 +104,7 @@ variable "hostname" {
 }
 
 variable "kube_ssh_key" {
-  default = ""
+  default = "ssh-rsa createAKey"
 }
 
 /* A list of ssh keys that will be added to
@@ -477,7 +477,7 @@ variable "external_secrets_operator_version" {
 }
 
 variable "ec2_keyname" {
-  default = "someone@uchicago.edu"
+  default = null
 }
 
 variable "instance_type" {
@@ -803,7 +803,7 @@ variable "deploy_karpenter_in_k8s" {
 }
 
 variable "karpenter_version" {
-  default = "v0.32.9"
+  default = "1.0.8"
 }
 
 variable "deploy_cloud_trail" {
@@ -1129,3 +1129,13 @@ variable "additional_rules" {
   default = []
 }
 
+variable "force_delete_bucket" {
+  description = "Force delete S3 buckets"
+  type = bool
+  default = false
+}
+
+variable "ha_squid_single_instance" {
+  description = "If true, deploy a single instance of squid in an autoscaling group"
+  default     = false
+}

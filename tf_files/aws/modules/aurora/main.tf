@@ -85,7 +85,12 @@ module "secrets_manager" {
   count       = var.secrets_manager_enabled ? 1 : 0
   source      = "../secrets_manager"
   vpc_name    = var.vpc_name
-  secret      = aws_rds_cluster.postgresql.master_password
+  secret	    = templatefile("${path.module}/secrets_manager.tftpl", {
+    hostname = aws_rds_cluster.postgresql.endpoint
+    database = "postgres"
+    username = aws_rds_cluster.postgresql.master_username
+    password = aws_rds_cluster.postgresql.master_password
+  })
   secret_name = "aurora-master-password"
 }
 

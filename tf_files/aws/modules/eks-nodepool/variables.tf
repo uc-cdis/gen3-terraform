@@ -4,9 +4,7 @@ variable "vpc_id" {
   default = ""
 }
 
-variable "ec2_keyname" {
-  default = "someone@uchicago.edu"
-}
+variable "ec2_keyname" {}
 
 variable "instance_type" {
   default = "t3.large"
@@ -31,6 +29,10 @@ variable "eks_cluster_ca" {
 }
 
 variable "eks_cluster_endpoint" {
+  default = ""
+}
+
+variable "eks_cluster_name" {
   default = ""
 }
 

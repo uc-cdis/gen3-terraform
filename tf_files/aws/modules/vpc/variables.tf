@@ -145,3 +145,13 @@ variable "commons_log_retention" {
   description = "value in days for the cloudwatch log retention period"
   default = "3650"
 }
+
+variable "force_delete_bucket" {
+  description = "Force delete the data bucket"
+  default     = false
+}
+
+variable "ha_squid_single_instance" {
+  description = "If true, deploy a single instance of squid in an autoscaling group"
+  default     = false
+}
