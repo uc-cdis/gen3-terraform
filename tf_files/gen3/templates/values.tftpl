@@ -23,7 +23,8 @@ global:
   publicDataSets: ${public_datasets}
   tierAccessLevel: "${tier_access_level}"
   tierAccessLimit: "${tier_access_limit}"
-  netPolicy:    enabled: ${netpolicy_enabled}
+  netPolicy:
+    enabled: ${netpolicy_enabled}
   dispatcherJobNum: "${dispatcher_job_number}"
   frontendRoot: "${frontend_root}"
   ddEnabled: ${dd_enabled}
@@ -42,7 +43,8 @@ argo-wrapper:
 audit:
   enabled: ${audit_enabled}
   serviceAccount:
-    annotations:      eks.amazonaws.com/role-arn: "${audit_service_account}"
+    annotations: 
+      eks.amazonaws.com/role-arn: "${audit_service_account}"
   externalSecrets:
     dbcreds: "${vpc_name}-${namespace}-audit-creds"
     createK8sAuditSecret: true

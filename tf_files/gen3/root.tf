@@ -112,7 +112,7 @@ resource "local_file" "app_yaml" {
   depends_on = [null_resource.config_setup, helm_release.gen3]
 }
 
-resource "local_file" "app_yaml" {
+resource "local_file" "cluster_app_yaml" {
   filename = "./gitops-repo/${var.vpc_name}/cluster-level-resources/app.yaml"
   content  = templatefile("${path.module}/templates/cluster-app.tftpl", {
     vpc_name  = var.vpc_name

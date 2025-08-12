@@ -293,12 +293,12 @@ resource "helm_release" "karpenter" {
   version             = var.karpenter_version
 
   set {
-    name  = "settings.aws.clusterName"
+    name  = "settings.clusterName"
     value = aws_eks_cluster.eks_cluster.id
   }
 
   set {
-    name  = "settings.aws.clusterEndpoint"
+    name  = "settings.clusterEndpoint"
     value = aws_eks_cluster.eks_cluster.endpoint
   }
 
@@ -395,6 +395,8 @@ resource "kubectl_manifest" "karpenter_node_class" {
       name: default
     spec:
       amiFamily: AL2
+      amiSelectorTerms:
+      - alias: al2@latest
       blockDeviceMappings:
       - deviceName: /dev/xvda
         ebs:
