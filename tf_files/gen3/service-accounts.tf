@@ -30,7 +30,7 @@ resource "aws_iam_role" "audit-role" {
       }
     ]
   })
-  path = "/gen3-service/"
+  path = "/gen3_service/"
 }
 
 resource "aws_iam_role_policy" "audit-role-policy" {
@@ -88,7 +88,7 @@ resource "aws_iam_role" "fence-role" {
     ]
   })
 
-  path = "/gen3-service/"
+  path = "/gen3_service/"
 }
 
 resource "aws_iam_role_policy" "fence-role-policy" {
@@ -143,7 +143,7 @@ resource "aws_iam_role" "gitops-role" {
     ]
   })
 
-  path = "/gen3-service/"
+  path = "/gen3_service/"
 }
 
 resource "aws_iam_role_policy" "gitops-role-policy" {
@@ -279,7 +279,7 @@ resource "aws_iam_role" "manifestservice-role" {
     ]
   })
 
-  path = "/gen3-service/"
+  path = "/gen3_service/"
 }
 
 resource "aws_iam_role_policy" "manifestservice-role-policy" {
@@ -346,7 +346,7 @@ resource "aws_iam_role" "aws-load-balancer-controller-role" {
     ]
   })
 
-  path = "/gen3-service/"
+  path = "/gen3_service/"
 }
 
 
@@ -610,7 +610,7 @@ resource "aws_iam_role" "external-secrets-role" {
     ]
   })
 
-  path = "/gen3-service/"
+  path = "/gen3_service/"
 }
 
 resource "aws_iam_role_policy" "external-secrets-role-policy" {
@@ -666,7 +666,7 @@ resource "aws_iam_role" "s3-mountpoint-role" {
     ]
   })
 
-  path = "/gen3-service/"
+  path = "/gen3_service/"
 }
 
 resource "aws_iam_role_policy" "s3-mountpoint-role-policy" {
@@ -732,7 +732,7 @@ resource "aws_iam_role" "grafana-role" {
     ]
   })
 
-  path = "/gen3-service/"
+  path = "/gen3_service/"
 }
 
 resource "aws_iam_role_policy" "grafana-role-policy" {
