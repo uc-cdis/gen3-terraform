@@ -45,5 +45,5 @@ resource "aws_secretsmanager_secret" "fence-jwt-keys" {
 
 resource "aws_secretsmanager_secret_version" "fence-jwt-keys" {
   secret_id     = aws_secretsmanager_secret.fence-jwt-keys.id
-  secret_string = base64encode(tls_private_key.fence-jwt-keys.private_key_pem)
+  secret_string = tls_private_key.fence-jwt-keys.private_key_pem
 }

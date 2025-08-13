@@ -12,9 +12,9 @@ spec:
       helm:
         releaseName: gen3
         valueFiles:
-          - $values/${vpc_name}/${hostname}/values/values.yaml
+          - $values/${vpc_name}/${hostname}/values.yaml
     - repoURL: '<git repo url>'
-      targetRevision: master
+      targetRevision: main
       ref: values
   destination:
     server: "https://kubernetes.default.svc"

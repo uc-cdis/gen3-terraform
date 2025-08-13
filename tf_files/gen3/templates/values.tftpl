@@ -78,9 +78,7 @@ fence:
     fenceConfig: "${fence_config_secret_name}"
     fenceGoogleAppCredsSecret: ""
     fenceGoogleStorageCredsSecret: ""
-    createK8sJwtKeysSecret: true
     createK8sGoogleAppSecrets: true
-    createK8sFenceConfigSecret: true
     dbcreds: "${vpc_name}-${namespace}-fence-creds"
 
   usersync:
