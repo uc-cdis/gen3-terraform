@@ -51,7 +51,7 @@ locals {
 }
 
 module "commons" {
-  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/commons?ref=b7693e767051e58c7011f4d8caa9f1c1285ef7d7"
+  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/commons?ref=c221ff299713c4ea23df5698d5baf2e7548f0dd2"
 
   vpc_name                       = local.vpc_name
   vpc_cidr_block                 = "10.10.0.0/20"
@@ -83,7 +83,7 @@ module "commons" {
 }
 
 module "gen3" {
-  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/gen3?ref=b7693e767051e58c7011f4d8caa9f1c1285ef7d7"
+  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/gen3?ref=c221ff299713c4ea23df5698d5baf2e7548f0dd2"
   vpc_name                 = local.vpc_name
   aurora_username          = module.commons.aurora_cluster_master_username
   aurora_password          = module.commons.aurora_cluster_master_password
@@ -155,14 +155,9 @@ resource "aws_iam_access_key" "gitops_key" {
 resource "aws_s3_bucket" "users_bucket" {
   count  = local.create_gitops_infra ? 1 : 0
   bucket = local.user_yaml_bucket_name
-
+  force_destroy = true
   tags = {
     Name        = "user-yaml-bucket"
     Environment = local.vpc_name
   }
-
-  lifecycle {
-    prevent_destroy = true
-  }
-  
 }
