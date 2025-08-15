@@ -29,6 +29,7 @@ module "squid-auto" {
   customer_id                    = var.customer_id
   slack_webhook                  = var.slack_webhook
   fips                           = var.fips
+  ha_squid_single_instance       = var.ha_squid_single_instance 
 }
 
 module "data-bucket" {
@@ -37,6 +38,7 @@ module "data-bucket" {
   cloudwatchlogs_group = aws_cloudwatch_log_group.main_log_group.arn
   environment          = var.vpc_name
   deploy_cloud_trail   = var.deploy_cloud_trail
+  force_delete_bucket  = var.force_delete_bucket
 }
 
 module "fence-bot-user" {
@@ -150,10 +152,12 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.gw.id
   }
 
-  route {
-    #from the commons vpc to the csoc vpc via the peering connection
-    cidr_block                = var.peering_cidr
-    vpc_peering_connection_id = aws_vpc_peering_connection.vpcpeering.id
+  dynamic "route" {
+    for_each = var.csoc_managed ? [1] : []
+    content {
+      cidr_block                = var.peering_cidr
+      vpc_peering_connection_id = aws_vpc_peering_connection.vpcpeering[0].id
+    }
   }
 
   tags = {
@@ -163,7 +167,6 @@ resource "aws_route_table" "public" {
   }
 
   lifecycle {
-    # ignore changes
     ignore_changes = all
   }
 }
@@ -183,10 +186,12 @@ resource "aws_eip" "nat_gw" {
 resource "aws_default_route_table" "default" {
   default_route_table_id = aws_vpc.main.default_route_table_id
 
-  route {
-    #from the commons vpc to the csoc vpc via the peering connection
-    cidr_block                = var.peering_cidr
-    vpc_peering_connection_id = aws_vpc_peering_connection.vpcpeering.id
+  dynamic "route" {
+    for_each = var.csoc_managed ? [1] : []
+    content {
+      cidr_block                = var.peering_cidr
+      vpc_peering_connection_id = aws_vpc_peering_connection.vpcpeering[0].id
+    }
   }
 
   tags = {
@@ -267,6 +272,7 @@ resource "aws_route53_zone" "main" {
 
 # this is for vpc peering
 resource "aws_vpc_peering_connection" "vpcpeering" {
+  count         = var.csoc_managed ? 1 : 0
   peer_owner_id = var.csoc_managed ? var.csoc_account_id : data.aws_caller_identity.current.account_id
   peer_vpc_id   = var.peering_vpc_id
   vpc_id        = aws_vpc.main.id
@@ -284,10 +290,10 @@ resource "aws_vpc_peering_connection" "vpcpeering" {
 }
 
 resource "aws_route" "default_csoc" {
-  count                     = var.csoc_managed ? 0 : 1
+  count                     = var.csoc_managed ? 1 : 0
   route_table_id            = data.aws_route_tables.control_routing_table[count.index].id
   destination_cidr_block    = var.vpc_cidr_block
-  vpc_peering_connection_id = aws_vpc_peering_connection.vpcpeering.id
+  vpc_peering_connection_id = var.csoc_managed ? aws_vpc_peering_connection.vpcpeering[0].id : null
 }
 
 ##to be used by arranger when accessing the ES

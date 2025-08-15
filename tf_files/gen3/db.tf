@@ -6,6 +6,7 @@ module "arborist-db" {
   admin_database_username = var.aurora_username
   admin_database_password = var.aurora_password
   namespace               = var.namespace
+  create_db               = var.create_dbs
   secrets_manager_enabled = true
 }
 
@@ -17,6 +18,7 @@ module "argo-db" {
   admin_database_username = var.aurora_username
   admin_database_password = var.aurora_password
   namespace               = var.namespace
+  create_db               = var.create_dbs
   secrets_manager_enabled = true
 }
 
@@ -28,6 +30,7 @@ module "audit-db" {
   admin_database_username = var.aurora_username
   admin_database_password = var.aurora_password
   namespace               = var.namespace
+  create_db               = var.create_dbs
   secrets_manager_enabled = true
 }
 
@@ -39,6 +42,7 @@ module "dicom-viewer-db" {
   admin_database_username = var.aurora_username
   admin_database_password = var.aurora_password
   namespace               = var.namespace
+  create_db               = var.create_dbs
   secrets_manager_enabled = true
 }
 
@@ -50,6 +54,7 @@ module "dicom-server-db" {
   admin_database_username = var.aurora_username
   admin_database_password = var.aurora_password
   namespace               = var.namespace
+  create_db               = var.create_dbs
   secrets_manager_enabled = true
 }
 
@@ -61,6 +66,7 @@ module "fence-db" {
   admin_database_username = var.aurora_username
   admin_database_password = var.aurora_password
   namespace               = var.namespace
+  create_db               = var.create_dbs
   secrets_manager_enabled = true
 }
 
@@ -72,6 +78,7 @@ module "indexd-db" {
   admin_database_username = var.aurora_username
   admin_database_password = var.aurora_password
   namespace               = var.namespace
+  create_db               = var.create_dbs
   secrets_manager_enabled = true
 }
 
@@ -83,6 +90,7 @@ module "metadata-db" {
   admin_database_username = var.aurora_username
   admin_database_password = var.aurora_password
   namespace               = var.namespace
+  create_db               = var.create_dbs
   secrets_manager_enabled = true
 }
 
@@ -94,6 +102,7 @@ module "requestor-db" {
   admin_database_username = var.aurora_username
   admin_database_password = var.aurora_password
   namespace               = var.namespace
+  create_db               = var.create_dbs
   secrets_manager_enabled = true
 }
 
@@ -105,6 +114,7 @@ module "sheepdog-db" {
   admin_database_username = var.aurora_username
   admin_database_password = var.aurora_password
   namespace               = var.namespace
+  create_db               = var.create_dbs
   secrets_manager_enabled = true
 }
 
@@ -116,5 +126,6 @@ module "wts-db" {
   admin_database_username = var.aurora_username
   admin_database_password = var.aurora_password
   namespace               = var.namespace
+  create_db               = var.create_dbs
   secrets_manager_enabled = true
 }

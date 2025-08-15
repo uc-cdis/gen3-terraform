@@ -61,3 +61,7 @@ variable "db_dump" {
 variable "db_job_role_arn" {
   default = ""
 }
+
+variable "create_db" {
+  default = true
+}
