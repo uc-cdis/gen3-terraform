@@ -47,6 +47,8 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
     topic_arn = module.data-bucket-queue.data-bucket_name
     events    = ["s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"]
   }
+
+  depends_on = [module.data-bucket-queue.data-bucket_name]
 }
 
 

@@ -79,7 +79,6 @@ resource "helm_release" "gen3" {
 }
 
 resource "local_file" "values" {
-  count    = var.deploy_gen3 ? 1 : 0
   filename = "./gitops-repo/${var.vpc_name}/${var.hostname}/values.yaml"
   content  = local.values
   depends_on = [null_resource.config_setup, helm_release.gen3]

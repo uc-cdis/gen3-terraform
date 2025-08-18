@@ -100,7 +100,7 @@ module "gen3" {
   upload_bucket            = module.commons.data-bucket_name
   revproxy_arn             = local.revproxy_arn
   deploy_external_secrets  = true
-  deploy_gen3              = true
+  deploy_gen3              = false
   create_dbs               = false
 
   providers = {
