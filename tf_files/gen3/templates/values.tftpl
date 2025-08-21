@@ -8,6 +8,7 @@ global:
       name: external-secrets
       roleArn: "${external_secrets_operator_iam_role}"
     wafv2:
+      enabled: true
       wafAclArn: "${waf_arn}"
   dev: false
   externalSecrets:
