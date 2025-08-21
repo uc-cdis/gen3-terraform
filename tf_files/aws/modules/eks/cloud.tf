@@ -297,6 +297,12 @@ resource "aws_eks_cluster" "eks_cluster" {
       bootstrap_cluster_creator_admin_permissions = true
   }
 
+  lifecycle {
+    ignore_changes = [
+      access_config[0].bootstrap_cluster_creator_admin_permissions
+    ]
+  }
+
   vpc_config {
     subnet_ids              = flatten([aws_subnet.eks_private[*].id])
     security_group_ids      = [aws_security_group.eks_control_plane_sg.id]
