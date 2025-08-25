@@ -99,6 +99,7 @@ module "gen3" {
   fence_secret_key         = module.commons.fence-bot_user_secret
   upload_bucket            = module.commons.data-bucket_name
   revproxy_arn             = local.revproxy_arn
+  useryaml_s3_path         = "s3://${local.user_yaml_bucket_name}/dev/user.yaml"
   deploy_external_secrets  = true
   deploy_gen3              = false
   create_dbs               = false
