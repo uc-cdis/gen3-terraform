@@ -7,7 +7,7 @@ resource "aws_backup_vault" "rds_backup_vault" {
   kms_key_arn = aws_kms_key.backup_key.arn
 }
 
-resource "aws_backup_vault" "rds_cross_region_backup_vault" {
+resource "aws_backup_vault" "cross_region_rds_backup_vault" {
   name        = "rds-cross-region-backup-vault-${var.cross_region_destination}"
   kms_key_arn = aws_kms_key.cross_region_backup_key.arn
   region      = var.cross_region_destination
@@ -20,7 +20,7 @@ resource "aws_kms_key" "backup_key" {
   region                  = "us-east-1"
 }
 
-resource "aws_kms_key" "cross_region_backup_key" {
+resource "aws_kms_key" "cross_region_rds_backup_key" {
   description             = "KMS key for encrypting RDS backups, in ${var.cross_region_destination}"
   deletion_window_in_days = 10
   enable_key_rotation     = true
