@@ -48,6 +48,26 @@ locals {
   default_tags = {
     Environment = local.vpc_name
   }
+
+
+  ### Cognito setup
+  deploy_cognito = true
+  user_pool_name  = "${local.vpc_name}-pool"
+  app_client_name = "${local.vpc_name}-client"
+  domain_prefix = "${local.vpc_name}-auth"
+  callback_urls = [
+    "https://${local.hostname}/",
+    "https://${local.hostname}/login/",
+    "https://${local.hostname}/login/cognito/login/",
+    "https://${local.hostname}/user/",
+    "https://${local.hostname}/user/login/cognito/",
+  ]
+  logout_urls = [
+    "https://${local.hostname}/",
+  ]
+  allowed_oauth_flows  = ["code"]
+  allowed_oauth_scopes = ["email", "openid", "phone", "profile"]
+  supported_identity_providers = ["COGNITO"]
 }
 
 module "commons" {
@@ -103,6 +123,9 @@ module "gen3" {
   deploy_external_secrets  = true
   deploy_gen3              = false
   create_dbs               = false
+  cognito_discovery_url    = "https://${aws_cognito_user_pool.cognito_pool[0].endpoint}/.well-known/openid-configuration"
+  cognito_client_id        = aws_cognito_user_pool_client.cognito_client[0].id
+  cognito_client_secret    = aws_cognito_user_pool_client.cognito_client[0].client_secret
 
   providers = {
     helm       = helm

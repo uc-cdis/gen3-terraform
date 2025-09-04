@@ -356,3 +356,15 @@ variable "create_dbs" {
   description = "Whether to create databases or not. Requires connectivity to RDS cluster."
   default = false
 }
+
+variable "cognito_discovery_url" {
+  default = ""
+}
+
+variable "cognito_client_id" {
+  default = ""
+}
+
+variable "cognito_client_secret" {
+  default = ""
+}
