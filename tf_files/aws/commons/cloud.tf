@@ -42,6 +42,10 @@ module "cdis_vpc" {
   commons_log_retention          = var.commons_log_retention
   ha_squid_single_instance       = var.ha_squid_single_instance
   force_delete_bucket            = var.force_delete_bucket
+  providers = {
+    aws      = aws
+    aws.csoc = aws.csoc
+  }
 }
 
 module "csoc_peering_connection" {
