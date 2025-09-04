@@ -291,7 +291,7 @@ resource "aws_vpc_peering_connection" "vpcpeering" {
 
 resource "aws_route" "default_csoc" {
   count                     = var.csoc_managed ? 1 : 0
-  route_table_id            = data.aws_route_tables.control_routing_table[count.index].id
+  route_table_id            = data.aws_route_tables.control_routing_table[0].id
   destination_cidr_block    = var.vpc_cidr_block
   vpc_peering_connection_id = var.csoc_managed ? aws_vpc_peering_connection.vpcpeering[0].id : null
 }
