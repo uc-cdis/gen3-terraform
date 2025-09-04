@@ -7,4 +7,7 @@ data "aws_caller_identity" "current" {}
 data "aws_route_tables" "control_routing_table" {
   count   = var.csoc_managed ? 1 : 0
   vpc_id  = var.peering_vpc_id
+  providers = {
+    aws = aws.csoc
+  }
 }
