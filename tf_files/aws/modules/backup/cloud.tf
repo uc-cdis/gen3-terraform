@@ -9,7 +9,7 @@ resource "aws_backup_vault" "rds_backup_vault" {
 
 resource "aws_backup_vault" "cross_region_rds_backup_vault" {
   name        = "rds-cross-region-backup-vault-${var.cross_region_destination}"
-  kms_key_arn = aws_kms_key.cross_region_backup_key.arn
+  kms_key_arn = aws_kms_key.cross_region_rds_backup_key.arn
   region      = var.cross_region_destination
 }
 
@@ -48,7 +48,7 @@ resource "aws_backup_plan" "daily" {
         delete_after = 7 # Retain for 7 days
       }
 
-      destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
+      destination_vault_arn = aws_backup_vault.cross_region_rds_backup_vault.arn
     }
   }
 }
@@ -86,7 +86,7 @@ resource "aws_backup_plan" "weekly" {
         delete_after = 30 # Retain for 30 days
       }
 
-      destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
+      destination_vault_arn = aws_backup_vault.cross_region_rds_backup_vault.arn
     }
   }
 }
@@ -123,7 +123,7 @@ resource "aws_backup_plan" "monthly" {
         delete_after = 365 # Retain for 365 days (1 year)
       }
 
-      destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
+      destination_vault_arn = aws_backup_vault.cross_region_rds_backup_vault.arn
     }
   }
 }
@@ -160,7 +160,7 @@ resource "aws_backup_plan" "yearly" {
         delete_after = 2555 # Retain for 7 days
       }
 
-      destination_vault_arn = aws_backup_vault.rds_cross_region_backup_vault.arn
+      destination_vault_arn = aws_backup_vault.cross_region_rds_backup_vault.arn
     }
   }
 }
