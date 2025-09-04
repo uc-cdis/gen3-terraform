@@ -3,7 +3,13 @@ BASE_URL: 'https://${hostname}/user'
 
 DEBUG: True
 
+ARBORIST: 'http://arborist-service'
 
+INDEXD: 'http://indexd-service'
+
+HTTP_PROXY:
+  host: 'cloud-proxy.internal.io'
+  port: 3128
 
 OPENID_CONNECT:
   google:
@@ -12,6 +18,18 @@ OPENID_CONNECT:
     scope: 'openid email'
     client_id: "${google_client_id}"
     client_secret: "${google_client_secret}"
+  cognito:
+    # You must create a user pool in order to have a discovery url
+    discovery_url: '${cognito_discovery_url}'
+    client_id: "${cognito_client_id}"
+    client_secret: "${cognito_client_secret}"
+    redirect_url: '{{BASE_URL}}/login/cognito/login/'
+    scope: 'openid email'
+    # In the case where Cognito is being used solely as an intermediary to a single IdP,
+    # and that IdP is a SAML IdP with no 'email_verified' outgoing claim, but it is safe
+    # to assume all emails from this SAML IdP are in fact verified, we may set this to True
+    assume_emails_verified: True
+
 
 DEFAULT_LOGIN_IDP: 'google'
 DEFAULT_LOGIN_URL: '{{BASE_URL}}/login/google'
@@ -20,6 +38,9 @@ LOGIN_OPTIONS: # [] # !!! remove the empty list to enable login options!
   - name: 'Login from Google'
     desc: ''
     idp: google
+  - name: 'Login from Cognito'
+    desc: ''
+    idp: cognito    
 
 AWS_CREDENTIALS:
   'fence-bot':
