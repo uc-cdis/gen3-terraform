@@ -81,14 +81,14 @@ resource "aws_cognito_user_pool" "cognito_pool" {
 
 resource "aws_cognito_user_pool_domain" "cognito_domain" {
   count        = local.deploy_cognito ? 1 : 0
-  user_pool_id = aws_cognito_user_pool.this[0].id
+  user_pool_id = aws_cognito_user_pool.cognito_pool[0].id
   domain       = local.domain_prefix
 }
 
 resource "aws_cognito_user_pool_client" "cognito_client" {
   count        = local.deploy_cognito ? 1 : 0
   name         = local.app_client_name
-  user_pool_id = aws_cognito_user_pool.this[0].id
+  user_pool_id = aws_cognito_user_pool.cognito_pool[0].id
 
   generate_secret = true
 
