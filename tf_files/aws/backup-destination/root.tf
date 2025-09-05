@@ -16,13 +16,13 @@ resource "aws_kms_key" "central_backup_key" {
 }
 
 resource "aws_backup_vault" "account_vaults" {
-  for_each = toset(var.account_ids)
+  for_each = var.account_ids
   
-  name        = "rds-central-backup-vault-${each.key[0]}"
+  name        = "rds-central-backup-vault-${each.value}"
   kms_key_arn = aws_kms_key.central_backup_key.arn
   
   tags = {
-    Name      = "rds-central-backup-vault-${each.key[0]}"
+    Name      = "rds-central-backup-vault-${each.value}"
     AccountId = each.key
   }
 }
