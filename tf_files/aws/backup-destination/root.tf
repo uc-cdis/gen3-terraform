@@ -19,7 +19,7 @@ resource "aws_backup_vault" "account_vaults" {
   for_each = toset(var.account_ids)
   
   name        = "rds-central-backup-vault-${each.key}"
-  kms_key_arn = aws_kms_key.backup_vault_key.arn
+  kms_key_arn = aws_kms_key.cental_backup_key.arn
   
   tags = {
     Name      = "rds-central-backup-vault-${each.key}"
