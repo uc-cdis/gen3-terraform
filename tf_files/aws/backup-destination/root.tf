@@ -1,3 +1,14 @@
+terraform {
+  backend "s3" {
+    encrypt = "true"
+  }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+    }
+  }
+}
+
 resource "aws_kms_key" "central_backup_key" {
   description             = "KMS key for encrypting RDS backups from other accounts"
   deletion_window_in_days = 10
