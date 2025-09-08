@@ -26,3 +26,25 @@ resource "aws_backup_vault" "account_vaults" {
     AccountId = each.key
   }
 }
+
+resource "aws_backup_vault_policy" "account_vaults_policies" {
+  for_each var.account_ids
+
+  backup_vault_name = aws_backup_vault.account_vaults[each.value].name
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = "backup:CopyIntoBackupVault",
+        Resource = "*",
+        Principal = {
+          AWS = [
+            "arn:aws:iam::${each.value}:root"
+          ]
+        }
+      }
+    ]
+  })
+}
