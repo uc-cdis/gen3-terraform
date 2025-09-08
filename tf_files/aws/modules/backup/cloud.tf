@@ -31,7 +31,10 @@ resource "aws_kms_key_policy" "backup_key_external_account" {
         Action = "kms:*"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${var.backup_destination_account}:root"
+          AWS = [
+            "arn:aws:iam::${var.backup_destination_account}:root"
+            "arn:aws:iam::${data.aws_caller_identity.current}:root"
+          ]
         }
 
         Resource = "*"
