@@ -29,6 +29,7 @@ resource "aws_kms_key_policy" "backup_key_external_account" {
       {
         Action = "kms:*"
         Sid = "Enable access for the backup destination account"
+        Effect = "Allow"
         Principal = {
           AWS = "arn:aws:iam:${var.backup_destination_account}:root"
         } 
