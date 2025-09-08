@@ -61,6 +61,7 @@ locals {
     "https://${local.hostname}/login/cognito/login/",
     "https://${local.hostname}/user/",
     "https://${local.hostname}/user/login/cognito/",
+    "https://${local.hostname}/user/login/cognito/login/",
   ]
   logout_urls = [
     "https://${local.hostname}/",

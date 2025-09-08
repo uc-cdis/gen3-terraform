@@ -33,12 +33,14 @@ module "squid-auto" {
 }
 
 module "data-bucket" {
-  source               = "../upload-data-bucket"
-  vpc_name             = var.vpc_name
-  cloudwatchlogs_group = aws_cloudwatch_log_group.main_log_group.arn
-  environment          = var.vpc_name
-  deploy_cloud_trail   = var.deploy_cloud_trail
-  force_delete_bucket  = var.force_delete_bucket
+  source                 = "../upload-data-bucket"
+  vpc_name               = var.vpc_name
+  cloudwatchlogs_group   = aws_cloudwatch_log_group.main_log_group.arn
+  environment            = var.vpc_name
+  deploy_cloud_trail     = var.deploy_cloud_trail
+  force_delete_bucket    = var.force_delete_bucket
+  sqs_encryption_enabled = var.sqs_encryption_enabled
+  sqs_kms_key_id         = var.sqs_kms_key_id
 }
 
 module "fence-bot-user" {
