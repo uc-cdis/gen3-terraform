@@ -25,6 +25,7 @@ resource "aws_kms_key_policy" "backup_key_external_account" {
   key_id = aws_kms_key.backup_key.id
 
   policy = jsonencode({
+    Version = "2012-10-17"
     Statement = [
       {
         Action = "kms:*"
