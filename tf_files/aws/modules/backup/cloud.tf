@@ -70,9 +70,13 @@ resource "aws_backup_plan" "daily" {
     }
 
     dynamic "copy_action" {
-      for_each var.cross_account_backup ? [1]: []
+      for_each = var.cross_account_backup ? [1]: []
 
       content {
+        lifecycle {
+          delete_after = 7 # Retain for 7 days
+        }
+
         destination_vault_arn = "arn:aws:backup:us-east-1:${var.backup_destination_account}:backup-vault:rds-central-backup-vault-707767160287"
       }
     }
