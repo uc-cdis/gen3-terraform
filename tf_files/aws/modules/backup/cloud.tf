@@ -20,6 +20,24 @@ resource "aws_kms_key" "backup_key" {
   region                  = "us-east-1"
 }
 
+resource "aws_kms_key_policy" "backup_key_external_account" {
+  count = cross_account_backup ? 1: 0
+  key_id = aws_kms_key.backup_key
+
+  policy = jsonencode({
+    Statement = [
+      {
+        Action = "kms:*"
+        Sid = "Enable access for the backup destination account"
+        Principal = {
+          AWS = "arn:aws:iam:${var.backup_destination_account}:root"
+        } 
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 resource "aws_kms_key" "cross_region_rds_backup_key" {
   description             = "KMS key for encrypting RDS backups, in ${var.cross_region_destination}"
   deletion_window_in_days = 10
@@ -49,6 +67,14 @@ resource "aws_backup_plan" "daily" {
       }
 
       destination_vault_arn = aws_backup_vault.cross_region_rds_backup_vault.arn
+    }
+
+    dynamic "copy_action" {
+      for_each var.cross_account_backup ? [1]: []
+
+      content {
+        destination_vault_arn = "arn:aws:backup:us-east-1:${var.backup_destination_account}:backup-vault:rds-central-backup-vault-707767160287"
+      }
     }
   }
 }
