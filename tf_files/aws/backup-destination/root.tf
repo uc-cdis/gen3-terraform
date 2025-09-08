@@ -28,7 +28,7 @@ resource "aws_backup_vault" "account_vaults" {
 }
 
 resource "aws_backup_vault_policy" "account_vaults_policies" {
-  for_each var.account_ids
+  for_each = var.account_ids
 
   backup_vault_name = aws_backup_vault.account_vaults[each.value].name
   policy = jsonencode({
