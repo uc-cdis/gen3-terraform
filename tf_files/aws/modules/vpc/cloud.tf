@@ -175,7 +175,7 @@ resource "aws_route_table" "public" {
 
 
 resource "aws_eip" "nat_gw" {
-  vpc = true
+  domain = "vpc"
 
   tags = {
     Name         = "${var.vpc_name}-ngw-eip"
