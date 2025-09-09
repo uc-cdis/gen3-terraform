@@ -34,7 +34,7 @@ resource "aws_kms_key_policy" "backup_key_external_account" {
           AWS = [
             "arn:aws:iam::${var.backup_destination_account}:root",
             "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
-            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/service-role/AWSBackupDefaultServiceRole"
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/backup.amazonaws.com/AWSServiceRoleForBackup"
           ]
         }
 
