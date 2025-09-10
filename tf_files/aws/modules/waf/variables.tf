@@ -31,6 +31,7 @@ variable "base_rules" {
       managed_rule_group_name = "AWSManagedRulesAdminProtectionRuleSet"
       priority = 3
       override_to_count= ["AdminProtection_URIPATH"]
+      count = false
     },
     {
       managed_rule_group_name = "AWSManagedRulesCommonRuleSet"
