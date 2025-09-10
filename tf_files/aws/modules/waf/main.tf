@@ -13,7 +13,6 @@ resource "aws_wafv2_web_acl" "waf" {
       name     = "AWS-${rule.value.managed_rule_group_name}"
       priority = rule.value.priority
       override_action {
-        none {}
         dynamic "count" {
           for_each = rule.value.count ? [1] : []
           content {}
