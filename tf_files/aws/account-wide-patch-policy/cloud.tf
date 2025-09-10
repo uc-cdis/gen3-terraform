@@ -39,10 +39,10 @@ resource "aws_iam_role" "administration_role" {
         Action = "sts:AssumeRole"
         Condition = {
           StringEquals = {
-            "aws:SourceAccount" = "433568766270"
+            "aws:SourceAccount" = data.aws_caller_identity.account_id
           }
           StringLike = {
-            "aws:SourceArn" = "arn:aws:cloudformation:*:433568766270:stackset/AWS-QuickSetup-*"
+            "aws:SourceArn" = "arn:aws:cloudformation:*:${data.aws_caller_identity.account_id}:stackset/AWS-QuickSetup-*"
           }
         }
       }
@@ -60,7 +60,7 @@ resource "aws_iam_policy" "administration_policy" {
         Action = [
           "sts:AssumeRole"
         ]
-        Resource = "arn:aws:iam::433568766270:role/AWS-QuickSetup-PatchPolicy-LocalExecutionRole"
+        Resource = aws_iam_role.execution_role.arn
         Effect = "Allow"
       }
     ]
