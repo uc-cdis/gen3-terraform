@@ -39,10 +39,10 @@ resource "aws_iam_role" "administration_role" {
         Action = "sts:AssumeRole"
         Condition = {
           StringEquals = {
-            "aws:SourceAccount" = data.aws_caller_identity.account_id
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
           StringLike = {
-            "aws:SourceArn" = "arn:aws:cloudformation:*:${data.aws_caller_identity.account_id}:stackset/AWS-QuickSetup-*"
+            "aws:SourceArn" = "arn:aws:cloudformation:*:${data.aws_caller_identity.current.account_id}:stackset/AWS-QuickSetup-*"
           }
         }
       }
