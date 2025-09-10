@@ -20,6 +20,31 @@ resource "aws_kms_key" "backup_key" {
   region                  = "us-east-1"
 }
 
+resource "aws_kms_key_policy" "backup_key_external_account" {
+  count = var.cross_account_backup ? 1: 0
+  key_id = aws_kms_key.backup_key.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "kms:*"
+        Effect = "Allow"
+        Principal = {
+          AWS = [
+            "arn:aws:iam::${var.backup_destination_account}:root",
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/backup.amazonaws.com/AWSServiceRoleForBackup"
+          ]
+        }
+
+        Resource = "*"
+        Sid      = "Enable cross-account access to copy backups"
+      },
+    ]
+  })
+}
+
 resource "aws_kms_key" "cross_region_rds_backup_key" {
   description             = "KMS key for encrypting RDS backups, in ${var.cross_region_destination}"
   deletion_window_in_days = 10
@@ -49,6 +74,18 @@ resource "aws_backup_plan" "daily" {
       }
 
       destination_vault_arn = aws_backup_vault.cross_region_rds_backup_vault.arn
+    }
+
+    dynamic "copy_action" {
+      for_each = var.cross_account_backup ? [1]: []
+
+      content {
+        lifecycle {
+          delete_after = 7 # Retain for 7 days
+        }
+
+        destination_vault_arn = "arn:aws:backup:us-east-1:${var.backup_destination_account}:backup-vault:rds-central-backup-vault-${data.aws_caller_identity.current.account_id}"
+      }
     }
   }
 }
@@ -88,6 +125,18 @@ resource "aws_backup_plan" "weekly" {
 
       destination_vault_arn = aws_backup_vault.cross_region_rds_backup_vault.arn
     }
+
+    dynamic "copy_action" {
+      for_each = var.cross_account_backup ? [1]: []
+
+      content {
+        lifecycle {
+          delete_after = 30 # Retain for 30 days
+        }
+
+        destination_vault_arn = "arn:aws:backup:us-east-1:${var.backup_destination_account}:backup-vault:rds-central-backup-vault-${data.aws_caller_identity.current.account_id}"
+      }
+    }
   }
 }
 
@@ -125,6 +174,18 @@ resource "aws_backup_plan" "monthly" {
 
       destination_vault_arn = aws_backup_vault.cross_region_rds_backup_vault.arn
     }
+
+    dynamic "copy_action" {
+      for_each = var.cross_account_backup ? [1]: []
+
+      content {
+        lifecycle {
+          delete_after = 365 # Retain for 365 days (1 year)
+        }
+
+        destination_vault_arn = "arn:aws:backup:us-east-1:${var.backup_destination_account}:backup-vault:rds-central-backup-vault-${data.aws_caller_identity.current.account_id}"
+      }
+    }
   }
 }
 
@@ -161,6 +222,18 @@ resource "aws_backup_plan" "yearly" {
       }
 
       destination_vault_arn = aws_backup_vault.cross_region_rds_backup_vault.arn
+    }
+
+    dynamic "copy_action" {
+      for_each = var.cross_account_backup ? [1]: []
+
+      content {
+        lifecycle {
+          delete_after = 2555 # Retain for 2555 days (7 years)
+        }
+
+        destination_vault_arn = "arn:aws:backup:us-east-1:${var.backup_destination_account}:backup-vault:rds-central-backup-vault-${data.aws_caller_identity.current.account_id}"
+      }
     }
   }
 }
