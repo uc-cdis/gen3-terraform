@@ -68,7 +68,7 @@ resource "aws_iam_policy" "administration_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "administration_attachment" {
-  role = aws_iam_role.administration_role
+  role = aws_iam_role.administration_role.name
   policy_arn = aws_iam_policy.administration_policy.arn
 }
 
@@ -92,7 +92,7 @@ resource "aws_iam_role" "execution_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "execution_attachment" {
-  role = aws_iam_role.execution_role
+  role = aws_iam_role.execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSQuickSetupPatchPolicyDeploymentRolePolicy"
 }
 
