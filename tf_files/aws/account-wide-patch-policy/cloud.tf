@@ -1,3 +1,13 @@
+terraform {
+  backend "s3" {
+    encrypt = "true"
+  }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+    }
+  }
+}
 
 locals {
   selected_patch_baselines = jsonencode({
