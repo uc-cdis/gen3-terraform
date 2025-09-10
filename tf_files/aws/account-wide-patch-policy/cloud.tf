@@ -51,7 +51,7 @@ resource "aws_iam_role" "administration_role" {
 }
 
 resource "aws_iam_policy" "administration_policy" {
-  name "AWS-QuickSetup-PatchPolicy-LocalAdministrationAssumeRolePolicy"
+  name = "AWS-QuickSetup-PatchPolicy-LocalAdministrationAssumeRolePolicy"
   
   policy = jsonencode({
     Version = "2012-10-17"
