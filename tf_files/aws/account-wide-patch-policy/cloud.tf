@@ -20,12 +20,94 @@ locals {
   })
 }
 
+# =========
+# IAM roles
+# =========
+
+# Administration role
+resource "aws_iam_role" "administration_role" {
+  name = "AWS-QuickSetup-PatchPolicy-LocalAdministrationRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudformation.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = "433568766270"
+          }
+          StringLike = {
+            "aws:SourceArn" = "arn:aws:cloudformation:*:433568766270:stackset/AWS-QuickSetup-*"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "administration_policy" {
+  name "AWS-QuickSetup-PatchPolicy-LocalAdministrationAssumeRolePolicy"
+  
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "sts:AssumeRole"
+        ]
+        Resource = "arn:aws:iam::433568766270:role/AWS-QuickSetup-PatchPolicy-LocalExecutionRole"
+        Effect = "Allow"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "administration_attachment" {
+  role = aws_iam_role.administration_role
+  policy_arn = aws_iam_policy.administration_policy.arn
+}
+
+
+# Execution role
+resource "aws_iam_role" "execution_role" {
+  name = "AWS-QuickSetup-PatchPolicy-LocalExecutionRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = aws_iam_role.administration_role.arn
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "execution_attachment" {
+  role = aws_iam_role.execution_role
+  policy_arn = "arn:aws:iam::aws:policy/AWSQuickSetupPatchPolicyDeploymentRolePolicy"
+}
+
+# ================
+# The patch policy
+# ================
+
 resource "aws_ssmquicksetup_configuration_manager" "patch_policy_setup" {
   name = "primary-patch-policy"
 
+  depends_on = [aws_iam_role.execution_role, aws_iam_role.administration_role]
+
   configuration_definition {
-    local_deployment_administration_role_arn = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/csoc_adminvm"
-    local_deployment_execution_role_name     = "csoc_adminvm"
+    local_deployment_administration_role_arn = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/AWS-QuickSetup-PatchPolicy-LocalAdministrationRole"
+    local_deployment_execution_role_name     = "AWS-QuickSetup-PatchPolicy-LocalExecutionRole"
     type                                     = "AWSQuickSetupType-PatchPolicy"
 
     parameters = {
