@@ -24,7 +24,9 @@ resource "aws_ssmquicksetup_configuration_manager" "patch_policy_setup" {
   name = "primary-patch-policy"
 
   configuration_definition {
-    type = "AWSQuickSetupType-PatchPolicy"
+    local_deployment_administration_role_arn = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/csoc_adminvm"
+    local_deployment_execution_role_name     = "csoc_adminvm"
+    type                                     = "AWSQuickSetupType-PatchPolicy"
 
     parameters = {
       "ConfigurationOptionsPatchOperation" : "Scan",
