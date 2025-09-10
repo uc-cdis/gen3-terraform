@@ -32,7 +32,7 @@ resource "aws_ssmquicksetup_configuration_manager" "patch_policy_setup" {
       "ConfigurationOptionsPatchOperation" : "Scan",
       "ConfigurationOptionsScanValue" : "cron(0 1 * * ? *)",
       "ConfigurationOptionsScanNextInterval" : "false",
-      "PatchBaselineRegion" : data.aws_region.current,
+      "PatchBaselineRegion" : data.aws_region.current.region,
       "PatchBaselineUseDefault" : "default",
       "PatchPolicyName" : "example",
       "SelectedPatchBaselines" : local.selected_patch_baselines,
