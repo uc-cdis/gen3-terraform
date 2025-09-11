@@ -57,8 +57,8 @@ module "eks" {
   availability_zones               = var.availability_zones
   ci_run                           = var.ci_run
   use_asg                          = var.use_asg 
-  use_karpenter                    = var.user_karpenter
-  karpernter_version               = var.karpernter_version
+  use_karpenter                    = var.use_karpenter
+  karpenter_version                = var.karpenter_version
   eks_public_access                = var.eks_public_access
   enable_vpc_endpoints             = var.enable_vpc_endpoints
   k8s_bootstrap_resources          = var.k8s_bootstrap_resources
