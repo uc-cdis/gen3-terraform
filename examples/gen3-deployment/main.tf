@@ -13,7 +13,7 @@ terraform {
   backend "s3" {
     # The bucket to store the Terraform state file in.
     bucket = "<update with your own s3 bucket>" # Update to represent your environment
-    # The location of the Terraform state file within the bucket.
+    # The location of the Terraform state file within the bucket. Notice the bucket has to exist beforehand.
     key = "gen3-commons/terraform.tfstate" # Update to represent your environment    
     encrypt = "true"
     # The region where the S3 bucket is located.
@@ -42,7 +42,7 @@ locals {
   revproxy_arn                  = "<Update with your ACM certificate arn>"
   # Whether or not to create users/buckets needed for useryaml gitops management.
   create_gitops_infra           = true
-  # The name of the S3 bucket where the user.yaml file will be stored
+  # The name of the S3 bucket where the user.yaml file will be stored. Notice this will be created by terraform, so you don't need to create it beforehand.
   user_yaml_bucket_name = "<update with your user yaml bucket name>"
   # Set any tags you want to apply to all resources created by this module.
   default_tags = {
