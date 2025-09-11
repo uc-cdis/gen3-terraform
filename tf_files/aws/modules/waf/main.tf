@@ -70,14 +70,6 @@ resource "aws_wafv2_web_acl" "waf" {
         rule_group_reference_statement {
           arn = rule.value.arn
 
-          # Exclude specific rules inside the referenced Rule Group
-          dynamic "excluded_rule" {
-            for_each = rule.value.excluded_rules
-            content {
-              name = excluded_rule.value
-            }
-          }
-
           # Optionally force specific rules to Count
           dynamic "rule_action_override" {
             for_each = rule.value.override_to_count

@@ -77,7 +77,6 @@ variable "custom_rule_groups" {
     priority          = number
     arn               = string 
     count             = optional(bool, false)
-    excluded_rules    = optional(list(string), [])
     override_to_count = optional(list(string), [])
   }))
   default = []
