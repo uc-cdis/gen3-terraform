@@ -83,7 +83,9 @@ resource "aws_wafv2_web_acl" "waf" {
             for_each = rule.value.override_to_count
             content {
               name = rule_action_override.value
-              action_to_use { count {} }
+              action_to_use { 
+                count {} 
+                }
             }
           }
         }
