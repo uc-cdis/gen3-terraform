@@ -1173,3 +1173,16 @@ variable "ha_squid_single_instance" {
   description = "If true, deploy a single instance of squid in an autoscaling group"
   default     = false
 }
+
+variable "custom_rule_groups" {
+  description = "References to customer-managed WAFv2 Rule Groups."
+  type = list(object({
+    name              = string
+    priority          = number
+    arn               = string 
+    count             = optional(bool, false)
+    excluded_rules    = optional(list(string), [])
+    override_to_count = optional(list(string), [])
+  }))
+  default = []
+}

@@ -6,7 +6,7 @@ resource "aws_wafv2_web_acl" "waf" {
   default_action {
     allow {}
   }
-
+  # --- Managed rules ---
   dynamic "rule" {
     for_each = concat(var.base_rules, var.additional_rules)
     content {
@@ -43,6 +43,56 @@ resource "aws_wafv2_web_acl" "waf" {
         sampled_requests_enabled   = true
         cloudwatch_metrics_enabled = true
         metric_name                = "AWS-${rule.value.managed_rule_group_name}"
+      }
+    }
+  }
+
+  # --- Customer-managed Rule Groups ---
+  dynamic "rule" {
+    for_each = var.custom_rule_groups
+    content {
+      name     = rule.value.name
+      priority = rule.value.priority
+
+      # Like managed groups, RuleGroupReference supports override_action = count|none
+      override_action {
+        dynamic "count" {
+          for_each = rule.value.count ? [1] : []
+          content {}
+        }
+        dynamic "none" {
+          for_each = rule.value.count ? [] : [1]
+          content {}
+        }
+      }
+
+      statement {
+        rule_group_reference_statement {
+          arn = rule.value.arn
+
+          # Exclude specific rules inside the referenced Rule Group
+          dynamic "excluded_rule" {
+            for_each = rule.value.excluded_rules
+            content {
+              name = excluded_rule.value
+            }
+          }
+
+          # Optionally force specific rules to Count
+          dynamic "rule_action_override" {
+            for_each = rule.value.override_to_count
+            content {
+              name = rule_action_override.value
+              action_to_use { count {} }
+            }
+          }
+        }
+      }
+
+      visibility_config {
+        sampled_requests_enabled   = true
+        cloudwatch_metrics_enabled = true
+        metric_name                = "RG-${rule.value.name}"
       }
     }
   }

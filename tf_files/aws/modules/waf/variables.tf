@@ -69,3 +69,16 @@ variable "additional_rules" {
   }))
   default = []
 }
+
+variable "custom_rule_groups" {
+  description = "References to customer-managed WAFv2 Rule Groups."
+  type = list(object({
+    name              = string
+    priority          = number
+    arn               = string 
+    count             = optional(bool, false)
+    excluded_rules    = optional(list(string), [])
+    override_to_count = optional(list(string), [])
+  }))
+  default = []
+}
