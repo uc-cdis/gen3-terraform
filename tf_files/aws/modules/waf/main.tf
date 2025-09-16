@@ -102,7 +102,7 @@ resource "aws_wafv2_web_acl" "waf" {
   }
 
   dynamic "rule" {
-    for_each = var.ip_set_rules
+    for_each = { for r in var.ip_set_rules : r.name => r }
     content {
       name     = "IPSET-${rule.value.name}"
       priority = rule.value.priority
