@@ -6,6 +6,7 @@ variable "base_rules" {
     managed_rule_group_name = string
     priority = number
     override_to_count = list(string)
+    override_to_allow = optional(list(string), [])
     count = bool
   }))
   default = [

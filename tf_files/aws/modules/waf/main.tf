@@ -76,7 +76,17 @@ resource "aws_wafv2_web_acl" "waf" {
             content {
               name = rule_action_override.value
               action_to_use { 
-                count {} 
+                count {}
+                }
+            }
+          }
+          # Optionally force specific rules to Allow
+          dynamic "rule_action_override" {
+            for_each = rule.value.override_to_allow
+            content {
+              name = rule_action_override.value
+              action_to_use { 
+                allow {} 
                 }
             }
           }
@@ -106,23 +116,34 @@ resource "aws_wafv2_web_acl" "waf" {
       # IP sets use action{}, not override_action{}
       dynamic "action" {
         for_each = rule.value.action == "allow" ? [1] : []
-        content { allow {} }
+        content { 
+          allow {} 
+          }
       }
       dynamic "action" {
         for_each = rule.value.action == "block" ? [1] : []
-        content { block {} }
+        content { 
+          block 
+          {} 
+          }
       }
       dynamic "action" {
         for_each = rule.value.action == "count" ? [1] : []
-        content { count {} }
+        content { 
+          count {} 
+          }
       }
       dynamic "action" {
         for_each = rule.value.action == "captcha" ? [1] : []
-        content { captcha {} }
+        content { 
+          captcha {} 
+          }
       }
       dynamic "action" {
         for_each = rule.value.action == "challenge" ? [1] : []
-        content { challenge {} }
+        content { 
+          challenge {} 
+          }
       }
 
       visibility_config {
