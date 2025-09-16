@@ -91,6 +91,48 @@ resource "aws_wafv2_web_acl" "waf" {
     }
   }
 
+  dynamic "rule" {
+    for_each = { for r in var.ip_set_rules : r.name => r }
+    content {
+      name     = "IPSET-${rule.value.name}"
+      priority = rule.value.priority
+
+      statement {
+        ip_set_reference_statement {
+          arn = rule.value.ip_set_arn
+        }
+      }
+
+      # IP sets use action{}, not override_action{}
+      dynamic "action" {
+        for_each = rule.value.action == "allow" ? [1] : []
+        content { allow {} }
+      }
+      dynamic "action" {
+        for_each = rule.value.action == "block" ? [1] : []
+        content { block {} }
+      }
+      dynamic "action" {
+        for_each = rule.value.action == "count" ? [1] : []
+        content { count {} }
+      }
+      dynamic "action" {
+        for_each = rule.value.action == "captcha" ? [1] : []
+        content { captcha {} }
+      }
+      dynamic "action" {
+        for_each = rule.value.action == "challenge" ? [1] : []
+        content { challenge {} }
+      }
+
+      visibility_config {
+        sampled_requests_enabled   = true
+        cloudwatch_metrics_enabled = true
+        metric_name                = "ipset_${replace(rule.value.name, "/[^A-Za-z0-9]/", "_")}"
+      }
+    }
+  }
+
   tags = {
     Environment = "${var.vpc_name}"
   }

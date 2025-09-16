@@ -81,3 +81,15 @@ variable "custom_rule_groups" {
   }))
   default = []
 }
+
+variable "ip_set_rules" {
+  description = "Rules that reference customer-managed IP sets."
+  type = list(object({
+    name       = string
+    priority   = number
+    ip_set_arn = string
+    # one of: "allow" | "block" | "count" | "captcha" | "challenge"
+    action     = string
+  }))
+  default = []
+}
