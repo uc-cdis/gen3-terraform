@@ -40,7 +40,7 @@ resource "aws_wafv2_web_acl" "waf" {
             for_each = length(rule.value.override_to_allow) > 0 ? rule.value.override_to_allow : []
             content {
               action_to_use {
-                count {}
+                allow {}
               }
               name = rule_action_override.value
             }
