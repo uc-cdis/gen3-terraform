@@ -123,8 +123,7 @@ resource "aws_wafv2_web_acl" "waf" {
       dynamic "action" {
         for_each = rule.value.action == "block" ? [1] : []
         content { 
-          block 
-          {} 
+          block {} 
           }
       }
       dynamic "action" {
