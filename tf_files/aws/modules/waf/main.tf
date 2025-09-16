@@ -36,6 +36,15 @@ resource "aws_wafv2_web_acl" "waf" {
               name = rule_action_override.value
             }
           }
+          dynamic "rule_action_override" {
+            for_each = length(rule.value.override_to_allow) > 0 ? rule.value.override_to_allow : []
+            content {
+              action_to_use {
+                count {}
+              }
+              name = rule_action_override.value
+            }
+          }
         }
       }
 
