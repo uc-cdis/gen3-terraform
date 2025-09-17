@@ -21,3 +21,15 @@ variable "cross_region_destination" {
   type        = string
   default     = "us-west-1"
 }
+
+variable cross_account_backup {
+  description = "Whether or not to enable cross-account backup. Must specify an account"
+  type        = bool
+  default     = true
+}
+
+variable backup_destination_account {
+  description = "The aws account ID for the target backup account"
+  type        = string
+  default     = "433568766270"
+}
