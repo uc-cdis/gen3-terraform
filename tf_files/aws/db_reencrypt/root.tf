@@ -8,7 +8,7 @@ locals {
   snapshot_date       = formatdate("MM-DD-YYYY", timestamp())
   snapshot_identifier = "${var.vpc_name}-${var.cluster_instance_identifier}-reencrypt-${local.snapshot_date}"
   master_password     = var.master_password != "" ? var.master_password : random_password.password.result
-  engine_version      = var.engine_version != "" ? data.aws_rds_cluster.source_db_instance.engine_version : var.engine_version
+  engine_version      = var.engine_version = "" ? data.aws_rds_cluster.source_db_instance.engine_version : var.engine_version
 }
 
 resource "random_password" "password" {
