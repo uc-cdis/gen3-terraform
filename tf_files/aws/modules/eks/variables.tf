@@ -12,9 +12,7 @@ variable "csoc_managed" {
   default = false
 }
 
-variable "ec2_keyname" {
-  default = "someone@uchicago.edu"
-}
+variable "ec2_keyname" {}
 
 variable "instance_type" {
   default = "t3.large"
@@ -204,7 +202,7 @@ variable "deploy_karpenter_in_k8s" {
 }
 
 variable "karpenter_version" {
-  default = "v0.32.9"
+  default = "1.0.8"
 }
 
 variable "spot_linked_role" {
@@ -231,4 +229,9 @@ variable "enable_vpc_endpoints" {
 variable "k8s_bootstrap_resources" {
   default = false
   description = "If set to true, creates resources for bootstrapping a kubernetes cluster (such as karpenter configs and helm releases)"
+}
+
+variable "ha_squid_single_instance" {
+  description = "If true, deploy a single instance of squid in an autoscaling group"
+  default     = false
 }

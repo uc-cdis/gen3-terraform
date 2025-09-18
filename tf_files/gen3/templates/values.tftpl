@@ -1,20 +1,21 @@
 global:
   aws:
     enabled: true
-    account: ${account_id}
-    hatchery_role: ${hatchery_service_account}
+    account: "${account_id}"
+    hatchery_role: "${hatchery_service_account}"
     secretStoreServiceAccount:
       enabled: true
       name: external-secrets
-      roleArn: ${external_secrets_operator_iam_role}
+      roleArn: "${external_secrets_operator_iam_role}"
     wafv2:
-      wafAclArn: ${waf_arn}
+      enabled: true
+      wafAclArn: "${waf_arn}"
   dev: false
   externalSecrets:
     deploy: true
   postgres:
-    dbCreate: false
-    externalSecret: "${vpc_name}_aurora-master-password"
+    dbCreate: true
+    externalSecret: "${vpc_name}-aurora-master-password"
   environment: "${vpc_name}"
   hostname: "${hostname}"
   revproxyArn: "${revproxy_arn}"
@@ -22,8 +23,8 @@ global:
   portalApp: gitops
   publicDataSets: ${public_datasets}
   tierAccessLevel: "${tier_access_level}"
-  tierAccessLimit: ${tier_access_limit}
-  netPolicy: 
+  tierAccessLimit: "${tier_access_limit}"
+  netPolicy:
     enabled: ${netpolicy_enabled}
   dispatcherJobNum: "${dispatcher_job_number}"
   frontendRoot: "${frontend_root}"
@@ -35,7 +36,7 @@ ambassador:
 arborist:
   enabled: ${arborist_enabled}
   externalSecrets:
-    dbcreds: "${vpc_name}_${namespace}-arborist-creds"
+    dbcreds: "${vpc_name}-${namespace}-arborist-creds"
 
 argo-wrapper:
   enabled: ${argo_enabled}
@@ -46,46 +47,40 @@ audit:
     annotations: 
       eks.amazonaws.com/role-arn: "${audit_service_account}"
   externalSecrets:
-    dbcreds: "${vpc_name}_${namespace}-audit-creds"    
+    dbcreds: "${vpc_name}-${namespace}-audit-creds"
     createK8sAuditSecret: true
 
 
 aws-es-proxy:
   enabled: ${aws-es-proxy_enabled}
-  esEndpoint: ${es_endpoint}
+  esEndpoint: "${es_endpoint}"
   externalSecrets:
     awsCreds: "${es_secret_name}"
 
 dicom-server:
   enabled: ${dicom-server_enabled}
   externalSecrets:
-    dbcreds: "${vpc_name}_${namespace}-dicom-server-creds"
+    dbcreds: "${vpc_name}-${namespace}-dicom-server-creds"
 
 dicom-viewer:
   enabled: ${dicom-viewer_enabled}
   externalSecrets:
-    dbcreds: "${vpc_name}_${namespace}-dicom-viewer-creds"
+    dbcreds: "${vpc_name}-${namespace}-dicom-viewer-creds"
 
 
 fence:
   enabled: ${fence_enabled}
   serviceAccount:
-    annotations: 
+    annotations:
       eks.amazonaws.com/role-arn: "${fence_service_account}"
-   
+
   externalSecrets:
-    fenceJwtKeys: ""
-    fenceConfig: ${fence_config_secret_name}
+    fenceJwtKeys: "${fence_jwt_keys}"
+    fenceConfig: "${fence_config_secret_name}"
     fenceGoogleAppCredsSecret: ""
-    fenceGoogleStorageCredsSecret: ""  
-    createK8sJwtKeysSecret: true
+    fenceGoogleStorageCredsSecret: ""
     createK8sGoogleAppSecrets: true
-    createK8sFenceConfigSecret: true
-    dbcreds: "${vpc_name}_${namespace}-fence-creds"    
-
-
-  USER_YAML: |
-    ${user_yaml}
+    dbcreds: "${vpc_name}-${namespace}-fence-creds"
 
   usersync:
     usersync: ${usersync_enabled}
@@ -98,8 +93,8 @@ fence:
 frontend-framework:
   enabled: ${gen3ff_enabled}
   image:
-    repository: ${gen3ff_repo}
-    tag: ${gen3ff_tag}
+    repository: "${gen3ff_repo}"
+    tag: "${gen3ff_tag}"
 
 grafana:
   enabled: ${deploy_grafana}
@@ -141,7 +136,7 @@ hatchery:
         args:
         - "--NotebookApp.base_url=/lw-workspace/proxy/"
         - "--NotebookApp.default_url=/lab"
-        - "--NotebookApp.password=''"
+        - "--NotebookApp.password=''" #pragma: allowlist secret
         - "--NotebookApp.token=''"
         - "--NotebookApp.shutdown_no_activity_timeout=5400"
         - "--NotebookApp.quit_button=False"
@@ -163,27 +158,30 @@ hatchery:
 
 indexd:
   enabled: ${indexd_enabled}
-  defaultPrefix: ${indexd_prefix}
+  defaultPrefix: "${indexd_prefix}"
   externalSecrets:
-    dbcreds: "${vpc_name}_${namespace}-indexd-creds"
+    dbcreds: "${vpc_name}-${namespace}-indexd-creds"
     createK8sServiceCredsSecret: true
 
 
 manifestservice:
   enabled: ${manifestservice_enabled}
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: "${manifestservice_service_account}"
   externalSecrets:
     createK8sManifestServiceSecret: true
 
 metadata:
   enabled: ${metadata_enabled}
   externalSecrets:
-    dbcreds: "${vpc_name}_${namespace}-metadata-creds"
+    dbcreds: "${vpc_name}-${namespace}-metadata-creds"
     createK8sMetadataSecret: true
 
 peregrine:
   enabled: ${peregrine_enabled}
   externalSecrets:
-    dbcreds: "${vpc_name}_${namespace}-sheepdg-creds"
+    dbcreds: "${vpc_name}-${namespace}-sheepdg-creds"
 
 pidgin:
   enabled: ${pidgin_enabled}
@@ -194,18 +192,15 @@ portal:
 requestor:
   enabled: ${requestor_enabled}
   externalSecrets:
-    dbcreds: "${vpc_name}_${namespace}-requestor-creds"
+    dbcreds: "${vpc_name}-${namespace}-requestor-creds"
 
 revproxy:
   enabled: ${revproxy_enabled}
 
-s3-mountpoint:
-  enabled: ${deploy_s3_mountpoint}
-
 sheepdog:
   enabled: ${sheepdog_enabled}
   externalSecrets:
-    dbcreds: "${vpc_name}_${namespace}-sheepdog-creds"
+    dbcreds: "${vpc_name}-${namespace}-sheepdog-creds"
 
 ssjdispatcher:
   enabled: ${ssjdispatcher_enabled}
@@ -216,4 +211,5 @@ sower:
 wts:
   enabled: ${wts_enabled}
   externalSecrets:
-    dbcreds: "${vpc_name}_${namespace}-wts-creds"
+    dbcreds: "${vpc_name}-${namespace}-wts-creds"
+    createK8sWtsSecret: true
