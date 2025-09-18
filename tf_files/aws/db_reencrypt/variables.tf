@@ -20,6 +20,18 @@ variable "cluster_instance_identifier" {
   default     = "aurora-cluster-instance"
 }
 
+variable "new_cluster_identifier" {
+  description = "Cluster Identifier"
+  type        = string
+  default     = "aurora-cluster"
+}
+
+variable "new_cluster_instance_identifier" {
+  description = "Cluster Instance Identifier"
+  type        = string
+  default     = "aurora-cluster-instance"
+}
+
 variable "serverlessv2_scaling_min_capacity" {
   type        = string
   description = "Serverless v2 RDS cluster minimum scaling capacity in ACUs"
