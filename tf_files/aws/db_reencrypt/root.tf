@@ -27,6 +27,7 @@ resource "aws_rds_cluster" "postgresql" {
   master_username                 = var.master_username
   master_password	          = local.master_password
   storage_encrypted	          = true
+  allow_major_version_upgrade     = true
   apply_immediately               = true
   engine_mode        	          = var.engine_mode
   skip_final_snapshot	          = false
