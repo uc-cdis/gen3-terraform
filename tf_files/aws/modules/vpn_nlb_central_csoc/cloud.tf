@@ -56,6 +56,10 @@ resource "aws_subnet" "vpn_pub0" {
   cidr_block        = cidrsubnet("${var.vpn_server_subnet}",3,count.index)
   availability_zone = data.aws_availability_zones.available.names[count.index]
   tags              = tomap({"Name" = "${var.env_vpn_nlb_name}_pub_${count.index}", "Organization" = var.organization_name, "Environment" = var.env_vpn_nlb_name})
+
+  lifecycle {
+    ignore_changes = [description]
+  }
 }
 
 resource "aws_route_table_association" "vpn_nlb0" {
