@@ -58,7 +58,7 @@ resource "aws_subnet" "vpn_pub0" {
   tags              = tomap({"Name" = "${var.env_vpn_nlb_name}_pub_${count.index}", "Organization" = var.organization_name, "Environment" = var.env_vpn_nlb_name})
 
   lifecycle {
-    ignore_changes = [description]
+    ignore_changes = [availability_zone]
   }
 }
 
