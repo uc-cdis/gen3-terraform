@@ -42,6 +42,7 @@ module "cdis_vpc" {
   commons_log_retention          = var.commons_log_retention
   ha_squid_single_instance       = var.ha_squid_single_instance
   force_delete_bucket            = var.force_delete_bucket
+  availability_zones             = var.availability_zones
   providers = {
     aws      = aws
     aws.csoc = aws.csoc
