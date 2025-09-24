@@ -44,6 +44,8 @@ locals {
   create_gitops_infra           = true
   # The name of the S3 bucket where the user.yaml file will be stored. Notice this will be created by terraform, so you don't need to create it beforehand.
   user_yaml_bucket_name = "<update with your user yaml bucket name>"
+  # Your ssh key name to access the nodes in the EKS cluster
+  ssh_key                = ""
   # Set any tags you want to apply to all resources created by this module.
   default_tags = {
     Environment = local.vpc_name
