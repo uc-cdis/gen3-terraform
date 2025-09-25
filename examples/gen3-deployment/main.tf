@@ -82,7 +82,7 @@ module "commons" {
   hostname                       = local.hostname
   kube_ssh_key                   = local.ssh_key
   ami_account_id                 = "amazon"
-  squid_image_search_criteria    = "al2023*"
+  squid_image_search_criteria    = "al2023-ami-2023.*-x86_64"
   ha-squid_instance_drive_size   = 30
   ha_squid_single_instance       = true
   deploy_ha_squid                = true
