@@ -37,6 +37,8 @@ variable "ssh_key_name" {
 }
 
 variable "allowed_principals_list" {
+  type        = set(string)
+  description = "IAM principal ARNs allowed to use the endpoint service."
   default = ["arn:aws:iam::707767160287:root"]
 }
 

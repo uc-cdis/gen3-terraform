@@ -44,6 +44,8 @@ locals {
   create_gitops_infra           = true
   # The name of the S3 bucket where the user.yaml file will be stored. Notice this will be created by terraform, so you don't need to create it beforehand.
   user_yaml_bucket_name = "<update with your user yaml bucket name>"
+  # Your ssh key name to access the nodes in the EKS cluster
+  ssh_key                = ""
   # Set any tags you want to apply to all resources created by this module.
   default_tags = {
     Environment = local.vpc_name
@@ -72,15 +74,16 @@ locals {
 }
 
 module "commons" {
-  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/commons?ref=63cf18bb1110c385888f32ad32ab036deaf07488"
+  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/commons?ref=9938e841ffcbc81171a2eb64431db8a7a0fc28eb"
 
   vpc_name                       = local.vpc_name
   vpc_cidr_block                 = "10.10.0.0/20"
   aws_region                     = local.aws_region
   hostname                       = local.hostname
-  kube_ssh_key                   = ""
-  ami_account_id                 = "143731057154"
-  squid_image_search_criteria    = "1-31-EKS-FIPS*"
+  kube_ssh_key                   = local.ssh_key
+  ami_account_id                 = "amazon"
+  squid_image_search_criteria    = "amzn2-ami-hvm-*-x86_64-gp2"
+  ha-squid_instance_drive_size   = 30
   ha_squid_single_instance       = true
   deploy_ha_squid                = true
   deploy_sheepdog_db             = false
@@ -104,7 +107,7 @@ module "commons" {
 }
 
 module "gen3" {
-  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/gen3?ref=63cf18bb1110c385888f32ad32ab036deaf07488"
+  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/gen3?ref=9938e841ffcbc81171a2eb64431db8a7a0fc28eb"
   vpc_name                 = local.vpc_name
   aurora_username          = module.commons.aurora_cluster_master_username
   aurora_password          = module.commons.aurora_cluster_master_password

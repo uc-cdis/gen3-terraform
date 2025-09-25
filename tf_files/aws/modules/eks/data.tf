@@ -188,4 +188,4 @@ data "aws_iam_policy_document" "planx-csoc-alerts-topic_access" {
   }
 }
 
-data "aws_ecrpublic_authorization_token" "token" {}
+#data "aws_ecrpublic_authorization_token" "token" {}
