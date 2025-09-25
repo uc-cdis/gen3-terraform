@@ -80,9 +80,10 @@ module "commons" {
   vpc_cidr_block                 = "10.10.0.0/20"
   aws_region                     = local.aws_region
   hostname                       = local.hostname
-  kube_ssh_key                   = ""
-  ami_account_id                 = "143731057154"
-  squid_image_search_criteria    = "1-31-EKS-FIPS*"
+  kube_ssh_key                   = local.ssh_key
+  ami_account_id                 = "amazon"
+  squid_image_search_criteria    = "al2023*"
+  ha_squid_instance_drive_size   = 30
   ha_squid_single_instance       = true
   deploy_ha_squid                = true
   deploy_sheepdog_db             = false
