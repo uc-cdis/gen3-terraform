@@ -116,12 +116,3 @@ variable "customer_id" {
 variable "slack_webhook" {
   default = ""
 }
-
-variable "squid_ami_id" {
-  default = ""
-}
-
-variable "refresh_schedule_cron" {
-  description = "Cron for AMI refresh "  
-  default     = "cron(0 2 * * * *)"
-}
