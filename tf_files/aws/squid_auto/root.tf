@@ -41,6 +41,4 @@ module "squid_auto" {
   activation_id              = var.activation_id
   customer_id                = var.customer_id
   slack_webhook              = var.slack_webhook
-  squid_ami_id               = var.squid_ami_id
-  refresh_schedule_cron      = var.refresh_schedule_cron
 }

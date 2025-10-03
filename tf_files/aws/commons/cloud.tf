@@ -97,6 +97,7 @@ module "cdis_vpc" {
   deploy_cloud_trail             = var.deploy_cloud_trail
   send_logs_to_csoc              = var.send_logs_to_csoc
   commons_log_retention          = var.commons_log_retention
+  squid_image_ssm_parameter_name = var.squid_image_ssm_parameter_name
 }
 
 

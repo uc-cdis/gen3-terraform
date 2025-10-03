@@ -134,11 +134,7 @@ variable "fips" {
   default = false
 }
 
-variable "squid_ami_id" {
-  default = ""
-}
-
-variable "refresh_schedule_cron" {
-  description = "Cron expression for AMI refresh"
-  default     = "cron(0 2 * * * *)"
+variable "ssm_parameter_name" {
+  description = "If provided, use this SSM parameter to get the AMI ID at launch time"
+  default     = ""
 }

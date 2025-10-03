@@ -145,3 +145,8 @@ variable "commons_log_retention" {
   description = "value in days for the cloudwatch log retention period"
   default = "3650"
 }
+
+variable "squid_image_ssm_parameter_name" {
+  description = "If provided, use this SSM parameter to get the AMI ID at launch time instead of squid_image_search_criteria"
+  default     = ""
+}
