@@ -538,7 +538,15 @@ def lambda_handler(event, context):
                             outcome['message'] = 'Proxy switch partially successfull'
                         else:
                             outcome['message'] = 'Proxy switch successfull'
-                            break
+                            break    
+                    else:
+                        try:
+                            client = boto3.client('ec2')
+                            terminate_response = client.terminate_instances(InstanceIds=[instance_id])
+                            outcome['terminated_instance_%s' % instance_id] = "Instance %s terminated due to closed port %s" % (instance_id, proxy_port)
+                            del client
+                        except Exception as e:
+                            outcome['termination_error_%s' % instance_id] = str(e) 
             else:
                 outcome['message'] = 'No healthy instances found'
         else:
@@ -580,4 +588,3 @@ def lambda_handler(event, context):
             print(json.dumps(outcome))
             return json.dumps(outcome)
         
-

@@ -1,60 +1,3 @@
-# Inject credentials via the AWS_PROFILE environment variable and shared credentials file
-# and/or EC2 metadata service
-terraform {
-  backend "s3" {
-    encrypt = "true"
-  }
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-    kubectl = {
-      source  = "gavinbunney/kubectl"
-    }    
-  }
-}
-
-provider "kubernetes" {
-  host                   = module.eks.0.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.0.cluster_certificate_authority_data)
-
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    # This requires the awscli to be installed locally where Terraform is executed
-    args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name, "--role-arn", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.iam_role_name}"]
-  }
-}
-
-provider "helm" {
-  kubernetes {
-    host                   = module.eks.0.cluster_endpoint
-    cluster_ca_certificate = base64decode(module.eks.0.cluster_certificate_authority_data)
-
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      command     = "aws"
-      # This requires the awscli to be installed locally where Terraform is executed
-      args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name, "--role-arn", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.iam_role_name}"]
-    }
-  }
-}
-
-provider "kubectl" {
-  apply_retry_count      = 5
-  host                   = module.eks.0.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.0.cluster_certificate_authority_data)
-  load_config_file       = false
-
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    # This requires the awscli to be installed locally where Terraform is executed
-    args = ["eks", "get-token", "--cluster-name", module.eks.0.cluster_name, "--role-arn", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.iam_role_name}"]
-  }
-}
-
 locals{
   db_fence_address = var.deploy_aurora ? module.aurora[0].aurora_cluster_writer_endpoint : var.deploy_fence_db && var.deploy_rds ? aws_db_instance.db_fence[0].address : ""
   db_indexd_address = var.deploy_aurora ? module.aurora[0].aurora_cluster_writer_endpoint : var.deploy_indexd_db && var.deploy_rds ? aws_db_instance.db_indexd[0].address : ""
@@ -66,10 +9,11 @@ module "cdis_vpc" {
   source                         = "../modules/vpc"
   ami_account_id                 = var.ami_account_id
   squid_image_search_criteria    = var.squid_image_search_criteria
+  squid_image_ssm_parameter_name = var.squid_image_ssm_parameter_name
   vpc_cidr_block                 = var.vpc_cidr_block
   secondary_cidr_block           = var.secondary_cidr_block
   vpc_name                       = var.vpc_name
-  ssh_key_name                   = aws_key_pair.automation_dev.key_name
+  ssh_key_name                   = var.kube_ssh_key != "" ? aws_key_pair.automation_dev.key_name : ""
   peering_cidr                   = var.peering_cidr
   csoc_account_id                = var.csoc_account_id
   organization_name              = var.organization_name
@@ -97,43 +41,13 @@ module "cdis_vpc" {
   deploy_cloud_trail             = var.deploy_cloud_trail
   send_logs_to_csoc              = var.send_logs_to_csoc
   commons_log_retention          = var.commons_log_retention
-  squid_image_ssm_parameter_name = var.squid_image_ssm_parameter_name
-}
-
-
-module "config_files" {
-  source                        = "../../shared/modules/k8s_configs"
-  vpc_name                      = var.vpc_name
-  db_fence_address              = local.db_fence_address
-  db_fence_password             = var.db_password_fence != "" ? var.db_password_fence : random_password.fence_password.result
-  db_fence_name                 = var.fence_database_name
-  db_sheepdog_address           = local.db_sheepdog_address
-  db_sheepdog_username          = var.sheepdog_db_username
-  db_sheepdog_password          = var.db_password_sheepdog != "" ? var.db_password_sheepdog : random_password.sheepdog_password.result
-  db_sheepdog_name              = var.sheepdog_database_name
-  db_peregrine_address          = local.db_peregrine_address
-  db_peregrine_password         = var.db_password_peregrine != "" ? var.db_password_peregrine : random_password.peregrine_password.result
-  db_indexd_address             = local.db_indexd_address
-  db_indexd_username            = var.indexd_db_username
-  db_indexd_password            = var.db_password_indexd != "" ? var.db_password_indexd : random_password.indexd_password.result
-  db_indexd_name                = var.indexd_database_name
-  hostname                      = var.hostname
-  google_client_secret          = var.google_client_secret
-  google_client_id              = var.google_client_id
-  hmac_encryption_key           = var.hmac_encryption_key != "" ? var.hmac_encryption_key : base64encode(random_password.hmac_encryption_key.result)
-  sheepdog_secret_key           = var.sheepdog_secret_key  != "" ? var.sheepdog_secret_key : random_password.sheepdog_secret_key.result
-  sheepdog_indexd_password      = var.sheepdog_indexd_password != "" ? var.sheepdog_indexd_password : random_password.sheepdog_indexd_password.result
-  sheepdog_oauth2_client_id     = var.sheepdog_oauth2_client_id
-  sheepdog_oauth2_client_secret = var.sheepdog_oauth2_client_secret
-  gitops_path                   = var.gitops_path
-  ssl_certificate_id            = var.aws_cert_name
-  aws_user_key                  = module.cdis_vpc.es_user_key
-  aws_user_key_id               = module.cdis_vpc.es_user_key_id
-  indexd_prefix                 = var.indexd_prefix
-  mailgun_api_key               = var.mailgun_api_key
-  mailgun_api_url               = var.mailgun_api_url
-  mailgun_smtp_host             = var.mailgun_smtp_host
-
+  ha_squid_single_instance       = var.ha_squid_single_instance
+  force_delete_bucket            = var.force_delete_bucket
+  availability_zones             = var.availability_zones
+  providers = {
+    aws      = aws
+    aws.csoc = aws.csoc
+  }
 }
 
 module "csoc_peering_connection" {

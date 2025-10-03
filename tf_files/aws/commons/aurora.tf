@@ -10,15 +10,16 @@ module "aurora" {
   master_username                   = var.master_username
   storage_encrypted                 = var.storage_encrypted
   apply_immediate                   = var.apply_immediate
-  engine_mode		            = var.engine_mode
+  engine_mode		                    = var.engine_mode
   serverlessv2_scaling_min_capacity = var.serverlessv2_scaling_min_capacity
   serverlessv2_scaling_max_capacity = var.serverlessv2_scaling_max_capacity
-  skip_final_snapshot	            = var.skip_final_snapshot
+  skip_final_snapshot	              = var.skip_final_snapshot
   final_snapshot_identifier         = var.final_snapshot_identifier
   backup_retention_period           = var.backup_retention_period
   preferred_backup_window           = var.preferred_backup_window
-  password_length		    = var.password_length
+  password_length		                = var.password_length
   secrets_manager_enabled           = var.secrets_manager_enabled
-  db_kms_key_id			    = var.db_kms_key_id
+  db_kms_key_id			                = var.db_kms_key_id
+  deploy_rds_check_lambda           = var.deploy_rds_check_lambda
   depends_on                        = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id]
 }
