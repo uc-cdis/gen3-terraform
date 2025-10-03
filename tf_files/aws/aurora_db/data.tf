@@ -5,7 +5,7 @@ data "aws_eks_cluster" "eks" {
 }
 
 data "aws_secretsmanager_secret" "aurora-master-password" {
-  name = "${var.vpc_name}_aurora-master-password"
+  name = "${var.vpc_name}-aurora-master-password"
 }
 
 

@@ -51,6 +51,10 @@ resource "aws_subnet" "squid_pub0" {
   cidr_block        = "10.128.${var.env_vpc_octet3}.0/27"
   availability_zone = data.aws_availability_zones.available.names[0]
   tags              = tomap({"Name" = "${var.env_nlb_name}_pub0", "Organization" = "Basic Service", "Environment" = var.env_nlb_name})
+
+  lifecycle {
+    ignore_changes = [availability_zone]
+  }
 }
 
 resource "aws_subnet" "squid_pub1" {
@@ -58,6 +62,10 @@ resource "aws_subnet" "squid_pub1" {
   cidr_block        = "10.128.${var.env_vpc_octet3}.32/27"
   availability_zone = data.aws_availability_zones.available.names[1]
   tags              = tomap({"Name" = "${var.env_nlb_name}_pub1", "Organization" = "Basic Service", "Environment" = var.env_nlb_name})
+
+  lifecycle {
+    ignore_changes = [availability_zone]
+  }
 }
 
 resource "aws_subnet" "squid_pub2" {
@@ -65,6 +73,10 @@ resource "aws_subnet" "squid_pub2" {
   cidr_block        = "10.128.${var.env_vpc_octet3}.64/27"
   availability_zone = data.aws_availability_zones.available.names[2]
   tags              = tomap({"Name" = "${var.env_nlb_name}_pub2", "Organization" = "Basic Service", "Environment" = var.env_nlb_name})
+
+  lifecycle {
+    ignore_changes = [availability_zone]
+  }
 }
 
 resource "aws_subnet" "squid_pub3" {
@@ -72,6 +84,10 @@ resource "aws_subnet" "squid_pub3" {
   cidr_block        = "10.128.${var.env_vpc_octet3}.96/27"
   availability_zone = data.aws_availability_zones.available.names[3]
   tags              = tomap({"Name" = "${var.env_nlb_name}_pub3", "Organization" = "Basic Service", "Environment" = var.env_nlb_name})
+
+  lifecycle {
+    ignore_changes = [availability_zone]
+  }
 }
 
 resource "aws_subnet" "squid_pub4" {
@@ -79,6 +95,10 @@ resource "aws_subnet" "squid_pub4" {
   cidr_block        = "10.128.${var.env_vpc_octet3}.128/27"
   availability_zone = data.aws_availability_zones.available.names[4]
   tags              = tomap({"Name" = "${var.env_nlb_name}_pub4", "Organization" = "Basic Service", "Environment" = var.env_nlb_name})
+
+  lifecycle {
+    ignore_changes = [availability_zone]
+  }
 }
 
 resource "aws_subnet" "squid_pub5" {
@@ -86,6 +106,10 @@ resource "aws_subnet" "squid_pub5" {
   cidr_block        = "10.128.${var.env_vpc_octet3}.160/27"
   availability_zone = data.aws_availability_zones.available.names[5]
   tags              = tomap({"Name" = "${var.env_nlb_name}_pub5", "Organization" = "Basic Service", "Environment" = var.env_nlb_name})
+
+  lifecycle {
+    ignore_changes = [availability_zone]
+  }
 }
 
 resource "aws_route_table_association" "squid_nlb0" {

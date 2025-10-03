@@ -1,0 +1,88 @@
+name: Test and deploy user.yaml files
+
+on: [push]
+
+jobs:
+  ci:
+    name: Test and deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check PR
+      run: |
+        echo Event name: $${{ github.event_name }}
+        if [[ $${{ github.event_name }} = "pull_request" || $${{ github.event_name }} = "pull_request_target" ]]; then
+          is_fork=`curl --header "Authorization: token $${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/$${{ github.event.repository.full_name }}/pulls/$${{github.event.number}} | jq -r .head.repo.fork`
+          echo Is this a fork? $is_fork
+          if [ $is_fork = "true" ]; then
+            labels=`curl -s --header "Authorization: token $${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/$${{ github.event.repository.full_name }}/issues/$${{github.event.number}}/labels | jq -r '.[].name'`
+            echo Labels: $labels
+            if [[ ! " $${labels[*]} " =~ "safe to test" ]]; then
+              echo "ERROR: PRs from forks must be labeled with 'safe to test' to run the CI"
+              exit 1
+            fi
+          fi
+        fi
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        pip install gen3users
+        pip install pyyaml==5.4
+    - name: Checkout, lint and test
+      run: |
+        # checkout the code - this supports checking out from a private fork
+        git clone https://Bot:$${{ secrets.GITHUB_TOKEN }}@github.com/$${{ github.event.repository.full_name }}
+        cd $${{ github.event.repository.name }}
+        if [ $${{ github.event_name }} = "push" ]; then
+          branch=$${GITHUB_REF#refs/*/}
+          echo Push event: checking out branch $branch
+          git checkout $branch
+        else # this is a pull request
+          echo Pull request event: checking out branch from PR $${{github.event.number}}
+          git fetch origin pull/$${{github.event.number}}/head:localbranch
+          git checkout localbranch
+        fi
+
+        # lint the files
+        cat - > lint.py <<EOM
+        import os
+        import yaml
+
+        def lint():
+            for commons in os.listdir("./users"):
+                with open(os.path.join("users", commons, "user.yaml"), "r") as f:
+                    data = yaml.safe_load(f)
+                # pyyaml auto sort
+                with open(os.path.join("users", commons, "user.yaml"), "w") as f:
+                    yaml.dump(data, f)
+
+        lint()
+        EOM
+        python lint.py
+        rm lint.py
+
+        # run the tests
+        changed_files=$(git diff --name-only HEAD..$${{ github.event.pull_request.base.sha }})
+        # user_yamls=()
+        for file in $changed_files; do
+          if [[ "$file" == *user.yaml ]]; then
+            # TODO do `user_yamls+=$file` here and `gen3users validate $user_yamls` after
+            # the `for` statement to validate all at once. Need to split `user_yamls` correctly
+            gen3users validate $file
+          fi
+        done
+    - name: Install AWS CLI
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: chrislennon/action-aws-cli@1.1
+    - name: Deploy dev to S3
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: |
+        cd $${{ github.event.repository.name }}
+        git checkout main
+        git pull
+        aws s3 cp users/dev/user.yaml ${useryaml_s3_path} --recursive --region us-east-1
+      env:
+        AWS_ACCESS_KEY_ID: $${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: $${{ secrets.AWS_SECRET_ACCESS_KEY }}
