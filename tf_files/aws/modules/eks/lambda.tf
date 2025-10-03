@@ -1,5 +1,5 @@
 module "iam_role" {
-  count                   = var.ha_squid ? 1 : 0
+  count                   = var.ha_squid && !var.ha_squid_single_instance ? 1 : 0
   source                  = "../iam-role"
   role_name               = "${var.vpc_name}-gw-checks-lambda-role"
   role_description        = "Role for ${var.vpc_name}-gw-checks-lambda"
@@ -25,7 +25,7 @@ EOF
 }
 
 module "iam_policy" {
-  count              = var.ha_squid ? 1 : 0
+  count              = var.ha_squid && !var.ha_squid_single_instance ? 1 : 0
   source             = "../iam-policy"
   policy_name        = "${var.vpc_name}-gw-checks-lambda-cwlg"
   policy_path        = "/"
@@ -50,20 +50,20 @@ EOF
 }
 
 resource "aws_cloudwatch_log_group" "gwl_group" {
-  count             = var.ha_squid ? 1 : 0
+  count             = var.ha_squid && !var.ha_squid_single_instance ? 1 : 0
   name              = "/aws/lambda/${var.vpc_name}-gw-checks-lambda" 
   retention_in_days = 14
 }
 
 resource "aws_iam_role_policy" "lambda_policy_resources" {
-  count  = var.ha_squid ? 1 : 0
+  count  = var.ha_squid && !var.ha_squid_single_instance ? 1 : 0
   name   = "resources_acces"
   policy = data.aws_iam_policy_document.with_resources.json
   role   = module.iam_role[0].role_id
 }
 
 resource "aws_iam_role_policy" "lambda_policy_no_resources" {
-  count  = var.ha_squid ? 1 : 0
+  count  = var.ha_squid && !var.ha_squid_single_instance ? 1 : 0
   name   = "no_resources_acces"
   policy = data.aws_iam_policy_document.without_resources.json
   role   = module.iam_role[0].role_id
@@ -71,14 +71,14 @@ resource "aws_iam_role_policy" "lambda_policy_no_resources" {
 
 
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
-  count      = var.ha_squid ? 1 : 0
+  count      = var.ha_squid && !var.ha_squid_single_instance ? 1 : 0
   role       = module.iam_role[0].role_id
   policy_arn = module.iam_policy[0].arn
 }
 
 
 resource "aws_lambda_function" "gw_checks" {
-  count            = var.ha_squid ? 1 : 0
+  count            = var.ha_squid && !var.ha_squid_single_instance ? 1 : 0
   filename         = "lambda_function_payload.zip"
   function_name    = "${var.vpc_name}-gw-checks-lambda"
   role             = "${module.iam_role[0].role_arn}" 
@@ -110,10 +110,10 @@ resource "aws_lambda_function" "gw_checks" {
 
 
 resource "aws_cloudwatch_event_rule" "gw_checks_rule" {
-  count               = var.ha_squid ? 1 : 0
+  count               = var.ha_squid && !var.ha_squid_single_instance ? 1 : 0
   name                = "${var.vpc_name}-GW-checks-job"
   description         = "Check if the gateway is working every minute"
-  schedule_expression = "rate(5 minute)"
+  schedule_expression = "rate(5 minutes)"
   
   tags = {
     Environment  = var.vpc_name
@@ -122,13 +122,13 @@ resource "aws_cloudwatch_event_rule" "gw_checks_rule" {
 }
 
 resource "aws_cloudwatch_event_target" "cw_to_lambda" {
-  count     = var.ha_squid ? 1 : 0
+  count     = var.ha_squid && !var.ha_squid_single_instance ? 1 : 0
   rule      = aws_cloudwatch_event_rule.gw_checks_rule[count.index].name
   arn       = aws_lambda_function.gw_checks[count.index].arn
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch" {
-  count         = var.ha_squid ? 1 : 0
+  count         = var.ha_squid && !var.ha_squid_single_instance ? 1 : 0
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.gw_checks[count.index].function_name

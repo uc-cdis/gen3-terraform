@@ -588,4 +588,3 @@ def lambda_handler(event, context):
             print(json.dumps(outcome))
             return json.dumps(outcome)
         
-
