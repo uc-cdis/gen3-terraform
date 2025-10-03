@@ -12,6 +12,7 @@ module "squid-auto" {
   ssh_key_name                   = var.ssh_key_name
   ami_account_id                 = var.ami_account_id
   image_name_search_criteria     = var.squid_image_search_criteria
+  ssm_parameter_name             = var.squid_image_ssm_parameter_name
   squid_instance_drive_size      = var.squid_instance_drive_size
   squid_availability_zones       = var.availability_zones
   main_public_route              = aws_route_table.public.id

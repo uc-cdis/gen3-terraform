@@ -9,6 +9,7 @@ module "cdis_vpc" {
   source                         = "../modules/vpc"
   ami_account_id                 = var.ami_account_id
   squid_image_search_criteria    = var.squid_image_search_criteria
+  squid_image_ssm_parameter_name = var.squid_image_ssm_parameter_name
   vpc_cidr_block                 = var.vpc_cidr_block
   secondary_cidr_block           = var.secondary_cidr_block
   vpc_name                       = var.vpc_name
