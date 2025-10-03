@@ -161,7 +161,7 @@ variable "ami_account_id" {
 
 variable "squid_image_search_criteria" {
   description = "Search criteria for squid AMI look up"
-  default     = "al2023-ami-*"
+  default     = "amzn2-ami-hvm-*-x86_64-gp2"
 }
 
 variable "peering_vpc_id" {
