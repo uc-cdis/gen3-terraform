@@ -293,12 +293,12 @@ resource "helm_release" "karpenter" {
   version             = var.karpenter_version
 
   set {
-    name  = "settings.aws.clusterName"
+    name  = "settings.clusterName"
     value = aws_eks_cluster.eks_cluster.id
   }
 
   set {
-    name  = "settings.aws.clusterEndpoint"
+    name  = "settings.clusterEndpoint"
     value = aws_eks_cluster.eks_cluster.endpoint
   }
 
@@ -334,38 +334,22 @@ resource "kubectl_manifest" "karpenter_node_pool" {
 
   yaml_body = <<-YAML
     ---
-    apiVersion: karpenter.sh/v1beta1
+    apiVersion: karpenter.sh/v1
     kind: NodePool
     metadata:
       name: default
     spec:
-      disruption:
-        consolidateAfter: 30s
-        consolidationPolicy: WhenEmpty
-        expireAfter: "168h"
-      limits:
-        cpu: "1000"
-        memory: 1000Gi
       template:
         metadata:
           labels:
             role: default
         spec:
-          kubelet:
-            evictionHard:
-              memory.available: 5%
-            evictionSoft:
-              memory.available: 10%
-            evictionSoftGracePeriod:
-              memory.available: 5m
-            kubeReserved:
-              cpu: 480m
-              ephemeral-storage: 3Gi
-              memory: 1632Mi
           nodeClassRef:
-            apiVersion: karpenter.k8s.aws/v1beta1
+            group: karpenter.k8s.aws
             kind: EC2NodeClass
             name: default
+          expireAfter: 168h
+          terminationGracePeriod: 48h
           requirements:
           - key: karpenter.sh/capacity-type
             operator: In
@@ -379,10 +363,16 @@ resource "kubectl_manifest" "karpenter_node_pool" {
           - key: karpenter.k8s.aws/instance-category
             operator: In
             values:
-            - c
-            - m
             - r
-            - t
+      disruption:
+        consolidateAfter: 30s
+        consolidationPolicy: WhenEmpty
+        budgets:
+        - nodes: 10%
+
+      limits:
+        cpu: "1000"
+        memory: 1000Gi
   YAML
 
   depends_on = [
@@ -399,7 +389,7 @@ resource "kubectl_manifest" "karpenter_node_class" {
 
   yaml_body = <<-YAML
     ---
-    apiVersion: karpenter.k8s.aws/v1beta1
+    apiVersion: karpenter.k8s.aws/v1
     kind: EC2NodeClass
     metadata:
       name: default

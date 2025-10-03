@@ -56,6 +56,12 @@ variable "engine_mode" {
   default     = "provisioned"
 }
 
+variable "engine_version" {
+  type        = string
+  description = "The engine version of the cluster"
+  default     = ""
+}
+
 variable "password_length" {
   type        = number
   description = "The length of the password string"

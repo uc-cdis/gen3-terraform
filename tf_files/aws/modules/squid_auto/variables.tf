@@ -133,3 +133,8 @@ variable "fips_ami_kms" {
 variable "fips" {
   default = false
 }
+
+variable "ha_squid_single_instance" {
+  description = "If true, deploy a single instance of squid instead in an autoscaling group"
+  default     = false
+}

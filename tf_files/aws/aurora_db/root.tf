@@ -25,11 +25,11 @@ module "secrets_manager" {
   })
   secret_name = "${var.namespace}-${var.service}-creds"
 
-  depends_on = [ null_resource.user_setup ]
+  #depends_on = [ null_resource.user_setup[0] ]
 }
 
 resource "aws_iam_policy" "secrets_manager_policy" {
-  count       = var.secrets_manager_enabled ? 1 : 0
+  count       = var.secrets_manager_enabled ? var.role != "" ? 0 : 1 : 0
   name        = "${var.vpc_name}-${var.service}-${var.namespace}-creds-access-policy"
   description = "Policy for ${var.vpc_name}-${var.service} to access secrets manager"
   policy      = data.aws_iam_policy_document.policy.json
@@ -54,6 +54,7 @@ resource "random_password" "db_password" {
 }
 
 resource "null_resource" "db_setup" {
+    count = var.create_db ? 1 : 0
     provisioner "local-exec" {
         command = "psql -h ${data.aws_db_instance.database.address} -U ${var.admin_database_username} -d ${var.admin_database_name} -c \"CREATE DATABASE \\\"${local.database_name}\\\";\""
         environment = {
@@ -69,7 +70,7 @@ resource "null_resource" "db_setup" {
 }
 
 resource "null_resource" "user_setup" {
-
+    count = var.create_db ? 1 : 0
     provisioner "local-exec" {
         command = "psql -h ${data.aws_db_instance.database.address} -U ${var.admin_database_username} -d ${var.admin_database_name} -c \"${templatefile("${path.module}/db_setup.tftpl", {
           username  = local.database_username
@@ -88,11 +89,11 @@ resource "null_resource" "user_setup" {
         password = local.database_password
     }
 
-    depends_on = [ null_resource.db_setup ]
+    depends_on = [ null_resource.db_setup[0] ]
 }
 
 resource "null_resource" "db_restore" {
-  count = var.db_restore && var.dump_file_to_restore != "" ? 1 : 0
+  count = var.db_restore && var.dump_file_to_restore != "" && var.create_db ? 1 : 0
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
@@ -123,7 +124,7 @@ EOF
         password = local.database_password
     }
 
-    depends_on = [ null_resource.user_setup ]
+    depends_on = [ null_resource.user_setup[0] ]
 }
 
 resource "null_resource" "db_dump" {
@@ -157,5 +158,5 @@ EOF
       password = local.database_password
   }
 
-  depends_on = [ null_resource.user_setup ]
+  depends_on = [ null_resource.user_setup[0] ]
 }

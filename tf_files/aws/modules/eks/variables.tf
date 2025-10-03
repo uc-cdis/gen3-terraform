@@ -12,9 +12,7 @@ variable "csoc_managed" {
   default = false
 }
 
-variable "ec2_keyname" {
-  default = "someone@uchicago.edu"
-}
+variable "ec2_keyname" {}
 
 variable "instance_type" {
   default = "t3.large"
@@ -204,7 +202,7 @@ variable "deploy_karpenter_in_k8s" {
 }
 
 variable "karpenter_version" {
-  default = "v0.32.9"
+  default = "1.0.8"
 }
 
 variable "spot_linked_role" {
@@ -257,3 +255,7 @@ variable "karpenter_ami_owner" {
   default     = "143731057154"
 }
 
+variable "ha_squid_single_instance" {
+  description = "If true, deploy a single instance of squid in an autoscaling group"
+  default     = false
+}

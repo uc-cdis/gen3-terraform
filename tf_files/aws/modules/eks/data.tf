@@ -36,6 +36,7 @@ data "aws_nat_gateway" "the_gateway" {
 
 # Also let's allow comminication through the peering
 data "aws_vpc_peering_connection" "pc" {
+  count = var.csoc_managed ? 1 : 0
   vpc_id = data.aws_vpc.the_vpc.id
   peer_owner_id = var.csoc_account_id
   status = "active"
@@ -187,4 +188,4 @@ data "aws_iam_policy_document" "planx-csoc-alerts-topic_access" {
   }
 }
 
-data "aws_ecrpublic_authorization_token" "token" {}
+#data "aws_ecrpublic_authorization_token" "token" {}
