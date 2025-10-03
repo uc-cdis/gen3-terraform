@@ -394,9 +394,12 @@ resource "kubectl_manifest" "karpenter_node_class" {
     metadata:
       name: default
     spec:
-      amiFamily: AL2
+      amiFamily: ${var.karpenter_ami_family}
+      %{ if var.karpenter_ami_name != "" && var.karpenter_ami_owner != "" }
       amiSelectorTerms:
-      - alias: al2@latest
+      - name: "${var.karpenter_ami_name}"
+        owner: "${var.karpenter_ami_owner}"
+      %{ endif }
       blockDeviceMappings:
       - deviceName: /dev/xvda
         ebs:
