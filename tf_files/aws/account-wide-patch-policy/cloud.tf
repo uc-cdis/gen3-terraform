@@ -111,7 +111,7 @@ resource "aws_ssmquicksetup_configuration_manager" "patch_policy_setup" {
     type                                     = "AWSQuickSetupType-PatchPolicy"
 
     parameters = {
-      "ConfigurationOptionsPatchOperation" : "Scan",
+      "ConfigurationOptionsPatchOperation" : "ScanAndInstall",
       "ConfigurationOptionsScanValue" : "cron(0 1 * * ? *)",
       "ConfigurationOptionsScanNextInterval" : "false",
       "PatchBaselineRegion" : data.aws_region.current.region,
