@@ -39,8 +39,8 @@ module "data-bucket" {
   environment            = var.vpc_name
   deploy_cloud_trail     = var.deploy_cloud_trail
   force_delete_bucket    = var.force_delete_bucket
-  sqs_encryption_enabled = var.sqs_encryption_enabled
-  sqs_kms_key_id         = var.sqs_kms_key_id
+  encryption_enabled     = var.sqs_encryption_enabled
+  kms_key_id             = var.sqs_kms_key_id
 }
 
 module "fence-bot-user" {
