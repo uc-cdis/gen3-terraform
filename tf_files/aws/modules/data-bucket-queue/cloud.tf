@@ -1,6 +1,6 @@
 resource "aws_sns_topic" "user_updates" {
   name              = "${var.bucket_name}_sns_topic"
-  kms_master_key_id = "alias/aws/sns"
+  kms_master_key_id = var.kms_key_id != "" ? var.kms_key_id : null
 }
 
 resource "aws_sqs_queue" "user_updates_queue" {
