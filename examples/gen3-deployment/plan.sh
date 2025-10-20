@@ -1,8 +1,3 @@
 echo "Running terraform plan"
-terraform plan  -var-file=sample.tfvars
-
-
-
-
-
-
+terraform init
+terraform plan  -var-file=/workspace/gen3-terraform/terraform.tfvars
