@@ -18,11 +18,12 @@ RUN apk add --no-cache \
 WORKDIR /workspace
 
 # Copy repo contents into container (optional if you mount instead)
-# COPY . /workspace
+COPY examples /workspace
 
 # Pre-install Python requirements if needed (for scripts inside gen3-terraform)
 # RUN pip install -r requirements.txt
 
 # Terraform entrypoint
-ENTRYPOINT [ "/bin/bash" ]
+# ENTRYPOINT [ "/bin/terraform" ]
+ENTRYPOINT ["/bin/sh", "-c"]
 # CMD ["/bin/bash"]
