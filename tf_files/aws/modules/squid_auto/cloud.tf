@@ -72,7 +72,7 @@ resource "aws_route_table_association" "squid_auto0" {
 resource "aws_launch_template" "squid_auto" {
   name_prefix   = "${var.env_squid_name}-lt"
   instance_type = var.squid_instance_type
-  image_id      = var.ssm_parameter_name != "" ? "resolve:ssm:/gen3/squid-ami-${var.env_vpc_name}" : data.aws_ami.public_squid_ami.id
+  image_id      = var.ssm_parameter_name != "" ? var.ssm_parameter_name : data.aws_ami.public_squid_ami.id
   key_name      = var.ssh_key_name != "" ? var.ssh_key_name : null
 
   iam_instance_profile {
