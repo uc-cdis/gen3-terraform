@@ -164,6 +164,11 @@ variable "squid_image_search_criteria" {
   default     = "amzn2-ami-hvm-*-x86_64-gp2"
 }
 
+variable "squid_image_ssm_parameter_name" {
+  description = "If provided, use this SSM parameter to get the AMI ID at launch time instead of squid_image_search_criteria"
+  default     = ""
+}
+
 variable "peering_vpc_id" {
   default = "vpc-e2b51d99"
 }

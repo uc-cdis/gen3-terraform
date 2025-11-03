@@ -146,6 +146,10 @@ variable "commons_log_retention" {
   default = "3650"
 }
 
+variable "squid_image_ssm_parameter_name" {
+  description = "If provided, use this SSM parameter to get the AMI ID at launch time instead of squid_image_search_criteria"
+}
+  
 variable "force_delete_bucket" {
   description = "Force delete the data bucket"
   default     = false
