@@ -5,7 +5,7 @@ resource "aws_sns_topic" "user_updates" {
 
 resource "aws_sqs_queue" "user_updates_queue" {
   name                       = "${var.bucket_name}_data_upload"
-  sqs_managed_sse_enabled    = var.encryption_enabled
+  sqs_managed_sse_enabled    = var.kms_key_id != "" ? null : var.encryption_enabled 
   kms_master_key_id          = var.kms_key_id != "" ? var.kms_key_id : null
   # 5 min visilibity timeout; avoid consuming the same message twice
   visibility_timeout_seconds = 300
