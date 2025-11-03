@@ -161,7 +161,7 @@ variable "ami_account_id" {
 
 variable "squid_image_search_criteria" {
   description = "Search criteria for squid AMI look up"
-  default     = "al2023-ami-*"
+  default     = "amzn2-ami-hvm-*-x86_64-gp2"
 }
 
 variable "squid_image_ssm_parameter_name" {
@@ -809,6 +809,31 @@ variable "deploy_karpenter_in_k8s" {
 
 variable "karpenter_version" {
   default = "1.0.8"
+}
+
+
+variable "karpenter_ami_family" {
+  description = "Optional AMI family for Karpenter node class"
+  type        = string
+  default     = "AL2"
+  nullable    = false
+
+  validation {
+    condition     = length(var.karpenter_ami_family) > 0
+    error_message = "karpenter_ami_family must not be an empty string."
+  }
+}
+
+variable "karpenter_ami_name" {
+  description = "Optional AMI name pattern for Karpenter node class"
+  type        = string
+  default     = "EKS-FIPS*"
+}
+
+variable "karpenter_ami_owner" {
+  description = "Optional AMI owner for Karpenter node class"
+  type        = string
+  default     = "143731057154"
 }
 
 variable "deploy_cloud_trail" {
