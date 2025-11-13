@@ -85,6 +85,12 @@ variable "final_snapshot_identifier" {
   default     = "aurora-cluster-snapshot-final"
 }
 
+variable "aurora_snapshot_identifier" {
+  type        = string
+  description = "The name of an existing DB snapshot to restore from when creating the DB cluster"
+  default     = ""
+}
+
 variable "backup_retention_period" {
   type        = number
   description = "The days to retain backups for"
