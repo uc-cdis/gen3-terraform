@@ -752,6 +752,12 @@ variable "skip_final_snapshot" {
   default     = false
 }
 
+variable "aurora_snapshot_identifier" {
+  type        = string
+  description = "The name of your final DB snapshot when this DB cluster is deleted"
+  default     = ""
+}
+
 variable "final_snapshot_identifier" {
   type        = string
   description = "The name of your final DB snapshot when this DB cluster is deleted"
