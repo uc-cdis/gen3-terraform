@@ -21,5 +21,7 @@ module "aurora" {
   secrets_manager_enabled           = var.secrets_manager_enabled
   db_kms_key_id			                = var.db_kms_key_id
   deploy_rds_check_lambda           = var.deploy_rds_check_lambda
+  performance_insights_enabled      = var.performance_insights_enabled
+  database_insights_mode            = var.database_insights_mode
   depends_on                        = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id]
 }

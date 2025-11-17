@@ -27,6 +27,8 @@ resource "aws_db_instance" "db_fence" {
   auto_minor_version_upgrade  = var.fence_auto_minor_version_upgrade
   storage_encrypted           = var.rds_instance_storage_encrypted
   max_allocated_storage       = var.fence_max_allocated_storage
+  performance_insights_enabled = var.performance_insights_enabled
+  database_insights_mode      = var.database_insights_mode
 
   tags = {
     Environment  = var.vpc_name
@@ -64,6 +66,8 @@ resource "aws_db_instance" "db_sheepdog" {
   auto_minor_version_upgrade  = var.sheepdog_auto_minor_version_upgrade
   storage_encrypted           = var.rds_instance_storage_encrypted
   max_allocated_storage       = var.sheepdog_max_allocated_storage
+  performance_insights_enabled = var.performance_insights_enabled
+  database_insights_mode      = var.database_insights_mode
 
   tags = {
     Environment  = var.vpc_name
@@ -101,6 +105,8 @@ resource "aws_db_instance" "db_indexd" {
   auto_minor_version_upgrade  = var.indexd_auto_minor_version_upgrade
   storage_encrypted           = var.rds_instance_storage_encrypted
   max_allocated_storage       = var.indexd_max_allocated_storage
+  performance_insights_enabled = var.performance_insights_enabled
+  database_insights_mode      = var.database_insights_mode
 
   tags = {
     Environment  = var.vpc_name
