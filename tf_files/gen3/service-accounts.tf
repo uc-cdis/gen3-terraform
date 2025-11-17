@@ -386,6 +386,7 @@ resource "aws_iam_role_policy" "aws-load-balancer-role-policy" {
           "ec2:DescribeCoipPools",
           "elasticloadbalancing:DescribeLoadBalancers",
           "elasticloadbalancing:DescribeLoadBalancerAttributes",
+          "elasticloadbalancing:DescribeListenerAttributes",
           "elasticloadbalancing:DescribeListeners",
           "elasticloadbalancing:DescribeListenerAttributes",
           "elasticloadbalancing:DescribeListenerCertificates",
