@@ -47,6 +47,7 @@ module "aws_rds" {
   rds_instance_parameter_group_name                  = var.rds_instance_parameter_group_name
   rds_instance_password                              = var.rds_instance_password
   rds_instance_performance_insights_enabled          = var.rds_instance_performance_insights_enabled
+  rds_instance_database_insights_mode                = var.rds_instance_database_insights_mode
   rds_instance_performance_insights_retention_period = var.rds_instance_performance_insights_retention_period
   rds_instance_port                                  = var.rds_instance_port
   rds_instance_publicly_accessible                   = var.rds_instance_publicly_accessible
