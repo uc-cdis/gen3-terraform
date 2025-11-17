@@ -133,6 +133,11 @@ variable "rds_instance_performance_insights_enabled" {
   default     = false
 }
 
+variable "rds_instance_database_insights_mode" {
+  description = "The mode of Database Insights"
+  default     = "standard"
+}
+
 variable "rds_instance_performance_insights_retention_period" {
   description = "The amount of time in days to retain Performance Insights data. Either 7 (7 days) or 731 (2 years)."
   default     = 7

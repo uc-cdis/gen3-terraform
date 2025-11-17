@@ -112,3 +112,15 @@ variable "deploy_rds_check_lambda" {
   type        = bool
   default     = false
 }
+
+variable "performance_insights_enabled" {
+  description = "Specifies whether to enable Performance Insights for the DB cluster"
+  type        = bool
+  default     = false
+}
+
+variable "database_insights_mode" {
+  description = "The mode of Database Insights"
+  type        = string
+  default     = "standard"
+}
