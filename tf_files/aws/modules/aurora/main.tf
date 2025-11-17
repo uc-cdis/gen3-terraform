@@ -85,7 +85,12 @@ module "secrets_manager" {
   count       = var.secrets_manager_enabled ? 1 : 0
   source      = "../secrets_manager"
   vpc_name    = var.vpc_name
-  secret      = aws_rds_cluster.postgresql.master_password
+  secret	    = templatefile("${path.module}/secrets_manager.tftpl", {
+    hostname = aws_rds_cluster.postgresql.endpoint
+    database = "postgres"
+    username = aws_rds_cluster.postgresql.master_username
+    password = aws_rds_cluster.postgresql.master_password
+  })
   secret_name = "aurora-master-password"
 }
 
@@ -141,4 +146,85 @@ resource "aws_rds_cluster_parameter_group" "aurora_cdis_pg" {
   lifecycle {
     ignore_changes  = all
   }
+}
+
+resource "aws_iam_role" "lambda_rds_check_role" {
+  count = var.deploy_rds_check_lambda ? 1 : 0
+  name  = "lambda-rds-check-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action    = "sts:AssumeRole",
+      Effect    = "Allow",
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "lambda_rds_check_policy" {
+  count = var.deploy_rds_check_lambda ? 1 : 0
+  name  = "lambda-rds-check-policy"
+  role  = aws_iam_role.lambda_rds_check_role[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Effect   = "Allow",
+        Resource = "arn:aws:logs:*:*:*"
+      },
+      {
+        Action = ["rds:DescribePendingMaintenanceActions"],
+        Effect = "Allow",
+        Resource = "*"
+      },
+      {
+        Action = ["cloudwatch:PutMetricData"],
+        Effect = "Allow",
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_lambda_function" "rds_upgrade_checker" {
+  count            = var.deploy_rds_check_lambda ? 1 : 0
+  filename         = "lambda_function_payload.zip" 
+  function_name    = "rds-upgrade-checker"
+  role             = aws_iam_role.lambda_rds_check_role[0].arn
+  handler          = "lambda_function.lambda_handler"
+  runtime          = "python3.13"
+  source_code_hash = data.archive_file.lambda_function.output_base64sha256
+  timeout          = 60
+  memory_size      = 128
+}
+
+resource "aws_cloudwatch_event_rule" "rds_upgrade_schedule" {
+  count              = var.deploy_rds_check_lambda ? 1 : 0
+  name                = "rds-upgrade-schedule"
+  schedule_expression = "rate(12 hours)"
+}
+
+resource "aws_cloudwatch_event_target" "lambda_target" {
+  count     = var.deploy_rds_check_lambda ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.rds_upgrade_schedule[0].name
+  target_id = "lambda"
+  arn       = aws_lambda_function.rds_upgrade_checker[0].arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge" {
+  count         = var.deploy_rds_check_lambda ? 1 : 0
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.rds_upgrade_checker[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.rds_upgrade_schedule[0].arn
 }

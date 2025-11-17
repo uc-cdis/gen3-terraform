@@ -133,3 +133,13 @@ variable "fips_ami_kms" {
 variable "fips" {
   default = false
 }
+
+variable "ssm_parameter_name" {
+  description = "If provided, use this SSM parameter to get the AMI ID at launch time"
+  default     = ""
+}
+
+variable "ha_squid_single_instance" {
+  description = "If true, deploy a single instance of squid instead in an autoscaling group"
+  default     = false
+}

@@ -41,7 +41,7 @@ resource "aws_iam_role" "esproxy-role" {
             "Condition": {
                 "ForAllValues:StringLike": {
                     "${module.eks[0].oidc_provider_arn}:sub": [
-                        "system:serviceaccount:*:esproxy-sa"
+                        "system:serviceaccount:*:aws-es-proxy-sa"
                     ],
                     "${module.eks[0].oidc_provider_arn}:aud": "sts.amazonaws.com"
                 }

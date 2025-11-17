@@ -31,10 +31,11 @@ resource "aws_iam_role_policy_attachment" "eks-policy-AmazonEKSServicePolicy" {
   role       = aws_iam_role.eks_control_plane_role.name
 }
 
-resource "aws_iam_role_policy_attachment" "bucket_write" {
-  policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/bucket_writer_logs-${var.vpc_name}-gen3"
-  role       = aws_iam_role.eks_control_plane_role.name
-}
+# TODO figure out if we still need this
+# resource "aws_iam_role_policy_attachment" "bucket_write" {
+#   policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/bucket_writer_logs-${var.vpc_name}-gen3"
+#   role       = aws_iam_role.eks_control_plane_role.name
+# }
 
 # Amazon SSM Policy 
 resource "aws_iam_role_policy_attachment" "eks-policy-AmazonSSMManagedInstanceCore" {
@@ -268,7 +269,7 @@ resource "aws_launch_template" "eks_launch_template" {
   name_prefix   = "eks-${var.vpc_name}-nodepool-${var.nodepool}"
   instance_type = var.nodepool_instance_type
   image_id      = data.aws_ami.eks_worker.id
-  key_name      = var.ec2_keyname
+  key_name      = var.ec2_keyname != null && var.ec2_keyname != "" ? var.ec2_keyname : null
 
   iam_instance_profile {
     name = aws_iam_instance_profile.eks_node_instance_profile.name
@@ -400,4 +401,11 @@ resource "aws_security_group" "ssh" {
     Name                     = "ssh_eks_${var.vpc_name}-nodepool-${var.nodepool}"
     "karpenter.sh/discovery" = "${var.vpc_name}-${var.nodepool}"
   }
+}
+
+resource "aws_eks_access_entry" "node_pool" {
+  cluster_name  = var.eks_cluster_name
+  principal_arn = aws_iam_role.eks_node_role.arn
+  type          = "EC2_LINUX"
+
 }

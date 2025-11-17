@@ -104,7 +104,7 @@ variable "hostname" {
 }
 
 variable "kube_ssh_key" {
-  default = ""
+  default = "ssh-rsa createAKey"
 }
 
 /* A list of ssh keys that will be added to
@@ -161,7 +161,12 @@ variable "ami_account_id" {
 
 variable "squid_image_search_criteria" {
   description = "Search criteria for squid AMI look up"
-  default     = "al2023-ami-*"
+  default     = "amzn2-ami-hvm-*-x86_64-gp2"
+}
+
+variable "squid_image_ssm_parameter_name" {
+  description = "If provided, use this SSM parameter to get the AMI ID at launch time instead of squid_image_search_criteria"
+  default     = ""
 }
 
 variable "peering_vpc_id" {
@@ -465,7 +470,7 @@ variable "deploy_argocd" {
 }
 
 variable "argocd_version" {
-  default = ""
+  default = "7.8.2"
 }
 
 variable "deploy_external_secrets_operator" {
@@ -473,11 +478,11 @@ variable "deploy_external_secrets_operator" {
 }
 
 variable "external_secrets_operator_version" {
-  default = ""
+  default = "0.14.0"
 }
 
 variable "ec2_keyname" {
-  default = "someone@uchicago.edu"
+  default = null
 }
 
 variable "instance_type" {
@@ -771,12 +776,22 @@ variable "password_length" {
   default     = 32
 }
 
+variable "db_kms_key_id" {
+  default = ""
+}
+
 variable "deploy_aurora" {
   default = false
 }
 
 variable "deploy_rds" {
   default = true
+}
+
+variable "deploy_rds_check_lambda" {
+  description = "Deploy the lambda function to check the RDS cluster"
+  type        = bool
+  default     = false
 }
 
 variable "use_asg" {
@@ -787,8 +802,38 @@ variable "use_karpenter" {
   default = false
 }
 
+variable "deploy_karpenter_in_k8s" {
+  default = false
+  description = "Allows you to enable the Karpenter Helm chart and associated resources without deploying the other parts of karpenter (i.e. the roles, permissions, and SQS queue)"
+}
+
 variable "karpenter_version" {
-  default = "v0.24.0"
+  default = "1.0.8"
+}
+
+
+variable "karpenter_ami_family" {
+  description = "Optional AMI family for Karpenter node class"
+  type        = string
+  default     = "AL2"
+  nullable    = false
+
+  validation {
+    condition     = length(var.karpenter_ami_family) > 0
+    error_message = "karpenter_ami_family must not be an empty string."
+  }
+}
+
+variable "karpenter_ami_name" {
+  description = "Optional AMI name pattern for Karpenter node class"
+  type        = string
+  default     = "EKS-FIPS*"
+}
+
+variable "karpenter_ami_owner" {
+  description = "Optional AMI owner for Karpenter node class"
+  type        = string
+  default     = "143731057154"
 }
 
 variable "deploy_cloud_trail" {
@@ -1074,28 +1119,75 @@ variable "deploy_waf" {
   default = false
 }
 
+variable "k8s_bootstrap_resources" {
+  default = true
+  description = "If set to true, creates resources for bootstrapping a kubernetes cluster (such as karpenter configs and helm releases)"
+}
 variable "base_rules" {
   description = "Base AWS Managed Rules"
   type = list(object({
     managed_rule_group_name = string
     priority = number
     override_to_count = list(string)
+    override_to_allow = list(string)
+    count = bool
   }))
   default = [
     {
       managed_rule_group_name = "AWSManagedRulesAmazonIpReputationList"
       priority = 0
       override_to_count = ["AWSManagedReconnaissanceList"]
+      override_to_allow = []
+      count = false
     },
     {
       managed_rule_group_name = "AWSManagedRulesPHPRuleSet"
       priority = 1
       override_to_count = ["PHPHighRiskMethodsVariables_HEADER", "PHPHighRiskMethodsVariables_QUERYSTRING", "PHPHighRiskMethodsVariables_BODY"]
+      override_to_allow = []
+      count = false
     },
     {
       managed_rule_group_name = "AWSManagedRulesWordPressRuleSet"
       priority = 2
       override_to_count= ["WordPressExploitableCommands_QUERYSTRING", "WordPressExploitablePaths_URIPATH"]
+      override_to_allow = []
+      count = false
+    },
+    {
+      managed_rule_group_name = "AWSManagedRulesAdminProtectionRuleSet"
+      priority = 3
+      override_to_count= ["AdminProtection_URIPATH"]
+      override_to_allow = []
+      count = false
+    },
+    {
+      managed_rule_group_name = "AWSManagedRulesCommonRuleSet"
+      priority = 4
+      override_to_count= []
+      override_to_allow = []
+      count = true
+    },
+    {
+      managed_rule_group_name = "AWSManagedRulesKnownBadInputsRuleSet"
+      priority = 5
+      override_to_count= []
+      override_to_allow = []
+      count = true
+    },
+    {
+      managed_rule_group_name = "AWSManagedRulesLinuxRuleSet"
+      priority = 6
+      override_to_count= []
+      override_to_allow = []
+      count = true
+    },
+    {
+      managed_rule_group_name = "AWSManagedRulesBotControlRuleSet"
+      priority = 7
+      override_to_count= []
+      override_to_allow = []
+      count = true
     },
   ]
 }
@@ -1110,3 +1202,37 @@ variable "additional_rules" {
   default = []
 }
 
+variable "custom_rule_groups" {
+  description = "References to customer-managed WAFv2 Rule Groups."
+  type = list(object({
+    name              = string
+    priority          = number
+    arn               = string 
+    count             = optional(bool, false)
+    override_to_count = optional(list(string), [])
+  }))
+  default = []
+}
+
+variable "ip_set_rules" {
+  description = "Rules that reference customer-managed IP sets."
+  type = list(object({
+    name       = string
+    priority   = number
+    ip_set_arn = string
+    # one of: "allow" | "block" | "count" | "captcha" | "challenge"
+    action     = string
+  }))
+  default = []
+}
+
+variable "force_delete_bucket" {
+  description = "Force delete S3 buckets"
+  type = bool
+  default = false
+}
+
+variable "ha_squid_single_instance" {
+  description = "If true, deploy a single instance of squid in an autoscaling group"
+  default     = false
+}

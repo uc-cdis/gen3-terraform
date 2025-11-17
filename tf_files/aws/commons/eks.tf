@@ -46,10 +46,16 @@ module "eks" {
   use_asg                          = var.use_asg
   use_karpenter                    = var.use_karpenter
   karpenter_version                = var.karpenter_version
+  deploy_karpenter_in_k8s          = var.deploy_karpenter_in_k8s
+  karpenter_ami_family             = var.karpenter_ami_family
+  karpenter_ami_name               = var.karpenter_ami_name
+  karpenter_ami_owner              = var.karpenter_ami_owner
   ci_run                           = var.ci_run
   eks_public_access                = var.eks_public_access
   enable_vpc_endpoints             = var.enable_vpc_endpoints
   spot_linked_role                 = var.spot_linked_role
   csoc_account_id                  = var.csoc_account_id
+  k8s_bootstrap_resources          = var.k8s_bootstrap_resources
+  ha_squid_single_instance         = var.ha_squid_single_instance
   depends_on                       = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id, module.cdis_vpc.squid_auto]
 }

@@ -1,7 +1,7 @@
 resource "aws_iam_role" "audit-role" {
   count = var.audit_enabled ? 1 : 0
   name = "${var.vpc_name}-${var.namespace}-audit-sa"
-  description = "Role for ES proxy service account for ${var.vpc_name}"
+  description = "Role for audit service account for ${var.vpc_name}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -30,7 +30,7 @@ resource "aws_iam_role" "audit-role" {
       }
     ]
   })
-  path = "/gen3-service/"
+  path = "/gen3_service/"
 }
 
 resource "aws_iam_role_policy" "audit-role-policy" {
@@ -58,7 +58,7 @@ resource "aws_iam_role_policy" "audit-role-policy" {
 resource "aws_iam_role" "fence-role" {
   count = var.fence_enabled ? 1 : 0
   name = "${var.vpc_name}-${var.namespace}-fence-sa"
-  description = "Role for ES proxy service account for ${var.vpc_name}"
+  description = "Role for fence service account for ${var.vpc_name}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -88,7 +88,7 @@ resource "aws_iam_role" "fence-role" {
     ]
   })
 
-  path = "/gen3-service/"
+  path = "/gen3_service/"
 }
 
 resource "aws_iam_role_policy" "fence-role-policy" {
@@ -143,7 +143,7 @@ resource "aws_iam_role" "gitops-role" {
     ]
   })
 
-  path = "/gen3-service/"
+  path = "/gen3_service/"
 }
 
 resource "aws_iam_role_policy" "gitops-role-policy" {
@@ -180,7 +180,7 @@ resource "aws_iam_role_policy" "gitops-role-policy" {
 resource "aws_iam_role" "hatchery-role" {
   count = var.hatchery_enabled ? 1 : 0
   name = "${var.vpc_name}-${var.namespace}-hatchery-sa"
-  description = "Role for ES proxy service account for ${var.vpc_name}"
+  description = "Role for hatchery service account for ${var.vpc_name}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -279,7 +279,7 @@ resource "aws_iam_role" "manifestservice-role" {
     ]
   })
 
-  path = "/gen3-service/"
+  path = "/gen3_service/"
 }
 
 resource "aws_iam_role_policy" "manifestservice-role-policy" {
@@ -315,7 +315,7 @@ resource "aws_iam_role_policy" "manifestservice-role-policy" {
 
 resource "aws_iam_role" "aws-load-balancer-controller-role" {
   count = var.namespace == "default" ? 1 : 0
-  name = "${var.vpc_name}-aws-load-balancer-controller-sa"
+  name = "${var.vpc_name}--${var.namespace}--ingress"
   description = "Role for ALB controller service account for ${var.vpc_name}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -346,7 +346,7 @@ resource "aws_iam_role" "aws-load-balancer-controller-role" {
     ]
   })
 
-  path = "/gen3-service/"
+  path = "/gen3_service/"
 }
 
 
@@ -388,6 +388,7 @@ resource "aws_iam_role_policy" "aws-load-balancer-role-policy" {
           "elasticloadbalancing:DescribeLoadBalancerAttributes",
           "elasticloadbalancing:DescribeListenerAttributes",
           "elasticloadbalancing:DescribeListeners",
+          "elasticloadbalancing:DescribeListenerAttributes",
           "elasticloadbalancing:DescribeListenerCertificates",
           "elasticloadbalancing:DescribeSSLPolicies",
           "elasticloadbalancing:DescribeRules",
@@ -578,7 +579,7 @@ resource "aws_iam_role_policy" "aws-load-balancer-role-policy" {
 }
 
 resource "aws_iam_role" "external-secrets-role" {
-  count = var.namespace == "default" || var.deploy_external_secrets  ? 1 : 0
+  count = var.deploy_external_secrets  ? 1 : 0
   name = "${var.vpc_name}-${var.namespace}-external-secrets-sa"
   description = "Role for external-secrets service account for ${var.vpc_name}"
   assume_role_policy = jsonencode({
@@ -601,7 +602,7 @@ resource "aws_iam_role" "external-secrets-role" {
         Condition = {
           StringEquals = {
             "${var.oidc_provider_arn}:sub" = [
-              "system:serviceaccount:${var.namespace}:secret-store-sa"
+              "system:serviceaccount:${var.namespace}:external-secrets"
             ]
             "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
           }
@@ -610,11 +611,11 @@ resource "aws_iam_role" "external-secrets-role" {
     ]
   })
 
-  path = "/gen3-service/"
+  path = "/gen3_service/"
 }
 
 resource "aws_iam_role_policy" "external-secrets-role-policy" {
-  count = var.namespace == "default" || var.deploy_external_secrets ? 1 : 0
+  count = var.deploy_external_secrets ? 1 : 0
   name = "external-secrets-role-policy"
   role = aws_iam_role.external-secrets-role[0].id
 
@@ -666,7 +667,7 @@ resource "aws_iam_role" "s3-mountpoint-role" {
     ]
   })
 
-  path = "/gen3-service/"
+  path = "/gen3_service/"
 }
 
 resource "aws_iam_role_policy" "s3-mountpoint-role-policy" {
@@ -732,7 +733,7 @@ resource "aws_iam_role" "grafana-role" {
     ]
   })
 
-  path = "/gen3-service/"
+  path = "/gen3_service/"
 }
 
 resource "aws_iam_role_policy" "grafana-role-policy" {
