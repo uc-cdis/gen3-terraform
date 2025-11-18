@@ -14,7 +14,7 @@ data "aws_iam_policy_document" "this" {
   dynamic "statement" {
     for_each = var.account_folders
     content {
-      sid    = "Example permissions"
+      sid    = "AllowList_${replace(statement.key, "-", "")}"
       effect = "Allow"
 
       principals {
@@ -44,7 +44,7 @@ data "aws_iam_policy_document" "this" {
   dynamic "statement" {
     for_each = var.account_folders
     content {
-      sid    = "Example permissions"
+      sid    = "AllowGet_${replace(statement.key, "-", "")}"
       effect = "Allow"
 
       principals {
