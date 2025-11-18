@@ -11,34 +11,24 @@ terraform {
 }
 
 data "aws_iam_policy_document" "this" {
-  dynamic "statement" {
-    for_each = var.account_folders
-    content {
-      sid    = "AllowList_${replace(statement.key, "-", "")}"
-      effect = "Allow"
+  statement {
+    sid    = "AllowList"
+    effect = "Allow"
 
-      principals {
-        type        = "AWS"
-        identifiers = ["arn:aws:iam::${statement.key}:root"]
-      }
-
-      actions   = ["s3:ListBucket", "s3:GetBucketLocation"]
-      resources = ["arn:aws:s3:::${var.bucket_name}"]
-
-      condition {
-        test     = "StringLike"
-        variable = "s3:prefix"
-
-        values = distinct(
-          flatten([
-            for prefix in statement.value : [
-              prefix,
-              "${prefix}*",
-            ]
-          ])
-        )
-      }
+    principals {
+      type        = "AWS"
+      identifiers = [
+        for account_id in keys(var.account_folders) :
+        "arn:aws:iam::${account_id}:root"
+      ]
     }
+
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+    ]
+
+    resources = ["arn:aws:s3:::${var.bucket_name}"]
   }
 
   dynamic "statement" {
