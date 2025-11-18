@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "this" {
 
       principals {
         type        = "AWS"
-        identifiers = ["arn:aws:iam::${each.key}:root"]
+        identifiers = ["arn:aws:iam::${statement.key}:root"]
       }
 
       actions   = ["s3:ListBucket", "s3:GetBucketLocation"]
@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "this" {
 
         values = distinct(
           flatten([
-            for prefix in each.value : [
+            for prefix in statement.value : [
               prefix,
               "${prefix}*",
             ]
@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "this" {
 
       principals {
         type        = "AWS"
-        identifiers = ["arn:aws:iam::${each.key}:root"]
+        identifiers = ["arn:aws:iam::${statement.key}:root"]
       }
 
       actions = [
@@ -57,7 +57,7 @@ data "aws_iam_policy_document" "this" {
       ]
 
       resources = [
-        for prefix in each.value :
+        for prefix in statement.value :
         "arn:aws:s3:::${var.bucket_name}/${prefix}/user.yaml"
       ]
     }
