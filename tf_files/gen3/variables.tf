@@ -319,7 +319,7 @@ variable "gitops_path" {
 variable "gitops_repo" {
   description = "Git repository URL for ArgoCD GitOps"
   type        = string
-  default = "'<git repo url>'"
+  default     = "'<git repo url>'"
 }
 
 variable "helm_repo" {
