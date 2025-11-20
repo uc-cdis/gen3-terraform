@@ -84,11 +84,11 @@ data "aws_route_table" "public_kube" {
 data "aws_ami" "eks_worker" {
   filter {
     name   = "name"
-    values = ["amazon-eks-node-${var.eks_version}*"]
+    values = ["amazon-eks-node-al2023-x86_64-standard-${var.eks_version}-*"]
   }
 
   most_recent = true
-  owners      = ["602401143452"] # Amazon Account ID
+  owners      = ["amazon"] # Amazon Account ID
 }
 
 # grab the local traffic sec group
