@@ -193,9 +193,9 @@ resource "aws_wafv2_web_acl" "waf" {
   }
 
   visibility_config {
-    cloudwatch_metrics_enabled = false
+    cloudwatch_metrics_enabled = true
     metric_name                = "WebAclMetrics"
-    sampled_requests_enabled   = false
+    sampled_requests_enabled   = true
   }
 }
 
