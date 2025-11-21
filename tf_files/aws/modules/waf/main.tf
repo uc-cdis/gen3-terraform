@@ -228,10 +228,16 @@ resource "aws_wafv2_rule_group" "geo_restriction" {
       }
     }
   }
-
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "geoblock"
       sampled_requests_enabled   = true
     }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "geoblock"
+    sampled_requests_enabled   = true
+  }
 }
