@@ -1230,6 +1230,7 @@ variable "geo_restriction" {
   description = "If custom rule group 'geo' should be created and added."
   type = bool
   default = false
+}
 
 variable "force_delete_bucket" {
   description = "Force delete S3 buckets"
