@@ -4,7 +4,7 @@ variable "kms_key_arn" {
   default     = null
 }
 
-variable "authorized_account_ids" {
+variable "account_ids" {
   description = "List of AWS account IDs that can access the secret"
   type        = list(string)
 }

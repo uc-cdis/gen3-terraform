@@ -1,5 +1,16 @@
 data "aws_caller_identity" "current" {}
 
+terraform {
+  backend "s3" {
+    encrypt = "true"
+  }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+    }
+  }
+}
+
 # Create KMS key if not provided
 resource "aws_kms_key" "secret_key" {
   count               = var.kms_key_arn == null ? 1 : 0
@@ -59,7 +70,7 @@ resource "aws_secretsmanager_secret" "secret" {
         Sid    = "AllowAuthorizedAccounts"
         Effect = "Allow"
         Principal = {
-          AWS = [for account_id in var.authorized_account_ids : "arn:aws:iam::${account_id}:root"]
+          AWS = [for account_id in var.account_ids : "arn:aws:iam::${account_id}:root"]
         }
         Action = [
           "secretsmanager:GetSecretValue",
