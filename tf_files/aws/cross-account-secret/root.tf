@@ -33,7 +33,7 @@ resource "aws_kms_key" "secret_key" {
         Sid    = "Allow access from authorized accounts"
         Effect = "Allow"
         Principal = {
-          AWS = [for account_id in var.authorized_account_ids : "arn:aws:iam::${account_id}:root"]
+          AWS = [for account_id in var.account_ids : "arn:aws:iam::${account_id}:root"]
         }
         Action = [
           "kms:Decrypt",
