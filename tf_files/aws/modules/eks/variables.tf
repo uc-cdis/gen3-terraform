@@ -45,7 +45,7 @@ variable "worker_drive_size" {
 }
 
 variable "eks_version" {
-  default = "1.25"
+  default = "1.33"
 }
 
 variable "workers_subnet_size" {
@@ -234,7 +234,7 @@ variable "k8s_bootstrap_resources" {
 variable "karpenter_ami_family" {
   description = "Optional AMI family for Karpenter node class"
   type        = string
-  default     = "AL2"
+  default     = "AL2023"
   nullable    = false
 
   validation {
@@ -246,13 +246,13 @@ variable "karpenter_ami_family" {
 variable "karpenter_ami_name" {
   description = "Optional AMI name pattern for Karpenter node class"
   type        = string
-  default     = "EKS-FIPS*"
+  default     = ""
 }
 
 variable "karpenter_ami_owner" {
   description = "Optional AMI owner for Karpenter node class"
   type        = string
-  default     = "143731057154"
+  default     = ""
 }
 
 variable "ha_squid_single_instance" {
