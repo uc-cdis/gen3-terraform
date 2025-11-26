@@ -37,7 +37,9 @@ locals {
   # The hostname for your gen3 deployment. If you are creating another instance of the gen3 module set the hostname in it accordingly
   hostname                      = "<update with your hostname>"
   # Service linked roles can only be created once per account. If you see an error that it is already created, set this to false.
-  es_linked_role                = false
+  es_linked_role                = true
+  # Service linked role for spot instances
+  spot_linked_role       = true
   # The arn of the certificate in ACM
   revproxy_arn                  = "<Update with your ACM certificate arn>"
   # Whether or not to create users/buckets needed for useryaml gitops management.
