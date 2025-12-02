@@ -9,10 +9,11 @@ module "cdis_vpc" {
   source                         = "../modules/vpc"
   ami_account_id                 = var.ami_account_id
   squid_image_search_criteria    = var.squid_image_search_criteria
+  squid_image_ssm_parameter_name = var.squid_image_ssm_parameter_name
   vpc_cidr_block                 = var.vpc_cidr_block
   secondary_cidr_block           = var.secondary_cidr_block
   vpc_name                       = var.vpc_name
-  ssh_key_name                   = var.kube_ssh_key != "" ? aws_key_pair.automation_dev[0].key_name : ""
+  ssh_key_name                   = var.kube_ssh_key != "" ? aws_key_pair.automation_dev.key_name : ""
   peering_cidr                   = var.peering_cidr
   csoc_account_id                = var.csoc_account_id
   organization_name              = var.organization_name
@@ -42,6 +43,11 @@ module "cdis_vpc" {
   commons_log_retention          = var.commons_log_retention
   ha_squid_single_instance       = var.ha_squid_single_instance
   force_delete_bucket            = var.force_delete_bucket
+  availability_zones             = var.availability_zones
+  providers = {
+    aws      = aws
+    aws.csoc = aws.csoc
+  }
 }
 
 module "csoc_peering_connection" {

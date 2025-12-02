@@ -161,7 +161,12 @@ variable "ami_account_id" {
 
 variable "squid_image_search_criteria" {
   description = "Search criteria for squid AMI look up"
-  default     = "al2023-ami-*"
+  default     = "amzn2-ami-hvm-*-x86_64-gp2"
+}
+
+variable "squid_image_ssm_parameter_name" {
+  description = "If provided, use this SSM parameter to get the AMI ID at launch time instead of squid_image_search_criteria"
+  default     = ""
 }
 
 variable "peering_vpc_id" {
@@ -806,6 +811,31 @@ variable "karpenter_version" {
   default = "1.0.8"
 }
 
+
+variable "karpenter_ami_family" {
+  description = "Optional AMI family for Karpenter node class"
+  type        = string
+  default     = "AL2"
+  nullable    = false
+
+  validation {
+    condition     = length(var.karpenter_ami_family) > 0
+    error_message = "karpenter_ami_family must not be an empty string."
+  }
+}
+
+variable "karpenter_ami_name" {
+  description = "Optional AMI name pattern for Karpenter node class"
+  type        = string
+  default     = "EKS-FIPS*"
+}
+
+variable "karpenter_ami_owner" {
+  description = "Optional AMI owner for Karpenter node class"
+  type        = string
+  default     = "143731057154"
+}
+
 variable "deploy_cloud_trail" {
   default = true
 }
@@ -1099,22 +1129,65 @@ variable "base_rules" {
     managed_rule_group_name = string
     priority = number
     override_to_count = list(string)
+    override_to_allow = list(string)
+    count = bool
   }))
   default = [
     {
       managed_rule_group_name = "AWSManagedRulesAmazonIpReputationList"
       priority = 0
       override_to_count = ["AWSManagedReconnaissanceList"]
+      override_to_allow = []
+      count = false
     },
     {
       managed_rule_group_name = "AWSManagedRulesPHPRuleSet"
       priority = 1
       override_to_count = ["PHPHighRiskMethodsVariables_HEADER", "PHPHighRiskMethodsVariables_QUERYSTRING", "PHPHighRiskMethodsVariables_BODY"]
+      override_to_allow = []
+      count = false
     },
     {
       managed_rule_group_name = "AWSManagedRulesWordPressRuleSet"
       priority = 2
       override_to_count= ["WordPressExploitableCommands_QUERYSTRING", "WordPressExploitablePaths_URIPATH"]
+      override_to_allow = []
+      count = false
+    },
+    {
+      managed_rule_group_name = "AWSManagedRulesAdminProtectionRuleSet"
+      priority = 3
+      override_to_count= ["AdminProtection_URIPATH"]
+      override_to_allow = []
+      count = false
+    },
+    {
+      managed_rule_group_name = "AWSManagedRulesCommonRuleSet"
+      priority = 4
+      override_to_count= []
+      override_to_allow = []
+      count = true
+    },
+    {
+      managed_rule_group_name = "AWSManagedRulesKnownBadInputsRuleSet"
+      priority = 5
+      override_to_count= []
+      override_to_allow = []
+      count = true
+    },
+    {
+      managed_rule_group_name = "AWSManagedRulesLinuxRuleSet"
+      priority = 6
+      override_to_count= []
+      override_to_allow = []
+      count = true
+    },
+    {
+      managed_rule_group_name = "AWSManagedRulesBotControlRuleSet"
+      priority = 7
+      override_to_count= []
+      override_to_allow = []
+      count = true
     },
   ]
 }
@@ -1129,6 +1202,30 @@ variable "additional_rules" {
   default = []
 }
 
+variable "custom_rule_groups" {
+  description = "References to customer-managed WAFv2 Rule Groups."
+  type = list(object({
+    name              = string
+    priority          = number
+    arn               = string 
+    count             = optional(bool, false)
+    override_to_count = optional(list(string), [])
+  }))
+  default = []
+}
+
+variable "ip_set_rules" {
+  description = "Rules that reference customer-managed IP sets."
+  type = list(object({
+    name       = string
+    priority   = number
+    ip_set_arn = string
+    # one of: "allow" | "block" | "count" | "captcha" | "challenge"
+    action     = string
+  }))
+  default = []
+}
+
 variable "force_delete_bucket" {
   description = "Force delete S3 buckets"
   type = bool
@@ -1138,4 +1235,16 @@ variable "force_delete_bucket" {
 variable "ha_squid_single_instance" {
   description = "If true, deploy a single instance of squid in an autoscaling group"
   default     = false
+}
+
+variable "performance_insights_enabled" {
+  description = "Specifies whether to enable Performance Insights for the DB cluster"
+  type        = bool
+  default     = false
+}
+
+variable "database_insights_mode" {
+  description = "The mode of Database Insights"
+  type        = string
+  default     = "standard"
 }

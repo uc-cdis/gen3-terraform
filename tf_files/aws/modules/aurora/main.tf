@@ -29,7 +29,10 @@ resource "aws_rds_cluster" "postgresql" {
   backup_retention_period         = var.backup_retention_period
   preferred_backup_window         = var.preferred_backup_window
   db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.aurora_cdis_pg.name
-  kms_key_id                      = var.db_kms_key_id 
+  performance_insights_enabled    = var.performance_insights_enabled
+  database_insights_mode          = var.database_insights_mode
+  performance_insights_kms_key_id = var.performance_insights_enabled && var.db_kms_key_id != "" ? var.db_kms_key_id : null
+  kms_key_id                      = var.db_kms_key_id
 
   serverlessv2_scaling_configuration {
     max_capacity = var.serverlessv2_scaling_max_capacity

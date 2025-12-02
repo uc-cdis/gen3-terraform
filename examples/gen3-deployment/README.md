@@ -95,7 +95,9 @@ kubectl apply -f <VPC_NAME>/cluster-level-resources/app.yaml
 
 This kicks off deployment of supplemental software (e.g., Argo CD, supporting operators).
 
-### 3.3 Configure Your IdP (Fence Config)
+### 3.3 Configure an IdP in Fence Config(Optional)
+
+Cognito is setup by default if you keep the deploy_cognito variable set to true. You may setup other IdPs, such as google, at this time though.
 
 1. In **AWS Secrets Manager**, search for the secret named like `fence-config-<COMMONS_HOSTNAME>` (exact name will depend on your setup).
 2. Retrieve and edit the secret’s value:

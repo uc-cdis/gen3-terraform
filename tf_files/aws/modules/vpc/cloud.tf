@@ -12,6 +12,7 @@ module "squid-auto" {
   ssh_key_name                   = var.ssh_key_name
   ami_account_id                 = var.ami_account_id
   image_name_search_criteria     = var.squid_image_search_criteria
+  ssm_parameter_name             = var.squid_image_ssm_parameter_name
   squid_instance_drive_size      = var.squid_instance_drive_size
   squid_availability_zones       = var.availability_zones
   main_public_route              = aws_route_table.public.id
@@ -33,12 +34,14 @@ module "squid-auto" {
 }
 
 module "data-bucket" {
-  source               = "../upload-data-bucket"
-  vpc_name             = var.vpc_name
-  cloudwatchlogs_group = aws_cloudwatch_log_group.main_log_group.arn
-  environment          = var.vpc_name
-  deploy_cloud_trail   = var.deploy_cloud_trail
-  force_delete_bucket  = var.force_delete_bucket
+  source                 = "../upload-data-bucket"
+  vpc_name               = var.vpc_name
+  cloudwatchlogs_group   = aws_cloudwatch_log_group.main_log_group.arn
+  environment            = var.vpc_name
+  deploy_cloud_trail     = var.deploy_cloud_trail
+  force_delete_bucket    = var.force_delete_bucket
+  encryption_enabled     = var.sqs_encryption_enabled
+  kms_key_id             = var.sqs_kms_key_id
 }
 
 module "fence-bot-user" {
@@ -173,7 +176,7 @@ resource "aws_route_table" "public" {
 
 
 resource "aws_eip" "nat_gw" {
-  vpc = true
+  domain = "vpc"
 
   tags = {
     Name         = "${var.vpc_name}-ngw-eip"
@@ -290,8 +293,13 @@ resource "aws_vpc_peering_connection" "vpcpeering" {
 }
 
 resource "aws_route" "default_csoc" {
-  count                     = var.csoc_managed ? 1 : 0
-  route_table_id            = data.aws_route_tables.control_routing_table[count.index].id
+  provider = aws.csoc
+  for_each = (
+    var.csoc_managed
+    ? toset(data.aws_route_tables.control_routing_table[0].ids)
+    : toset([])
+  )
+  route_table_id            = each.value
   destination_cidr_block    = var.vpc_cidr_block
   vpc_peering_connection_id = var.csoc_managed ? aws_vpc_peering_connection.vpcpeering[0].id : null
 }
