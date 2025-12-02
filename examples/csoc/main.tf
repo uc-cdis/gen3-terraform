@@ -78,7 +78,7 @@ locals {
 
 
 module "eks" {
-  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/eks?ref=f0cf0294266af2f41395b62636360bcd297335f0"
+  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/eks?ref=4071518b8859c17e790defcabb762c10c2e2f055"
   providers = {
     aws      = aws       # default account
     aws.csoc = aws.csoc  # satisfy aws.csoc in state/module
@@ -135,7 +135,7 @@ module "eks" {
 }
 
 module "vpc" {
-  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/modules/vpc?ref=f0cf0294266af2f41395b62636360bcd297335f0"
+  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/modules/vpc?ref=4071518b8859c17e790defcabb762c10c2e2f055"
   providers = {
     aws      = aws       # default account
     aws.csoc = aws.csoc  # satisfy aws.csoc in state/module
