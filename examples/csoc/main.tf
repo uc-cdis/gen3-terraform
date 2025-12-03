@@ -153,7 +153,7 @@ module "vpc" {
 # add module for cluster-level-resources
 
 resource "aws_route_table" "private_kube" {
-  vpc_id                      = module.cdis_vpc.vpc_id
+  vpc_id                      = module.vpc.vpc_id
 
   tags = {
     Name                      = "private_kube"
