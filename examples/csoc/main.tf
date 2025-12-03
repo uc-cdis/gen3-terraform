@@ -50,7 +50,7 @@ module "eks" {
     aws      = aws       # default account
     aws.csoc = aws.csoc  # satisfy aws.csoc in state/module
   }
-  depends_on                       = [module.vpc]
+  depends_on                       = [module.vpc, aws_route_table.private_kube]
   vpc_name                         = var.vpc_name
   vpc_id                           = var.vpc_id
   ec2_keyname                      = var.ec2_keyname
@@ -110,6 +110,7 @@ module "vpc" {
     aws      = aws       # default account
     aws.csoc = aws.csoc  # satisfy aws.csoc in state/module
   }
+  depends_on                       = [aws_iam_policy.configbucket_reader]
   ami_account_id                   = var.ami_account_id
   vpc_name                         = var.vpc_name
   vpc_cidr_block                   = var.vpc_cidr_block
