@@ -135,7 +135,9 @@ variable "csoc_managed" {
   default = false
 }
 
-variable "ec2_keyname" {}
+variable "ec2_keyname" {
+  default = ""
+}
 
 variable "instance_type" {
   default = "t3.large"
