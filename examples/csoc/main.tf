@@ -45,7 +45,7 @@ locals {
 
 
 module "eks" {
-  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/eks?ref=f345a784df4bddb1a81911351a9ec78dad83a7ca"
+  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/modules/eks?ref=f345a784df4bddb1a81911351a9ec78dad83a7ca"
   providers = {
     aws      = aws       # default account
     aws.csoc = aws.csoc  # satisfy aws.csoc in state/module
@@ -62,6 +62,7 @@ module "eks" {
   eks_version                      = var.eks_version
   jupyter_instance_type            = var.jupyter_instance_type
   deploy_jupyter                   = var.deploy_jupyter
+  deploy_workflow                  - var.deploy_workflow
   workers_subnet_size              = var.workers_subnet_size
   bootstrap_script                 = var.bootstrap_script
   jupyter_bootstrap_script         = var.jupyter_bootstrap_script
