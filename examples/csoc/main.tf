@@ -19,18 +19,6 @@ provider "aws" {
 
 data "aws_caller_identity" "current" {}
 
-terraform {
-  backend "s3" {
-    # The bucket to store the Terraform state file in.
-    bucket = "elise-tftest" # Update to represent your environment
-    # The location of the Terraform state file within the bucket. Notice the bucket has to exist beforehand.
-    key = "gen3-commons/terraform.tfstate" # Update to represent your environment    
-    encrypt = "true"
-    # The region where the S3 bucket is located.
-    region = "us-east-1"
-  }
-}
-
 locals {
   # Core settings
   vpc_name             = var.vpc_name
