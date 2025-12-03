@@ -50,7 +50,7 @@ module "eks" {
     aws      = aws       # default account
     aws.csoc = aws.csoc  # satisfy aws.csoc in state/module
   }
-  depends_on              = [module.vpc]
+  depends_on                       = [module.vpc]
   vpc_name                         = var.vpc_name
   vpc_id                           = var.vpc_id
   ec2_keyname                      = var.ec2_keyname
@@ -151,3 +151,13 @@ module "vpc" {
 
 # add module for csoc deployment
 # add module for cluster-level-resources
+
+resource "aws_route_table" "private_kube" {
+  vpc_id                      = module.cdis_vpc.vpc_id
+
+  tags = {
+    Name                      = "private_kube"
+    Environment               = var.vpc_name
+    Organization              = var.organization_name
+  }
+}
