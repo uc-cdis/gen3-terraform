@@ -59,6 +59,7 @@ module "eks" {
   secondary_cidr_block             = var.secondary_cidr_block
   users_policy                     = var.users_policy
   worker_drive_size                = var.worker_drive_size
+  deploy_karpenter_in_k8s          = var.deploy_karpenter_in_k8s
   eks_version                      = var.eks_version
   jupyter_instance_type            = var.jupyter_instance_type
   deploy_jupyter                   = var.deploy_jupyter
@@ -96,7 +97,7 @@ module "eks" {
   ci_run                           = var.ci_run
   use_asg                          = var.use_asg 
   use_karpenter                    = var.use_karpenter
-  karpenter_version               = var.karpenter_version
+  karpenter_version                = var.karpenter_version
   eks_public_access                = var.eks_public_access
   enable_vpc_endpoints             = var.enable_vpc_endpoints
   k8s_bootstrap_resources          = var.k8s_bootstrap_resources
@@ -122,7 +123,7 @@ module "vpc" {
   organization_name                = var.organization_name
   availability_zones               = var.availability_zones
   squid_image_search_criteria      = var.squid_image_search_criteria
-  squid_image_ssm_parameter_name = var.squid_image_ssm_parameter_name
+  squid_image_ssm_parameter_name   = var.squid_image_ssm_parameter_name
   squid_instance_drive_size        = var.squid_instance_drive_size
   squid_instance_type              = var.squid_instance_type
   squid_bootstrap_script           = var.squid_bootstrap_script
