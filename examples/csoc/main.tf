@@ -41,6 +41,8 @@ locals {
   default_tags = length(var.default_tags) > 0 ? var.default_tags : {
     Environment = local.vpc_name
   }
+}
+
 
 module "eks" {
   source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/eks?ref=f345a784df4bddb1a81911351a9ec78dad83a7ca"
