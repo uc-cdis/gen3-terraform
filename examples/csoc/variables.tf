@@ -376,7 +376,7 @@ variable "vpc_flow_traffic" {
 
 # name of aws_key_pair ssh key to attach to VM's
 variable "ssh_key_name" {
-  default = "someone@uchicago.edu"
+  default = ""
 }
 
 variable "csoc_account_id" {
