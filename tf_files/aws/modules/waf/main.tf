@@ -162,13 +162,81 @@ resource "aws_wafv2_web_acl" "waf" {
     }
   }
 
+  dynamic "rule" {
+    for_each = var.geo_restriction ? [1] : []
+
+    content {
+      name     = "geo-restriction-rule-group"
+      priority = 10
+
+      override_action {
+        none {}
+      }
+
+      statement {
+        rule_group_reference_statement {
+          arn = aws_wafv2_rule_group.geo_restriction[0].arn
+        }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "geoblock"
+        sampled_requests_enabled   = true
+      }
+    }
+  }
+
+
   tags = {
     Environment = "${var.vpc_name}"
   }
 
   visibility_config {
-    cloudwatch_metrics_enabled = false
+    cloudwatch_metrics_enabled = true
     metric_name                = "WebAclMetrics"
-    sampled_requests_enabled   = false
+    sampled_requests_enabled   = true
+  }
+}
+
+resource "aws_wafv2_rule_group" "geo_restriction" {
+  count = var.geo_restriction ? 1 : 0
+  name        = "geo"
+  description = "A custom rule group to restrict by Country Code."
+  scope       = "REGIONAL"
+  capacity    = 10
+  rule {
+    name     = "geoblock"
+    priority = 0
+
+    action {
+      block {}
+    }
+
+    statement {
+      geo_match_statement {
+        country_codes = [
+          "CN",
+          "CU",
+          "HK",
+          "IR",
+          "KP",
+          "MO",
+          "RU",
+          "VE"
+        ]
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "geoblock"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "geoblock"
+    sampled_requests_enabled   = true
   }
 }
