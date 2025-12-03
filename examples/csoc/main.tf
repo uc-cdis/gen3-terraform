@@ -154,6 +154,7 @@ module "vpc" {
   organization_name                = var.organization_name
   availability_zones               = var.availability_zones
   squid_image_search_criteria      = var.squid_image_search_criteria
+  squid_image_ssm_parameter_name = var.squid_image_ssm_parameter_name
   squid_instance_drive_size        = var.squid_instance_drive_size
   squid_instance_type              = var.squid_instance_type
   squid_bootstrap_script           = var.squid_bootstrap_script
