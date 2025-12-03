@@ -67,7 +67,7 @@ variable "ssh_key" {
 variable "deploy_cognito" {
   description = "Whether to deploy Cognito resources"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "user_pool_name" {

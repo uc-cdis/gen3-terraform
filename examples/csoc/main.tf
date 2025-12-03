@@ -42,29 +42,6 @@ locals {
     Environment = local.vpc_name
   }
 
-
-  ### Cognito setup
-  deploy_cognito = true
-  user_pool_name  = "${local.vpc_name}-pool"
-  app_client_name = "${local.vpc_name}-client"
-  domain_prefix = "${local.vpc_name}-auth"
-  callback_urls = [
-    "https://${local.hostname}/",
-    "https://${local.hostname}/login/",
-    "https://${local.hostname}/login/cognito/login/",
-    "https://${local.hostname}/user/",
-    "https://${local.hostname}/user/login/cognito/",
-    "https://${local.hostname}/user/login/cognito/login/",
-  ]
-  logout_urls = [
-    "https://${local.hostname}/",
-  ]
-  allowed_oauth_flows  = ["code"]
-  allowed_oauth_scopes = ["email", "openid", "phone", "profile"]
-  supported_identity_providers = ["COGNITO"]
-}
-
-
 module "eks" {
   source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/eks?ref=f345a784df4bddb1a81911351a9ec78dad83a7ca"
   providers = {
@@ -82,6 +59,7 @@ module "eks" {
   worker_drive_size                = var.worker_drive_size
   eks_version                      = var.eks_version
   jupyter_instance_type            = var.jupyter_instance_type
+  deploy_jupyter                   = var.deploy_jupyter
   workers_subnet_size              = var.workers_subnet_size
   bootstrap_script                 = var.bootstrap_script
   jupyter_bootstrap_script         = var.jupyter_bootstrap_script
