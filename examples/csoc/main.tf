@@ -45,7 +45,7 @@ locals {
 
 
 module "eks" {
-  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/modules/eks?ref=f345a784df4bddb1a81911351a9ec78dad83a7ca"
+  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/modules/eks?ref=terraform-docker"
   providers = {
     aws      = aws       # default account
     aws.csoc = aws.csoc  # satisfy aws.csoc in state/module
@@ -105,12 +105,11 @@ module "eks" {
 }
 
 module "vpc" {
-  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/modules/vpc?ref=f345a784df4bddb1a81911351a9ec78dad83a7ca"
+  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/modules/vpc?ref=terraform-docker"
   providers = {
     aws      = aws       # default account
     aws.csoc = aws.csoc  # satisfy aws.csoc in state/module
   }
-  depends_on                       = [aws_iam_policy.configbucket_reader]
   ami_account_id                   = var.ami_account_id
   vpc_name                         = var.vpc_name
   vpc_cidr_block                   = var.vpc_cidr_block
@@ -163,12 +162,12 @@ resource "aws_route_table" "private_kube" {
   }
 }
 
-resource "aws_iam_policy" "configbucket_reader" {
-  name        = "bucket_reader_cdis-gen3-users_${var.vpc_name}"
-  description = "Read cdis-gen3-users/${var.config_folder}"
-  policy      = data.aws_iam_policy_document.configbucket_reader.json
+# resource "aws_iam_policy" "configbucket_reader" {
+#   name        = "bucket_reader_cdis-gen3-users_${var.vpc_name}"
+#   description = "Read cdis-gen3-users/${var.config_folder}"
+#   policy      = data.aws_iam_policy_document.configbucket_reader.json
 
-  lifecycle {
-    ignore_changes = [policy]
-  }
-}
+#   lifecycle {
+#     ignore_changes = [policy]
+#   }
+# }
