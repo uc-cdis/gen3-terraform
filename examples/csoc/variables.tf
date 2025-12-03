@@ -135,9 +135,7 @@ variable "csoc_managed" {
   default = false
 }
 
-variable "ec2_keyname" {
-  default = "someone@uchicago.edu"
-}
+variable "ec2_keyname" {}
 
 variable "instance_type" {
   default = "t3.large"
