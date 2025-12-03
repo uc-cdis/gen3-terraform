@@ -62,7 +62,7 @@ module "eks" {
   eks_version                      = var.eks_version
   jupyter_instance_type            = var.jupyter_instance_type
   deploy_jupyter                   = var.deploy_jupyter
-  deploy_workflow                  - var.deploy_workflow
+  deploy_workflow                  = var.deploy_workflow
   workers_subnet_size              = var.workers_subnet_size
   bootstrap_script                 = var.bootstrap_script
   jupyter_bootstrap_script         = var.jupyter_bootstrap_script
