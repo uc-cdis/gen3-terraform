@@ -4,6 +4,10 @@ variable "account_number" {
   default     = null
 }
 
+variable "config_folder" {
+  default = "csoc"
+}
+
 variable "aws_region" {
   description = "The AWS region where the resources will be created in"
   type        = string
