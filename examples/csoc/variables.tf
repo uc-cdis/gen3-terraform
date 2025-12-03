@@ -168,7 +168,7 @@ variable "worker_drive_size" {
 }
 
 variable "eks_version" {
-  default = "1.25"
+  default = "1.33"
 }
 
 variable "workers_subnet_size" {
