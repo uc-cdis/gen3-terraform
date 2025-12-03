@@ -399,7 +399,7 @@ variable "squid_image_search_criteria" {
 
 variable "squid_instance_drive_size" {
   description = "Volume size for the squid instance"
-  default     = 8
+  default     = 30
 }
 
 variable "squid_instance_type" {
