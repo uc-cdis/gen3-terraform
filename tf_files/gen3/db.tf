@@ -94,6 +94,18 @@ module "metadata-db" {
   secrets_manager_enabled = true
 }
 
+module "peregrine-db" {
+  count                   = var.peregrine_enabled ? 1 : 0
+  source                  = "../aws/aurora_db"
+  vpc_name                = var.vpc_name
+  service                 = "peregrine"
+  admin_database_username = var.aurora_username
+  admin_database_password = var.aurora_password
+  namespace               = var.namespace
+  create_db               = var.create_dbs
+  secrets_manager_enabled = true
+}
+
 module "requestor-db" {
   count                   = var.requestor_enabled ? 1 : 0
   source                  = "../aws/aurora_db"
