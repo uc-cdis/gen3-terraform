@@ -104,9 +104,11 @@ resource "local_file" "cluster_values" {
 resource "local_file" "app_yaml" {
   filename = "./gitops-repo/${var.vpc_name}/${var.hostname}/app.yaml"
   content  = templatefile("${path.module}/templates/app.tftpl", {
-    vpc_name  = var.vpc_name,
-    hostname  = var.hostname,
-    namespace = var.namespace
+    vpc_name    = var.vpc_name,
+    hostname    = var.hostname,
+    namespace   = var.namespace,
+    gitops_repo = var.gitops_repo,
+    helm_repo   = var.helm_repo
   })
   depends_on = [null_resource.config_setup, helm_release.gen3]
 }
@@ -114,7 +116,9 @@ resource "local_file" "app_yaml" {
 resource "local_file" "cluster_app_yaml" {
   filename = "./gitops-repo/${var.vpc_name}/cluster-level-resources/app.yaml"
   content  = templatefile("${path.module}/templates/cluster-app.tftpl", {
-    vpc_name  = var.vpc_name
+    vpc_name    = var.vpc_name,
+    gitops_repo = var.gitops_repo,
+    helm_repo   = var.helm_repo
   })
   depends_on = [null_resource.config_setup, helm_release.gen3]
 }

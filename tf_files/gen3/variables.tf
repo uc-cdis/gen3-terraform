@@ -316,6 +316,18 @@ variable "gitops_path" {
   default = ""
 }
 
+variable "gitops_repo" {
+  description = "Git repository URL for ArgoCD GitOps"
+  type        = string
+  default     = "'<git repo url>'"
+}
+
+variable "helm_repo" {
+  description = "Helm charts repository URL for Gen3"
+  type        = string
+  default     = "https://github.com/uc-cdis/gen3-helm"
+}
+
 variable "fence_config_path" {
   default = ""
 }
