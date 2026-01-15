@@ -1232,6 +1232,22 @@ variable "geo_restriction" {
   default = false
 }
 
+variable "country_codes" {
+  description = "Which country codes to block for 'geo' custom rule group."
+  type = list(string)
+  default = [
+    "CN",
+    "CU",
+    "HK",
+    "IR",
+    "KP",
+    "MO",
+    "RU",
+    "VE",
+    "NG"
+  ]
+}
+
 variable "force_delete_bucket" {
   description = "Force delete S3 buckets"
   type = bool
