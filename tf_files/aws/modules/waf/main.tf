@@ -215,16 +215,7 @@ resource "aws_wafv2_rule_group" "geo_restriction" {
 
     statement {
       geo_match_statement {
-        country_codes = [
-          "CN",
-          "CU",
-          "HK",
-          "IR",
-          "KP",
-          "MO",
-          "RU",
-          "VE"
-        ]
+        country_codes = var.country_codes
       }
     }
     visibility_config {

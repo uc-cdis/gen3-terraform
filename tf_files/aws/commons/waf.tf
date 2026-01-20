@@ -7,5 +7,6 @@ module "aws_waf" {
   custom_rule_groups                = var.custom_rule_groups
   ip_set_rules                      = var.ip_set_rules
   geo_restriction                   = var.geo_restriction
+  country_codes                     = var.country_codes
   depends_on                        = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id]
 }
