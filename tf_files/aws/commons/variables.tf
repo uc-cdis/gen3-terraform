@@ -1270,3 +1270,13 @@ variable "database_insights_mode" {
   type        = string
   default     = "standard"
 }
+
+variable "deploy_cloudwatch_alarms" {
+  default = false
+}
+
+variable "slack_webhook_secret_name" {
+  description = "Optional override for the Secrets Manager secret name."
+  type        = string
+  default     = null
+}
