@@ -11,15 +11,18 @@ terraform {
 }
 
 module "commons_vpc_es" {
-  count                   = var.deploy_es ? 1 : 0
-  source                  = "../modules/commons-vpc-es"
-  vpc_name                = var.vpc_name
-  vpc_id                  = var.vpc_id
-  instance_type           = var.instance_type
-  ebs_volume_size_gb      = var.ebs_volume_size_gb
-  encryption              = var.encryption
-  instance_count          = var.instance_count
-  organization_name       = var.organization_name
-  es_version              = var.es_version
-  es_linked_role          = var.es_linked_role
+  count                             = var.deploy_es ? 1 : 0
+  source                            = "../modules/commons-vpc-es"
+  vpc_name                          = var.vpc_name
+  vpc_id                            = var.vpc_id
+  instance_type                     = var.instance_type
+  ebs_volume_size_gb                = var.ebs_volume_size_gb
+  encryption                        = var.encryption
+  instance_count                    = var.instance_count
+  organization_name                 = var.organization_name
+  es_version                        = var.es_version
+  es_linked_role                    = var.es_linked_role
+  deploy_cloudwatch_alarm           = var.deploy_cloudwatch_alarm
+  slack_webhook_secret_name         = var.slack_webhook_secret_name
+  es_name                           = var.es_name
 }

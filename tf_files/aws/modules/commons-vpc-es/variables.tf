@@ -43,3 +43,13 @@ variable "role_arn" {
   description = "The ARN of the role to use for ES"
   default     = ""
 }
+
+variable "deploy_cloudwatch_alarm" {
+  default = false
+}
+
+variable "slack_webhook_secret_name" {
+  description = "Optional override for the Secrets Manager secret name."
+  type        = string
+  default     = null
+}
