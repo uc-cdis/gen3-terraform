@@ -53,7 +53,3 @@ variable "slack_webhook_secret_name" {
   type        = string
   default     = null
 }
-
-variable "es_name" {
-  default = ""
-}
