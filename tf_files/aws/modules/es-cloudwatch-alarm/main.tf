@@ -3,7 +3,7 @@ resource "aws_cloudwatch_metric_alarm" "es_alarm" {
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = 1
   metric_name               = "ClusterStatus.red"
-  namespace                 = "AWS/EC2"
+  namespace                 = "AWS/ES"
   period                    = 60
   statistic                 = "Maximum"
   threshold                 = 1
