@@ -79,12 +79,18 @@ data "aws_route_table" "public_kube" {
   }
 }
 
+locals {
+  # "1.33" -> ["1", "33"] -> 33
+  eks_minor = tonumber(element(split(".", var.eks_version), 1))
+  eks_ami_name_pattern = (local.eks_minor >= 33) ? "amazon-eks-node-al2023-x86_64-standard-${var.eks_version}*" : "amazon-eks-node-${var.eks_version}*"
+}
+
 # let's create a data source to fetch the latest Amazon Machine Image (AMI) that Amazon provides with
 # EKS compatible Kubernetes baked in.
 data "aws_ami" "eks_worker" {
   filter {
     name   = "name"
-    values = ["amazon-eks-node-${var.eks_version}*"]
+    values = [local.eks_ami_name_pattern]
   }
 
   most_recent = true
