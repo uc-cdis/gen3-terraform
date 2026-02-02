@@ -17,12 +17,14 @@ resource "aws_cloudwatch_metric_alarm" "es_alarm" {
 }
 
 resource "aws_lambda_function" "es_lambda" {
-  filename         = "lambda_function_payload.zip"
+  filename         = data.archive_file.lambda_zip.output_path
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  # filename         = "lambda_function_payload.zip"
   function_name    = "es-cluster-red-slack-alert"
   role             = aws_iam_role.lambda_es_cluster_red_role.arn
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.14"
-  source_code_hash = filebase64sha256("lambda_function_payload.zip")
+  # source_code_hash = filebase64sha256("lambda_function_payload.zip")
   timeout          = 60
   environment {
     variables = {
@@ -41,7 +43,6 @@ resource "aws_lambda_permission" "allow_cloudwatch" {
 }
 
 resource "aws_iam_role" "lambda_es_cluster_red_role" {
-#   count = var.deploy_rds_check_lambda ? 1 : 0
   name  = "${var.vpc_name}-lambda-es-cluster-red-role"
 
   assume_role_policy = jsonencode({
