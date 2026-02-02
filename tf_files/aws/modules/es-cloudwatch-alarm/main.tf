@@ -72,7 +72,7 @@ resource "aws_iam_role_policy" "lambda_es_cluster_red_policy" {
       },
       {
         Effect = "Allow",
-        Action = ["rds:secretsmanager:GetSecretValue"],
+        Action = ["secretsmanager:GetSecretValue"],
         Resource = data.aws_secretsmanager_secret.slack_webhook.arn
       }
     ]
