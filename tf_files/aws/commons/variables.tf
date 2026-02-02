@@ -1271,7 +1271,7 @@ variable "database_insights_mode" {
   default     = "standard"
 }
 
-variable "deploy_cloudwatch_alarms" {
+variable "deploy_cloudwatch_alarm" {
   default = false
 }
 
