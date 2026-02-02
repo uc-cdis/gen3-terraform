@@ -13,6 +13,7 @@ resource "aws_cloudwatch_metric_alarm" "es_alarm" {
   alarm_actions = [aws_lambda_function.es_lambda.arn]
   dimensions = {
     DomainName = var.es_name
+    ClientId   = data.aws_caller_identity.current.account_id
   }
 }
 
