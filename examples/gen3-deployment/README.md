@@ -24,7 +24,7 @@ You’ll need:
 * **Two Git repositories** for CI/CD:
 
   * A **GitOps repo** (cluster/app definitions).
-  * A **commons repo** (user.yaml management).
+  * A **users repo** (user.yaml management).
 * **An IdP** (Identity Provider) for user login (e.g., Google, Azure AD, Okta).
 
 ---
@@ -113,6 +113,17 @@ Apply the application definition for the commons (replace placeholders):
 kubectl apply -f <VPC_NAME>/<COMMONS_HOSTNAME>/app.yaml
 ```
 
+* Note: If you decide to make your repo private you will need to setup access to the repo within argocd. Without UI access, which can be setup after the commons is deployed, the easiest way to deploy it is through the following.
+
+```baash
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+argocd login localhost:8080 --username admin --password $(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d) --insecure
+# Github PAT has read only permissions
+argocd repo add <github repo> \
+  --username <github username> \
+  --password <github_pat>
+```
+
 When workloads become healthy, your environment will be functional (except **Guppy**, which won’t be fully ready until data is submitted and ETL has run).
 
 ### 3.5 Create DNS for Your Commons
@@ -125,6 +136,9 @@ kubectl get ingress -A
 
 Create an **A/ALIAS** or **CNAME** record for `<COMMONS_HOSTNAME>` pointing to the **ADDRESS** shown above.
 
+If root domain: create an A record, check 'Alias', click Application loadbalancer, region, and click corresponding load balancer 
+If sub domain, you can create cname and copy and paste the load balancer DNS name as the value
+
 Once DNS propagates, you should be able to open the URL and sign in via your IdP.
 
 ---
@@ -135,9 +149,9 @@ Initially you’ll have limited access. Configure **user permissions** via the *
 
 Further reading: [Fence user.yaml guide](https://github.com/uc-cdis/fence/blob/master/docs/additional_documentation/user.yaml_guide.md)
 
-### 4.1 Initialize the Commons Repo
+### 4.1 Initialize the users repo
 
-From the Terraform working directory, `cd` into the generated `commons-repo` directory:
+From the Terraform working directory, `cd` into the generated `users-repo` directory:
 
 ```bash
 git init
