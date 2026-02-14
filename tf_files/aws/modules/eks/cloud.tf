@@ -541,6 +541,19 @@ resource "aws_security_group_rule" "communication_plane_to_nodes" {
   description              = "from the control plane to the nodes"
 }
 
+# Workers to Fargate
+
+resource "aws_security_group_rule" "communication_plane_to_nodes" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  security_group_id        = aws_eks_cluster.eks_cluster.cluster_security_group_id
+  source_security_group_id = aws_security_group.eks_nodes_sg.id
+  depends_on               = [aws_security_group.eks_nodes_sg, aws_eks_cluster.eks_cluster]
+  description              = "from the worker nodes to fargate"
+}
+
 # Let's allow nodes talk to each other
 resource "aws_security_group_rule" "nodes_internode_communications" {
   type              = "ingress"
