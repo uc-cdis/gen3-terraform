@@ -67,7 +67,7 @@ locals {
             "Action": "es:*",
             "Principal": {
               "AWS": [
-                "${data.aws_iam_user.es_user.arn}"
+                "${data.aws_iam_user.es_user[0].arn}"
               ]
             },
             "Effect": "Allow",
@@ -84,7 +84,6 @@ POLICY1
             "Action": "es:*",
             "Principal": {
               "AWS": [
-                "${data.aws_iam_user.es_user.arn}",
                 "${var.role_arn}"
               ]
             },
