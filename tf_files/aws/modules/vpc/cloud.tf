@@ -317,5 +317,5 @@ resource "aws_iam_user" "es_user" {
 
 resource "aws_iam_access_key" "es_user_key" {
   count     = var.role_arn == "" ? 1 : 0
-  user = aws_iam_user.es_user.name
+  user = aws_iam_user.es_user[0].name
 }
