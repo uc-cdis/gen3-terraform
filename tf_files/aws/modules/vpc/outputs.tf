@@ -51,7 +51,7 @@ output "es_user_key" {
 }
 
 output "es_user_key_id" {
-  value = try(aws_iam_access_key.es_user_key[0].id, mull)
+  value = try(aws_iam_access_key.es_user_key[0].id, null)
 }
 
 output "cwlogs" {
