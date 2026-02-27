@@ -79,44 +79,6 @@ locals {
   })
 }
 
-# locals {
-#   es_policy  = var.role_arn == "" ? local.policy1 : local.policy2
-#   policy1 = <<POLICY1
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Action": "es:*",
-#             "Principal": {
-#               "AWS": [
-#                 "${data.aws_iam_user.es_user[0].arn}"
-#               ]
-#             },
-#             "Effect": "Allow",
-#             "Resource": "*"
-#         }
-#     ]
-# }
-# POLICY1
-#   policy2 = <<POLICY2
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Action": "es:*",
-#             "Principal": {
-#               "AWS": [
-#                 "${var.role_arn}"
-#               ]
-#             },
-#             "Effect": "Allow",
-#             "Resource": "*"
-#         }
-#     ]
-# }
-# POLICY2
-# }
-
 resource "aws_elasticsearch_domain" "gen3_metadata" {
   domain_name           = var.es_name != "" ? var.es_name : "${var.vpc_name}-gen3-metadata"
   elasticsearch_version = var.es_version
