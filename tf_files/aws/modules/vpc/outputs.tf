@@ -47,11 +47,11 @@ output "vpc_peering_id" {
 }
 
 output "es_user_key" {
-  value = aws_iam_access_key.es_user_key.secret
+  value = try(aws_iam_access_key.es_user_key[0].secret, null)
 }
 
 output "es_user_key_id" {
-  value = aws_iam_access_key.es_user_key.id
+  value = try(aws_iam_access_key.es_user_key[0].id, mull)
 }
 
 output "cwlogs" {
