@@ -44,6 +44,7 @@ module "cdis_vpc" {
   ha_squid_single_instance       = var.ha_squid_single_instance
   force_delete_bucket            = var.force_delete_bucket
   availability_zones             = var.availability_zones
+  role_arn                       = var.deploy_es_role ? aws_iam_role.esproxy-role[0].arn : ""
   providers = {
     aws      = aws
     aws.csoc = aws.csoc
