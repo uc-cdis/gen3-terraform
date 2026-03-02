@@ -56,44 +56,27 @@ resource "aws_cloudwatch_log_resource_policy" "es_logs" {
 CONFIG
 }
 
+locals {
+  es_principal_arn = var.role_arn != "" ? var.role_arn : data.aws_iam_user.es_user[0].arn
+}
 
 locals {
-  es_policy  = var.role_arn == "" ? local.policy1 : local.policy2
-  policy1 = <<POLICY1
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": "es:*",
-            "Principal": {
-              "AWS": [
-                "${data.aws_iam_user.es_user.arn}"
-              ]
-            },
-            "Effect": "Allow",
-            "Resource": "*"
+  es_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = "es:*"
+        Effect   = "Allow"
+        Resource = "*"
+
+        Principal = {
+          AWS = [
+            local.es_principal_arn
+          ]
         }
+      }
     ]
-}
-POLICY1
-  policy2 = <<POLICY2
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": "es:*",
-            "Principal": {
-              "AWS": [
-                "${data.aws_iam_user.es_user.arn}",
-                "${var.role_arn}"
-              ]
-            },
-            "Effect": "Allow",
-            "Resource": "*"
-        }
-    ]
-}
-POLICY2
+  })
 }
 
 resource "aws_elasticsearch_domain" "gen3_metadata" {
