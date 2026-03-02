@@ -578,7 +578,7 @@ variable "iam-serviceaccount" {
 
 variable "domain_test" {
   description = "url for the lambda function to check for the proxy"
-  default     = "www.google.com"
+  default     = "https://quay.io"
 }
 
 variable "deploy_workflow" {

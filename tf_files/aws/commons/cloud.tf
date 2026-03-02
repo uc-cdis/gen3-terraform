@@ -85,6 +85,14 @@ resource "aws_route" "for_peering" {
   depends_on                = [aws_route_table.private_kube]
 }
 
+resource "aws_route" "for_squid_lambda" {
+  count                     = var.csoc_managed ? 1 : 0
+  route_table_id            = aws_route_table.private_kube.id
+  destination_cidr_block    = "0.0.0.0/0"
+  nat_gateway_id            = module.cdis_vpc.nat_gw_id
+  depends_on                = [aws_route_table.private_kube]
+}
+
 resource "aws_route_table_association" "private_kube" {
   subnet_id                   = aws_subnet.private_kube.id
   route_table_id              = aws_route_table.private_kube.id

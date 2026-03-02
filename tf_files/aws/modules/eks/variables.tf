@@ -38,6 +38,10 @@ variable "peering_vpc_id" {
   default = "vpc-e2b51d99"
 }
 
+variable "private_kube_subnet_id" {
+  default = ""
+}
+
 variable "users_policy" {}
 
 variable "worker_drive_size" {
@@ -128,7 +132,7 @@ variable "availability_zones" {
 
 variable "domain_test" {
   description = "Domain for the lambda function to check for the proxy"
-  default     = "www.google.com"
+  default     = "https://quay.io"
 }
 
 variable "ha_squid" {
