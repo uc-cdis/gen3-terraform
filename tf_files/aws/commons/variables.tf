@@ -1115,6 +1115,10 @@ variable "deploy_es_role" {
   default = false
 }
 
+variable "es_role_override" {
+  default = ""
+}
+
 variable "deploy_waf" {
   default = false
 }
