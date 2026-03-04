@@ -90,7 +90,7 @@ resource "aws_lambda_function" "gw_checks" {
   runtime          = "python3.13"
 
   vpc_config {
-    subnet_ids         = flatten([aws_subnet.eks_private.*.id])
+    subnet_ids         = var.private_kube_subnet_id != "" ? [var.private_kube_subnet_id] : flatten([aws_subnet.eks_private.*.id])
     security_group_ids = [aws_security_group.eks_nodes_sg.id]
   }
 
