@@ -91,7 +91,7 @@ resource "aws_wafv2_web_acl" "waf" {
           }
           # Optionally force specific rules to Allow
           dynamic "rule_action_override" {
-            for_each = rule.value.override_to_allow
+            for_each = lookup(rule.value, "override_to_allow", [])
             content {
               name = rule_action_override.value
               action_to_use { 
