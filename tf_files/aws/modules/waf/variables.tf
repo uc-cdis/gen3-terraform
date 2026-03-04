@@ -87,6 +87,7 @@ variable "custom_rule_groups" {
     arn               = string 
     count             = optional(bool, false)
     override_to_count = optional(list(string), [])
+    override_to_allow = optional(list(string), [])
   }))
   default = []
 }
