@@ -44,7 +44,7 @@ module "cdis_vpc" {
   ha_squid_single_instance       = var.ha_squid_single_instance
   force_delete_bucket            = var.force_delete_bucket
   availability_zones             = var.availability_zones
-  role_arn                       = var.deploy_es_role ? aws_iam_role.esproxy-role[0].arn : ""
+  role_arn                       = var.deploy_es_role ? local.es_role_name : var.es_role_override != "" ? var.es_role_override : ""
   providers = {
     aws      = aws
     aws.csoc = aws.csoc
@@ -83,6 +83,14 @@ resource "aws_route" "for_peering" {
   route_table_id            = aws_route_table.private_kube.id
   destination_cidr_block    = var.peering_cidr
   vpc_peering_connection_id = module.cdis_vpc.vpc_peering_id
+  depends_on                = [aws_route_table.private_kube]
+}
+
+resource "aws_route" "for_squid_lambda" {
+  count                     = var.csoc_managed ? 1 : 0
+  route_table_id            = aws_route_table.private_kube.id
+  destination_cidr_block    = "0.0.0.0/0"
+  nat_gateway_id            = module.cdis_vpc.nat_gw_id
   depends_on                = [aws_route_table.private_kube]
 }
 

@@ -578,7 +578,7 @@ variable "iam-serviceaccount" {
 
 variable "domain_test" {
   description = "url for the lambda function to check for the proxy"
-  default     = "www.google.com"
+  default     = "https://quay.io"
 }
 
 variable "deploy_workflow" {
@@ -1113,6 +1113,10 @@ variable "enable_vpc_endpoints" {
 
 variable "deploy_es_role" {
   default = false
+}
+
+variable "es_role_override" {
+  default = ""
 }
 
 variable "deploy_waf" {
