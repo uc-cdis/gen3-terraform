@@ -509,7 +509,7 @@ variable "worker_drive_size" {
 }
 
 variable "eks_version" {
-  default = "1.31"
+  default = "1.33"
 }
 
 variable "workers_subnet_size" {
@@ -578,7 +578,7 @@ variable "iam-serviceaccount" {
 
 variable "domain_test" {
   description = "url for the lambda function to check for the proxy"
-  default     = "www.google.com"
+  default     = "https://quay.io"
 }
 
 variable "deploy_workflow" {
@@ -815,7 +815,7 @@ variable "karpenter_version" {
 variable "karpenter_ami_family" {
   description = "Optional AMI family for Karpenter node class"
   type        = string
-  default     = "AL2"
+  default     = "AL2023"
   nullable    = false
 
   validation {
@@ -827,13 +827,13 @@ variable "karpenter_ami_family" {
 variable "karpenter_ami_name" {
   description = "Optional AMI name pattern for Karpenter node class"
   type        = string
-  default     = "EKS-FIPS*"
+  default     = ""
 }
 
 variable "karpenter_ami_owner" {
   description = "Optional AMI owner for Karpenter node class"
   type        = string
-  default     = "143731057154"
+  default     = ""
 }
 
 variable "deploy_cloud_trail" {
@@ -1115,6 +1115,10 @@ variable "deploy_es_role" {
   default = false
 }
 
+variable "es_role_override" {
+  default = ""
+}
+
 variable "deploy_waf" {
   default = false
 }
@@ -1232,6 +1236,22 @@ variable "geo_restriction" {
   default = false
 }
 
+variable "country_codes" {
+  description = "Which country codes to block for 'geo' custom rule group."
+  type = list(string)
+  default = [
+    "CN",
+    "CU",
+    "HK",
+    "IR",
+    "KP",
+    "MO",
+    "RU",
+    "VE",
+    "NG"
+  ]
+}
+
 variable "force_delete_bucket" {
   description = "Force delete S3 buckets"
   type = bool
@@ -1253,4 +1273,14 @@ variable "database_insights_mode" {
   description = "The mode of Database Insights"
   type        = string
   default     = "standard"
+}
+
+variable "deploy_cloudwatch_alarm" {
+  default = false
+}
+
+variable "slack_webhook_secret_name" {
+  description = "Optional override for the Secrets Manager secret name."
+  type        = string
+  default     = null
 }

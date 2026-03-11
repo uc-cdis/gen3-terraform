@@ -37,7 +37,9 @@ locals {
   # The hostname for your gen3 deployment. If you are creating another instance of the gen3 module set the hostname in it accordingly
   hostname                      = "<update with your hostname>"
   # Service linked roles can only be created once per account. If you see an error that it is already created, set this to false.
-  es_linked_role                = false
+  es_linked_role                = true
+  # Service linked role for spot instances
+  spot_linked_role       = true
   # The arn of the certificate in ACM
   revproxy_arn                  = "<Update with your ACM certificate arn>"
   # Whether or not to create users/buckets needed for useryaml gitops management.
@@ -74,7 +76,7 @@ locals {
 }
 
 module "commons" {
-  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/commons?ref=9938e841ffcbc81171a2eb64431db8a7a0fc28eb"
+  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/aws/commons?ref=bb593106e48b6da5a557df4e9461aa99db8e3b9c"
 
   vpc_name                       = local.vpc_name
   vpc_cidr_block                 = "10.10.0.0/20"
@@ -107,7 +109,7 @@ module "commons" {
 }
 
 module "gen3" {
-  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/gen3?ref=9938e841ffcbc81171a2eb64431db8a7a0fc28eb"
+  source = "git::github.com/uc-cdis/gen3-terraform.git//tf_files/gen3?ref=bb593106e48b6da5a557df4e9461aa99db8e3b9c"
   vpc_name                 = local.vpc_name
   aurora_username          = module.commons.aurora_cluster_master_username
   aurora_password          = module.commons.aurora_cluster_master_password

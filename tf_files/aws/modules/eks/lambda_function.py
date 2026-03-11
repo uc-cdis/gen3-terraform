@@ -215,33 +215,25 @@ def get_route_table_id(route_table):
 """
 def test_proxy(url):
     response = ''
-    try:
-        """
-        #url = 'https://%s' % (url)
-        #f = urllib.request.urlopen(url)
-        #print(f.read())
-        #response = f.getcode()
-        """
-        
-        # The only reason we don't do https on checkups  is because in the proxy only the IP is reported instead of the domain.
-        # We want to know the domain this function is calling out
-        # conn = http.client.HTTPSConnection(url)
-        conn = http.client.HTTPConnection(url,timeout=3)
-        conn.request("GET", "/")
-        response = conn.getresponse().status
 
+    proxy_url = "http://cloud-proxy.internal.io:3128"
+
+    proxy_handler = urllib.request.ProxyHandler({
+        "http": proxy_url,
+        "https": proxy_url,
+    })
+
+    opener = urllib.request.build_opener(proxy_handler)
+    urllib.request.install_opener(opener)
+
+    try:
+        resp = urllib.request.urlopen(url, timeout=5)
+        return resp.getcode()
     except Exception as e:
-        outcome['test_proxy'] = "The url '%s' check failed with the following message: '%s'" % (url,e)
-        #print(e)
-        if str(e) == 'HTTP Error 403: Forbidden':
-            response = 403
-        elif 'Connection refused' in str(e):
-            # if we get <urlopen error [Errno 111] Connection refused> then we know the squid is busted or something similar
-            response = 111
-        else:
-            # if anything else, then let's assume the current default GW is not working
-            response = 112
-    return response
+        outcome['test_proxy'] = str(e)
+        return 112
+
+
     
 """
   function that searches for a default gateway in a defined routing table
@@ -490,7 +482,6 @@ def lambda_handler(event, context):
                         
                         vpc_id = get_instance_vpc_id(get_instances_info([instance_id]))
                         eks_private_route_table_id = get_route_table_id(get_route_table(vpc_id,'eks_private'))
-                        private_kube_route_table_id = get_route_table_id(get_route_table(vpc_id,'private_kube'))
                         
                         try:
                             set_default_gw(healthy_instance_eni[0],eks_private_route_table_id)
@@ -499,15 +490,6 @@ def lambda_handler(event, context):
                         except Exception as e:
                             statusCode = statusCode + 1
                             outcome['eks_private'] = e
-                            #print(e)
-                            
-                        try:
-                            set_default_gw(healthy_instance_eni[0],private_kube_route_table_id)
-                            outcome['private_kube'] = 'succefully changed the default route for private_kube routing table'
-                            #print('succefully changed the default route for private_kube routing table')
-                        except Exception as e:
-                            statusCode = statusCode + 1
-                            outcome['private_kube'] = e
                             #print(e)
                             
                         zone = get_hosted_zone(os.environ['vpc_name'])

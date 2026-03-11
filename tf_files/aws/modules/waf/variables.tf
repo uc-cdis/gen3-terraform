@@ -108,3 +108,19 @@ variable "geo_restriction" {
   type = bool
   default = false
 }
+
+variable "country_codes" {
+  description = "Which country codes to block for 'geo' custom rule group."
+  type = list(string)
+  default = [
+    "CN",
+    "CU",
+    "HK",
+    "IR",
+    "KP",
+    "MO",
+    "RU",
+    "VE",
+    "NG"
+  ]
+}

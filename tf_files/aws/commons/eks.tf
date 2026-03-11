@@ -6,6 +6,7 @@ module "eks" {
   ec2_keyname                      = var.ec2_keyname
   instance_type                    = var.instance_type
   peering_cidr                     = var.peering_cidr
+  private_kube_subnet_id           = aws_subnet.private_kube.id
   csoc_managed                     = var.csoc_managed
   secondary_cidr_block             = var.secondary_cidr_block
   users_policy                     = var.users_policy

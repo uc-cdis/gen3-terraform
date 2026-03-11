@@ -13,7 +13,7 @@ module "cdis_vpc" {
   vpc_cidr_block                 = var.vpc_cidr_block
   secondary_cidr_block           = var.secondary_cidr_block
   vpc_name                       = var.vpc_name
-  ssh_key_name                   = var.kube_ssh_key != "" ? aws_key_pair.automation_dev.key_name : ""
+  ssh_key_name                   = var.kube_ssh_key != "" ? aws_key_pair.automation_dev[0].key_name : ""
   peering_cidr                   = var.peering_cidr
   csoc_account_id                = var.csoc_account_id
   organization_name              = var.organization_name
@@ -44,6 +44,7 @@ module "cdis_vpc" {
   ha_squid_single_instance       = var.ha_squid_single_instance
   force_delete_bucket            = var.force_delete_bucket
   availability_zones             = var.availability_zones
+  role_arn                       = var.deploy_es_role ? local.es_role_name : var.es_role_override != "" ? var.es_role_override : ""
   providers = {
     aws      = aws
     aws.csoc = aws.csoc
@@ -82,6 +83,14 @@ resource "aws_route" "for_peering" {
   route_table_id            = aws_route_table.private_kube.id
   destination_cidr_block    = var.peering_cidr
   vpc_peering_connection_id = module.cdis_vpc.vpc_peering_id
+  depends_on                = [aws_route_table.private_kube]
+}
+
+resource "aws_route" "for_squid_lambda" {
+  count                     = var.csoc_managed ? 1 : 0
+  route_table_id            = aws_route_table.private_kube.id
+  destination_cidr_block    = "0.0.0.0/0"
+  nat_gateway_id            = module.cdis_vpc.nat_gw_id
   depends_on                = [aws_route_table.private_kube]
 }
 
