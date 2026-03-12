@@ -15,6 +15,7 @@ module "aurora" {
   serverlessv2_scaling_max_capacity = var.serverlessv2_scaling_max_capacity
   skip_final_snapshot	              = var.skip_final_snapshot
   final_snapshot_identifier         = var.final_snapshot_identifier
+  aurora_snapshot_identifier        = var.aurora_snapshot_identifier
   backup_retention_period           = var.backup_retention_period
   preferred_backup_window           = var.preferred_backup_window
   password_length		                = var.password_length
