@@ -70,6 +70,7 @@ data "aws_iam_policy_document" "irsa" {
       "ssm:GetParameter",
       "iam:PassRole",
       "iam:*InstanceProfile",
+      "iam:ListInstanceProfiles",
       "ec2:DescribeImages",
       "ec2:RunInstances",
       "ec2:DescribeSubnets",
@@ -399,6 +400,9 @@ resource "kubectl_manifest" "karpenter_node_class" {
       amiSelectorTerms:
       - name: "${var.karpenter_ami_name}"
         owner: "${var.karpenter_ami_owner}"
+      %{ else }
+      amiSelectorTerms:
+      - alias: ${lower(var.karpenter_ami_family)}@latest
       %{ endif }
       blockDeviceMappings:
       - deviceName: /dev/xvda

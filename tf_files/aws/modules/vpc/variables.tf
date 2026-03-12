@@ -171,3 +171,8 @@ variable "sqs_kms_key_id" {
   type        = string
   default     = ""
 }
+
+variable "role_arn" {
+  description = "The ARN of the role to use for ES"
+  default     = ""
+}

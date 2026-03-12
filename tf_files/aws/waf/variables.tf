@@ -106,3 +106,24 @@ variable "ip_set_rules" {
   }))
   default = []
 }
+
+variable "geo_restriction" {
+  description = "If custom rule group 'geo' should be created and added."
+  type = bool
+  default = false
+}
+variable "country_codes" {
+  description = "Which country codes to block for 'geo' custom rule group."
+  type = list(string)
+  default = [
+    "CN",
+    "CU",
+    "HK",
+    "IR",
+    "KP",
+    "MO",
+    "RU",
+    "VE",
+    "NG"
+  ]
+}

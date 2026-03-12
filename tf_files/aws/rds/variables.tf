@@ -137,6 +137,11 @@ variable "rds_instance_performance_insights_retention_period" {
   default     = 7
 }
 
+variable "rds_instance_database_insights_mode" {
+  description = "The mode of Database Insights"
+  default     = "standard"
+}
+
 variable "rds_instance_timeouts" {
   description = "(Optional) Updated Terraform resource management timeouts. Applies to `aws_db_instance` in particular to permit resource management times"
   default = {

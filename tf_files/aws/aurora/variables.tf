@@ -108,3 +108,15 @@ variable "deploy_aurora" {
 variable "db_kms_key_id" {
   default = ""
 }
+
+variable "performance_insights_enabled" {
+  description = "Specifies whether to enable Performance Insights for the DB cluster"
+  type        = bool
+  default     = false
+}
+
+variable "database_insights_mode" {
+  description = "The mode of Database Insights"
+  type        = string
+  default     = "standard"
+}
