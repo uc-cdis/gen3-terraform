@@ -3,6 +3,8 @@ data "aws_s3_bucket" "selected" {
   bucket = var.bucket_name
 }
 
+data "aws_caller_identity" "current" {} 
+
 data "aws_iam_policy_document" "sns-topic-policy" {
   policy_id = "__default_policy_ID"
 
@@ -26,7 +28,7 @@ data "aws_iam_policy_document" "sns-topic-policy" {
 
     principals {
       type        = "AWS"
-      identifiers = ["*"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
 
     resources = [

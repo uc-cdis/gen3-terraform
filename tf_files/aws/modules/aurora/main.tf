@@ -26,6 +26,7 @@ resource "aws_rds_cluster" "postgresql" {
   engine_mode        	            = var.engine_mode
   skip_final_snapshot	            = var.skip_final_snapshot
   final_snapshot_identifier       = "${var.vpc_name}-${var.final_snapshot_identifier}"
+  snapshot_identifier             = var.aurora_snapshot_identifier == "" ? null : var.aurora_snapshot_identifier 
   backup_retention_period         = var.backup_retention_period
   preferred_backup_window         = var.preferred_backup_window
   db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.aurora_cdis_pg.name

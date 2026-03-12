@@ -18,6 +18,7 @@ locals {
 }
 
 data "aws_iam_user" "es_user" {
+  count     = var.role_arn == "" ? 1 : 0
   user_name = "${var.vpc_name}_es_user"
 }
 
