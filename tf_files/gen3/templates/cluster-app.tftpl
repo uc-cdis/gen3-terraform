@@ -14,9 +14,9 @@ spec:
       valueFiles:
       - $values/${vpc_name}/cluster-level-resources/cluster-values.yaml
     path: helm/cluster-level-resources
-    repoURL: https://github.com/uc-cdis/gen3-helm
+    repoURL: '${helm_repo}'
   - ref: values
-    repoURL: '<git repo url>'
+    repoURL: '${gitops_repo}'
     targetRevision: main
   syncPolicy:
     automated:
