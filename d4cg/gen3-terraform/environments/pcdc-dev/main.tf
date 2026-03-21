@@ -50,12 +50,29 @@ locals {
   default_tags = {
     Environment = local.vpc_name
   }
+  ### Cognito setup
+  deploy_cognito = true
+  user_pool_name  = "${local.vpc_name}-pool"
+  app_client_name = "${local.vpc_name}-client"
+  domain_prefix = "${local.vpc_name}-auth"
+  callback_urls = [
+    "https://${local.hostname}/",
+    "https://${local.hostname}/login/",
+    "https://${local.hostname}/login/cognito/login/",
+    "https://${local.hostname}/user/",
+    "https://${local.hostname}/user/login/cognito/",
+    "https://${local.hostname}/user/login/cognito/login/",
+  ]
+  logout_urls = [
+    "https://${local.hostname}/",
+  ]
+  allowed_oauth_flows  = ["code"]
+  allowed_oauth_scopes = ["email", "openid", "phone", "profile"]
+  supported_identity_providers = ["COGNITO"]
 }
 
 module "commons" {
   source = "./../../modules/pcdc-commons"
-
-  environment                    = "dev"
   vpc_name                       = local.vpc_name
   vpc_cidr_block                 = "10.10.0.0/20"
   aws_region                     = local.aws_region
@@ -64,7 +81,6 @@ module "commons" {
   ami_account_id                 = "amazon"
   squid_image_search_criteria    = "amzn2-ami-hvm-*-x86_64-gp2"
   ha-squid_instance_drive_size   = 30
-  ha_squid_single_instance       = true
   deploy_ha_squid                = true
   deploy_sheepdog_db             = false
   deploy_fence_db                = false
