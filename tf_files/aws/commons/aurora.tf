@@ -23,5 +23,6 @@ module "aurora" {
   deploy_rds_check_lambda           = var.deploy_rds_check_lambda
   performance_insights_enabled      = var.performance_insights_enabled
   database_insights_mode            = var.database_insights_mode
+  aurora_snapshot_identifier        = var.aurora_snapshot_identifier
   depends_on                        = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id]
 }

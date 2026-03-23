@@ -33,6 +33,7 @@ resource "aws_rds_cluster" "postgresql" {
   database_insights_mode          = var.database_insights_mode
   performance_insights_kms_key_id = var.performance_insights_enabled && var.db_kms_key_id != "" ? var.db_kms_key_id : null
   kms_key_id                      = var.db_kms_key_id
+  snapshot_identifier             = var.aurora_snapshot_identifier == "" ? null : var.aurora_snapshot_identifier 
 
   serverlessv2_scaling_configuration {
     max_capacity = var.serverlessv2_scaling_max_capacity

@@ -1284,3 +1284,9 @@ variable "slack_webhook_secret_name" {
   type        = string
   default     = null
 }
+
+variable "aurora_snapshot_identifier" {
+  type        = string
+  description = "The name of your final DB snapshot when this DB cluster is deleted"
+  default     = ""
+}
