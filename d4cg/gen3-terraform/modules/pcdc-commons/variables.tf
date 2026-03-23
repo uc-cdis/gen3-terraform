@@ -119,3 +119,15 @@ variable "enable_vpc_endpoints" {
   default = true
 }
 
+variable "amanuensis-bot_bucket_access_arns" {
+  description = "When amanuensis bot has to access another bucket that wasn't created by the VPC module"
+  default     = []
+}
+
+variable "deploy_es_role" {
+  default = false
+}
+
+variable "deploy_es" {
+  default = true
+}

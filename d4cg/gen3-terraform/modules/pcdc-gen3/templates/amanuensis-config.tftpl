@@ -1,0 +1,14 @@
+BASE_URL: 'https://${hostname}/user'
+
+AWS_CREDENTIALS:
+AWS_SES:
+  SENDER: "pcdc_help@lists.uchicago.edu"
+  CC_RECIPIENTS: ["lgraglia@bsd.uchicago.edu", "bfurner@bsd.uchicago.edu"]
+  RECIPIENT: ""
+  region_name: "us-east-1"
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+DATA_DELIVERY_S3_BUCKET:
+  bucket_name: '${data_release_bucket}'
+  aws_access_key_id: '${amanuensis_access_key}'
+  aws_secret_access_key: '${amanuensis_secret_key}'

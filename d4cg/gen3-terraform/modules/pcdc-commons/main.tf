@@ -28,4 +28,19 @@ module "commons" {
   secrets_manager_enabled=var.secrets_manager_enabled
   force_delete_bucket=var.force_delete_bucket
   enable_vpc_endpoints=var.enable_vpc_endpoints
+  deploy_es=var.deploy_es
+  deploy_es_role=var.deploy_es_role
+}
+
+module "amanuensis-data-release-bucket" {
+  source   = "../amanuensis-data-release-bucket"
+  vpc_name = var.vpc_name
+}
+
+module "amanuensis-bot-user" {
+  source             = "../bot-user"
+  vpc_name           = var.vpc_name
+  bot_name           = "amanuensis"
+  bucket_name        = module.amanuensis-data-release-bucket.bucket_name
+  bucket_access_arns = var.amanuensis-bot_bucket_access_arns
 }

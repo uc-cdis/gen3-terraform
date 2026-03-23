@@ -97,3 +97,24 @@ variable "cognito_client_id" {
 variable "cognito_client_secret" {
   default = ""
 }
+
+variable "amanuensis_access_key" {
+  default = ""
+}
+
+variable "amanuensis_secret_key" {
+  default = ""
+}
+
+variable "data_release_bucket" {
+  default = ""
+}
+
+variable "amanuensis_config_path" {
+  default = ""
+}
+
+variable "data-release-bucket_name" {
+  description = "Name of the bucket used for data release, used by amanuensis to export data from the commons"
+  default     = ""
+}

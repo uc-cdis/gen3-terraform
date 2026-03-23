@@ -100,6 +100,8 @@ module "commons" {
   force_delete_bucket            = true
   enable_vpc_endpoints           = false
   cluster_engine_version         = "13"
+  deploy_es                      = false
+  deploy_es_role                 = false
 }
 
 module "gen3" {
@@ -109,7 +111,7 @@ module "gen3" {
   aurora_password          = module.commons.aurora_cluster_master_password
   aurora_hostname          = module.commons.aurora_cluster_writer_endpoint
   dictionary_url           = "https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json"
-  es_endpoint              = module.commons.es_endpoint
+  es_endpoint              = module.commons.es_endpoint != null ? module.commons.es_endpoint : ""
   hostname                 = local.hostname
   cluster_endpoint         = module.commons.eks_cluster_endpoint
   cluster_ca_cert          = module.commons.eks_cluster_ca_cert
@@ -118,6 +120,9 @@ module "gen3" {
   fence_access_key         = module.commons.fence-bot_user_id
   fence_secret_key         = module.commons.fence-bot_user_secret
   upload_bucket            = module.commons.data-bucket_name
+  amanuensis_access_key    = module.commons.amanuensis-bot_user_id
+  amanuensis_secret_key    = module.commons.amanuensis-bot_user_secret
+  data_release_bucket      = module.commons.data-release-bucket_name
   revproxy_arn             = local.revproxy_arn
   useryaml_s3_path         = "s3://${local.user_yaml_bucket_name}/dev/user.yaml"
   deploy_external_secrets  = true

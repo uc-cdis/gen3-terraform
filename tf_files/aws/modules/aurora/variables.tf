@@ -124,3 +124,9 @@ variable "database_insights_mode" {
   type        = string
   default     = "standard"
 }
+
+variable "aurora_snapshot_identifier" {
+  type        = string
+  description = "The name of an existing DB snapshot to restore from when creating the DB cluster"
+  default     = ""
+}
