@@ -1,15 +1,3 @@
-terraform {
-  backend "s3" {
-    encrypt = "true"
-  }
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-
 resource "aws_iam_role" "role" {
   name               = "${var.vm_name}-${var.vpc_name}-public_role"
   path               = "/"
