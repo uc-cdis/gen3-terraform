@@ -185,6 +185,13 @@ variable "netpolicy_enabled" {
   default     = false
 }
 
+variable "ohdsi_enabled" {
+  description = "Enable ohdsi"
+  type        = bool
+  default     = false
+}
+
+
 variable "peregrine_enabled" {
   description = "Enable perergrine"
   type        = bool
