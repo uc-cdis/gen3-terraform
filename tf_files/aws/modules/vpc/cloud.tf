@@ -20,6 +20,7 @@ module "squid-auto" {
   squid_instance_type            = var.squid_instance_type
   bootstrap_script               = var.squid_bootstrap_script
   extra_vars                     = var.squid_extra_vars
+  automation_repo                = var.automation_repo
   branch                         = var.branch
   cluster_max_size               = var.squid_cluster_max_size
   cluster_min_size               = var.squid_cluster_min_size

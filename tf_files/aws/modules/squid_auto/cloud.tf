@@ -2,6 +2,7 @@ locals{
   cidrs  = var.secondary_cidr_block != "" ? [var.env_vpc_cidr, var.peering_cidr, var.secondary_cidr_block] : [var.env_vpc_cidr, var.peering_cidr]
   cidrs2 = var.secondary_cidr_block != "" ? [var.env_vpc_cidr, var.secondary_cidr_block] : [var.env_vpc_cidr]
   bootstrap_script = var.ha_squid_single_instance ? "squid_running_on_docker_single_instance.sh" : var.bootstrap_script
+  
 }
 
 #Launching the public subnets for the squid VMs
@@ -118,7 +119,7 @@ fi
   if [[ ! -z "${var.slack_webhook}" ]]; then
     echo "${var.slack_webhook}" > /slackWebhook
   fi
-  git clone https://github.com/uc-cdis/cloud-automation.git
+  git clone ${var.automation_repo}
   cd $CLOUD_AUTOMATION
   git pull
 

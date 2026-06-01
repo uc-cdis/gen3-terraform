@@ -349,6 +349,11 @@ variable "ha-squid_extra_vars" {
   default     = ["squid_image=master"]
 }
 
+variable "automation_repo" {
+  description = "repo holding the squid startup scripts"
+  default     = "https://github.com/uc-cdis/cloud-automation.git"
+}
+
 variable "branch" {
   description = "For testing purposes, when something else than the master"
   default     = "master"

@@ -30,6 +30,10 @@ variable "database_name" {
   default = ""
 }
 
+variable "database_instance_identifier" {
+  default = ""
+}
+
 # The username used to access the database you're trying to create 
 # (for example, if this is a fence database, it might be 'fence_user')
 variable "username" {

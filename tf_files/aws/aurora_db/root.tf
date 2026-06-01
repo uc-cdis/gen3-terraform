@@ -5,12 +5,13 @@ terraform {
 }
 
 locals {
-  sa_name           = "${var.service}-sa"
-  sa_namespace      = var.namespace
-  eks_oidc_issuer   = trimprefix(data.aws_eks_cluster.eks.identity[0].oidc[0].issuer, "https://")
-  database_name     = var.database_name != "" ? var.database_name : "${var.service}_${var.namespace}"
-  database_username = var.username != "" ? var.username : "${var.service}_${var.namespace}"
-  database_password = var.password != "" ? var.password : random_password.db_password[0].result
+  sa_name             = "${var.service}-sa"
+  sa_namespace        = var.namespace
+  eks_oidc_issuer     = trimprefix(data.aws_eks_cluster.eks.identity[0].oidc[0].issuer, "https://")
+  database_name       = var.database_name != "" ? var.database_name : "${var.service}_${var.namespace}"
+  database_username   = var.username != "" ? var.username : "${var.service}_${var.namespace}"
+  database_password   = var.password != "" ? var.password : random_password.db_password[0].result
+  instance_identifier = var.database_instance_identifier != "" var.database_instance_identifier : "${var.vpc_name}-aurora-cluster-instance"
 }
 
 module "secrets_manager" {

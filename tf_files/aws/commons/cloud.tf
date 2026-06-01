@@ -21,6 +21,7 @@ module "cdis_vpc" {
   peering_vpc_id                 = var.peering_vpc_id
   vpc_flow_logs                  = var.vpc_flow_logs
   vpc_flow_traffic               = var.vpc_flow_traffic
+  automation_repo                = var.automation_repo
   branch                         = var.branch
   fence-bot_bucket_access_arns   = var.fence-bot_bucket_access_arns
   deploy_ha_squid                = var.deploy_ha_squid

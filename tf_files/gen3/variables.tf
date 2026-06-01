@@ -22,6 +22,10 @@ variable "audit_enabled" {
   default     = true
 }
 
+variable "database_instance_identifier" {
+  default = ""
+}
+
 variable "aurora_username" {
   description = "aurora username"
   default = ""

@@ -73,6 +73,11 @@ variable "route_53_zone_id" {
   description = "DNS zone for .internal.io"
 }
 
+variable "automation_repo" {
+  description = "repo holding the squid startup scripts"
+  default     = "https://github.com/uc-cdis/cloud-automation.git"
+}
+
 variable "branch" {
   description = "branch to use in bootstrap script"
   default     = "master"
