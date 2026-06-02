@@ -93,6 +93,7 @@ module "commons" {
   deploy_indexd_db               = false
   network_expansion              = true
   users_policy                   = "dev"
+  users_bucket_name              = local.user_yaml_bucket_name
   availability_zones             = local.availability_zones
   es_version                     = "7.10"
   es_linked_role                 = local.es_linked_role
