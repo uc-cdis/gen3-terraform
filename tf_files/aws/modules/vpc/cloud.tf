@@ -32,6 +32,16 @@ module "squid-auto" {
   slack_webhook                  = var.slack_webhook
   fips                           = var.fips
   ha_squid_single_instance       = var.ha_squid_single_instance 
+  ssh_keys_repo                  = var.squid_ssh_keys_repo
+  ssh_admin_keys_file            = var.squid_ssh_admin_keys_file
+  ssh_user_keys_file             = var.squid_ssh_user_keys_file
+  whitelist_repo                 = var.squid_whitelist_repo
+  ftp_whitelist_file             = var.squid_ftp_whitelist_file
+  web_whitelist_file             = var.squid_web_whitelist_file
+  web_wildcard_whitelist_file    = var.squid_web_wildcard_whitelist_file
+  script_repo                    = var.squid_script_repo
+  updatewhitelist_script_file    = var.squid_updatewhitelist_script_file
+  healthcheck_script_file        = var.squid_healthcheck_script_file 
 }
 
 module "data-bucket" {

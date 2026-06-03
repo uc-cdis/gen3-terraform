@@ -2,7 +2,26 @@ locals{
   cidrs  = var.secondary_cidr_block != "" ? [var.env_vpc_cidr, var.peering_cidr, var.secondary_cidr_block] : [var.env_vpc_cidr, var.peering_cidr]
   cidrs2 = var.secondary_cidr_block != "" ? [var.env_vpc_cidr, var.secondary_cidr_block] : [var.env_vpc_cidr]
   bootstrap_script = var.ha_squid_single_instance ? "squid_running_on_docker_single_instance.sh" : var.bootstrap_script
-  
+  generated_squid_bootstrap_vars = compact([
+    var.ssh_keys_repo != "" ? "ssh_keys_repo=${var.ssh_keys_repo}" : "",
+    var.ssh_admin_keys_file != "" ? "ssh_admin_keys_file=${var.ssh_admin_keys_file}" : "",
+    var.ssh_user_keys_file != "" ? "ssh_user_keys_file=${var.ssh_user_keys_file}" : "",
+
+    var.whitelist_repo != "" ? "whitelist_repo=${var.whitelist_repo}" : "",
+    var.ftp_whitelist_file != "" ? "ftp_whitelist_file=${var.ftp_whitelist_file}" : "",
+    var.web_whitelist_file != "" ? "web_whitelist_file=${var.web_whitelist_file}" : "",
+    var.web_wildcard_whitelist_file != "" ? "web_wildcard_whitelist_file=${var.web_wildcard_whitelist_file}" : "",
+
+    var.script_repo != "" ? "script_repo=${var.script_repo}" : "",
+    var.updatewhitelist_script_file != "" ? "updatewhitelist_script_file=${var.updatewhitelist_script_file}" : "",
+    var.healthcheck_script_file != "" ? "healthcheck_script_file=${var.healthcheck_script_file}" : "",
+  ])
+
+  squid_bootstrap_vars = concat(
+    ["cwl_group=${var.env_log_group}"],
+    var.extra_vars,
+    local.generated_squid_bootstrap_vars
+  )
 }
 
 #Launching the public subnets for the squid VMs
@@ -143,7 +162,7 @@ fi
   fi
   cd $USER_HOME
 
-  bash "${var.bootstrap_path}${local.bootstrap_script}" "cwl_group=${var.env_log_group};${join(";",var.extra_vars)}" 2>&1
+  bash "${var.bootstrap_path}${var.bootstrap_script}" "${join(";", local.squid_bootstrap_vars)}" 2>&1
   cd $CLOUD_AUTOMATION
   git checkout master
 ) > /var/log/bootstrapping_script.log

@@ -45,6 +45,16 @@ module "cdis_vpc" {
   ha_squid_single_instance       = var.ha_squid_single_instance
   force_delete_bucket            = var.force_delete_bucket
   availability_zones             = var.availability_zones
+  ssh_keys_repo                  = var.squid_ssh_keys_repo
+  ssh_admin_keys_file            = var.squid_ssh_admin_keys_file
+  ssh_user_keys_file             = var.squid_ssh_user_keys_file
+  whitelist_repo                 = var.squid_whitelist_repo
+  ftp_whitelist_file             = var.squid_ftp_whitelist_file
+  web_whitelist_file             = var.squid_web_whitelist_file
+  web_wildcard_whitelist_file    = var.squid_web_wildcard_whitelist_file
+  script_repo                    = var.squid_script_repo
+  updatewhitelist_script_file    = var.squid_updatewhitelist_script_file
+  healthcheck_script_file        = var.squid_healthcheck_script_file
   role_arn                       = var.deploy_es_role ? local.es_role_name : var.es_role_override != "" ? var.es_role_override : ""
   providers = {
     aws      = aws
