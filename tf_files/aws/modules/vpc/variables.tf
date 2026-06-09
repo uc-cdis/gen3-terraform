@@ -89,52 +89,52 @@ variable "branch" {
   default     = "master"
 }
 
-variable "squid_ssh_keys_repo" {
+variable "ssh_keys_repo" {
   description = "Optional repo containing squid authorized key files"
   default     = ""
 }
 
-variable "squid_ssh_admin_keys_file" {
+variable "ssh_admin_keys_file" {
   description = "Repo-relative path to admin authorized_keys file"
   default     = ""
 }
 
-variable "squid_ssh_user_keys_file" {
+variable "ssh_user_keys_file" {
   description = "Repo-relative path to sftp user authorized_keys file"
   default     = ""
 }
 
-variable "squid_whitelist_repo" {
+variable "whitelist_repo" {
   description = "Optional repo containing squid whitelist files"
   default     = ""
 }
 
-variable "squid_ftp_whitelist_file" {
+variable "ftp_whitelist_file" {
   description = "Repo-relative path to ftp whitelist file"
   default     = ""
 }
 
-variable "squid_web_whitelist_file" {
+variable "web_whitelist_file" {
   description = "Repo-relative path to web whitelist file"
   default     = ""
 }
 
-variable "squid_web_wildcard_whitelist_file" {
+variable "web_wildcard_whitelist_file" {
   description = "Repo-relative path to web wildcard whitelist file"
   default     = ""
 }
 
-variable "squid_script_repo" {
+variable "script_repo" {
   description = "Optional repo containing squid helper scripts"
   default     = ""
 }
 
-variable "squid_updatewhitelist_script_file" {
+variable "updatewhitelist_script_file" {
   description = "Repo-relative path to updatewhitelist script"
   default     = ""
 }
 
-variable "squid_healthcheck_script_file" {
+variable "healthcheck_script_file" {
   description = "Repo-relative path to healthcheck script"
   default     = ""
 }
