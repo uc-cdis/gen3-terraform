@@ -44,8 +44,10 @@ locals {
   revproxy_arn                  = "<Update with your ACM certificate arn>"
   # Whether or not to create users/buckets needed for useryaml gitops management.
   create_gitops_infra           = true
+  # THIS WILL OVERRIDE THE BUCKET CREATED AUTOMATICALLY, USE ONLY IF YOU WANT TO SUPPLY A BUCKET YOU'VE CREATED OUTSIDE OF THIS TERRAFORM!
+  user_supplied_users_bucket_name = ""
   # The name of the S3 bucket where the user.yaml file will be stored. Notice this will be created by terraform, so you don't need to create it beforehand.
-  user_yaml_bucket_name = "<update with your user yaml bucket name>"
+  user_yaml_bucket_name = local.user_supplied_users_bucket_name != "" ? local.user_supplied_users_bucket_name : create_gitops_infra ? aws_s3_bucket.users_bucket.id : "YOU NEED TO SET A VALID BUCKET"
   # Your ssh key name to access the nodes in the EKS cluster
   ssh_key                = ""
   # Set any tags you want to apply to all resources created by this module.
@@ -106,6 +108,7 @@ module "commons" {
   force_delete_bucket            = true
   enable_vpc_endpoints           = false
   cluster_engine_version         = "13"
+  user_yaml_bucket_name          = local.user_yaml_bucket_name
 }
 
 module "gen3" {
