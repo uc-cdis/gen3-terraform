@@ -21,6 +21,7 @@ module "cdis_vpc" {
   peering_vpc_id                 = var.peering_vpc_id
   vpc_flow_logs                  = var.vpc_flow_logs
   vpc_flow_traffic               = var.vpc_flow_traffic
+  automation_repo                = var.automation_repo
   branch                         = var.branch
   fence-bot_bucket_access_arns   = var.fence-bot_bucket_access_arns
   deploy_ha_squid                = var.deploy_ha_squid
@@ -44,6 +45,16 @@ module "cdis_vpc" {
   ha_squid_single_instance       = var.ha_squid_single_instance
   force_delete_bucket            = var.force_delete_bucket
   availability_zones             = var.availability_zones
+  squid_ssh_keys_repo                  = var.squid_ssh_keys_repo
+  squid_ssh_admin_keys_file            = var.squid_ssh_admin_keys_file
+  squid_ssh_user_keys_file             = var.squid_ssh_user_keys_file
+  squid_whitelist_repo                 = var.squid_whitelist_repo
+  squid_ftp_whitelist_file             = var.squid_ftp_whitelist_file
+  squid_web_whitelist_file             = var.squid_web_whitelist_file
+  squid_web_wildcard_whitelist_file    = var.squid_web_wildcard_whitelist_file
+  squid_script_repo                    = var.squid_script_repo
+  squid_updatewhitelist_script_file    = var.squid_updatewhitelist_script_file
+  squid_healthcheck_script_file        = var.squid_healthcheck_script_file
   role_arn                       = var.deploy_es_role ? local.es_role_name : var.es_role_override != "" ? var.es_role_override : ""
   providers = {
     aws      = aws

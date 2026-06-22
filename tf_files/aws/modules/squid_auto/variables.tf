@@ -1,8 +1,8 @@
-variable "env_vpc_cidr"{
+variable "env_vpc_cidr" {
   description = "CIDR of the VPC where this cluster will reside"
 }
 
-variable "squid_proxy_subnet"{}
+variable "squid_proxy_subnet" {}
 
 variable "env_vpc_name" {}
 
@@ -56,7 +56,7 @@ variable "ssh_key_name" {
   description = "ssh key name that instances in the cluster will use"
 }
 
-variable "squid_instance_drive_size" { 
+variable "squid_instance_drive_size" {
   description = "Size of the root volume for the instance"
   default     = 8
 }
@@ -73,6 +73,11 @@ variable "route_53_zone_id" {
   description = "DNS zone for .internal.io"
 }
 
+variable "automation_repo" {
+  description = "repo holding the squid startup scripts"
+  default     = "https://github.com/uc-cdis/cloud-automation.git"
+}
+
 variable "branch" {
   description = "branch to use in bootstrap script"
   default     = "master"
@@ -81,6 +86,56 @@ variable "branch" {
 variable "extra_vars" {
   description = "additional variables to pass along with the bootstrapscript"
   default     = ["squid_image=master"]
+}
+
+variable "ssh_keys_repo" {
+  description = "Optional repo containing squid authorized key files. Empty keeps using automation_repo/cloud-automation defaults."
+  default     = ""
+}
+
+variable "ssh_admin_keys_file" {
+  description = "Repo-relative or absolute path to admin authorized_keys file. Empty keeps bootstrap default."
+  default     = ""
+}
+
+variable "ssh_user_keys_file" {
+  description = "Repo-relative or absolute path to sftp user authorized_keys file. Empty keeps bootstrap default."
+  default     = ""
+}
+
+variable "whitelist_repo" {
+  description = "Optional repo containing squid whitelist files. Empty keeps using automation_repo/cloud-automation defaults."
+  default     = ""
+}
+
+variable "ftp_whitelist_file" {
+  description = "Repo-relative or absolute path to ftp_whitelist file. Empty keeps bootstrap default."
+  default     = ""
+}
+
+variable "web_whitelist_file" {
+  description = "Repo-relative or absolute path to web_whitelist file. Empty keeps bootstrap default."
+  default     = ""
+}
+
+variable "web_wildcard_whitelist_file" {
+  description = "Repo-relative or absolute path to web_wildcard_whitelist file. Empty keeps bootstrap default."
+  default     = ""
+}
+
+variable "script_repo" {
+  description = "Optional repo containing updatewhitelist and healthcheck scripts. Empty keeps using automation_repo/cloud-automation defaults."
+  default     = ""
+}
+
+variable "updatewhitelist_script_file" {
+  description = "Repo-relative or absolute path to updatewhitelist script. Empty keeps bootstrap default."
+  default     = ""
+}
+
+variable "healthcheck_script_file" {
+  description = "Repo-relative or absolute path to healthcheck script. Empty keeps bootstrap default."
+  default     = ""
 }
 
 variable "deploy_ha_squid" {
@@ -98,7 +153,7 @@ variable "cluster_max_size" {
   default     = 3
 }
 
-variable "cluster_min_size" { 
+variable "cluster_min_size" {
   description = "Min size of the autoscaling group"
   default     = 1
 }
@@ -108,8 +163,8 @@ variable "network_expansion" {
   default     = false
 }
 
-variable "squid_depends_on" { 
-  default = "" 
+variable "squid_depends_on" {
+  default = ""
 }
 
 variable "activation_id" {
