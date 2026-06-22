@@ -234,7 +234,7 @@ Replace all placeholders before running commands:
 
 * `<REGION>` — AWS region (e.g., `us-east-1`)
 * `<EKS_CLUSTER_NAME>` — Your EKS cluster name
-* `<VPC_NAME>` — The VPC/stack identifier used in generated paths
+* `<VPC_NAME>` — The VPC/stack identifier used in generated paths. This will create s3 buckets based on this value, so the VPC name effectively needs to be globally unique.
 * `<COMMONS_HOSTNAME>` — Your Gen3 hostname (e.g., `commons.example.org`)
 * `<GIT_REPO_URL>` — Your Git remote URL
 * `<PATH_NAME>` — Subdirectory under `users/` for your `user.yaml` layout

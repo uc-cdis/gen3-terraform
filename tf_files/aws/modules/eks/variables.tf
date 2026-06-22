@@ -206,7 +206,7 @@ variable "deploy_karpenter_in_k8s" {
 }
 
 variable "karpenter_version" {
-  default = "1.0.8"
+  default = "1.9.0"
 }
 
 variable "spot_linked_role" {
