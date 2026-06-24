@@ -1,3 +1,16 @@
+variable "vpc_id" {
+  required = true
+}
+variable "servicename" {
+  required = true
+}
+variable "servicename" {
+  required = true
+}
+
+
+
+
 # id of AWS account that owns the public AMI's
 variable "ami_account_id" {
   default = "099720109477"
