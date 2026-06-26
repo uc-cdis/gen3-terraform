@@ -12,7 +12,6 @@ tg-all *args:
 check:
     @just fmt
     @just tg-all test
-    @echo "==> Deep Linting Child Modules..."
 
 lint:
     tflint --recursive --init
@@ -28,8 +27,7 @@ fmt:
 
 # Standard targeted pipelines
 plan-all:
-    just tg-all plan
+    @just tg-all plan
 
 apply-all:
-    just tg-all apply --terragrunt-non-interactive
-
+    @just tg-all apply --terragrunt-non-interactive
