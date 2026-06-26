@@ -12,6 +12,9 @@ check:
     tflint --recursive --init
     tflint --recursive
 
+init:
+    terragrunt init -backend=false
+
 # Format all decoupled terragrunt templates
 fmt:
     terragrunt run -- hclfmt
