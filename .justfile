@@ -4,11 +4,17 @@ set dotenv-load := true
 default:
     @just --list
 
+# Run dynamic commands across your entire stack graph concurrently
+tg-all *args:
+    terragrunt run -- {{ args }} -recursive
+
 # Runs tflint recursively across all decoupled infrastructure modules
 check:
-    ln -s ./root.tf terragrunt.hcl || true
-    terragrunt run -- validate-all
+    @just fmt
+    @just tg-all test
     @echo "==> Deep Linting Child Modules..."
+
+lint:
     tflint --recursive --init
     tflint --recursive
 
@@ -17,12 +23,8 @@ init:
 
 # Format all decoupled terragrunt templates
 fmt:
-    terragrunt run -- hclfmt
+    terragrunt hcl fmt
     terraform fmt -recursive
-
-# Run dynamic commands across your entire stack graph concurrently
-tg-all *args:
-    terragrunt run-all {{ args }}
 
 # Standard targeted pipelines
 plan-all:
