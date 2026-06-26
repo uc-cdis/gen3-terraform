@@ -1,4 +1,4 @@
-# YOINK:
+# .env files now load automagically, use with care
 set dotenv-load := true
 
 default:
@@ -6,6 +6,7 @@ default:
 
 # Runs tflint recursively across all decoupled infrastructure modules
 check:
+    ln -s ./root.tf terragrunt.hcl || true
     terragrunt run -- validate-all
     @echo "==> Deep Linting Child Modules..."
     tflint --recursive --init

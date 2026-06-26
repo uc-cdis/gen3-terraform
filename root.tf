@@ -24,18 +24,18 @@
 
 ### Automatically generate the AWS provider block in child module
 
-generate "provider" {
-  path = "provider.tf"
-  if_exists = "overwrite_terragrunt"
-  contents = <<EOF
-provider "aws" {
-	region = "us-east-1"
-	default_tags {
-	  tags = {
-#	  	Environment = "production"
-#	  	ManagedBy = "Terragrunt"
-#	  }
-#	}
+#generate "provider" {
+#  path = "provider.tf"
+#  if_exists = "overwrite_terragrunt"
+#  contents = <<EOF
+#provider "aws" {
+#	region = "us-east-1"
+#	default_tags {
+#	  tags = {
+##	  	Environment = "production"
+##	  	ManagedBy = "Terragrunt"
+##	  }
+##	}
+##}
+#EOF
 #}
-EOF
-}
