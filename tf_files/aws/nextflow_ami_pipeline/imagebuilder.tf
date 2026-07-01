@@ -131,8 +131,8 @@ resource "aws_imagebuilder_image_recipe" "recipe" {
     ebs {
       delete_on_termination = true
       volume_size           = 30
-      volume_type           = "gp2"
-      encrypted = false
+      volume_type           = "gp3"
+      encrypted             = true
     }
   }
 

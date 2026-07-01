@@ -149,7 +149,7 @@ resource "aws_instance" "utility_vm" {
   ami                    = aws_ami_copy.cdis_ami.id
   subnet_id              = var.vpc_subnet_id
   instance_type          = var.instance_type
-  monitoring             = true
+  monitoring             = false
   key_name               = var.ssh_key_name
   vpc_security_group_ids = [aws_security_group.ssh.id, aws_security_group.local.id]
   iam_instance_profile   = aws_iam_instance_profile.vm_role_profile.name

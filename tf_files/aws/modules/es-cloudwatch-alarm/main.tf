@@ -85,5 +85,6 @@ resource "aws_iam_role_policy" "lambda_es_cluster_red_policy" {
 }
 
 resource "aws_cloudwatch_log_group" "es_lambda" {
-  name            = "${var.vpc_name}-es-cluster-red-slack-alert"
+  name              = "${var.vpc_name}-es-cluster-red-slack-alert"
+  retention_in_days = 14
 }
