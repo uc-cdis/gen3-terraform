@@ -154,7 +154,7 @@ resource "aws_rds_cluster_parameter_group" "aurora_cdis_pg" {
   # Setting for pgvector performance
   parameter {
     name  = "maintenance_work_mem"
-    value = locals.pg_instantce_class_mem
+    value = locals.pg_instance_class_mem
   }
 
   # Setting for pgvector performance
@@ -172,7 +172,7 @@ resource "aws_rds_cluster_parameter_group" "aurora_cdis_pg" {
   # Setting for pgvector performance
   parameter {
     name  = "workmem"
-    value = locals.pg_instantce_class_mem
+    value = locals.pg_instance_class_mem
   }
 
   lifecycle {
