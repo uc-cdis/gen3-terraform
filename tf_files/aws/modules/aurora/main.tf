@@ -16,17 +16,17 @@ resource "random_password" "password" {
 resource "aws_rds_cluster" "postgresql" {
   cluster_identifier              = "${var.vpc_name}-${var.cluster_identifier}"
   engine                          = var.cluster_engine
-  engine_version	                = var.cluster_engine_version
-  db_subnet_group_name	          = "${var.vpc_name}_private_group"
+  engine_version                  = var.cluster_engine_version
+  db_subnet_group_name            = "${var.vpc_name}_private_group"
   vpc_security_group_ids          = [data.aws_security_group.private.id]
   master_username                 = var.master_username
-  master_password	                = random_password.password.result
-  storage_encrypted	              = var.storage_encrypted
+  master_password                 = random_password.password.result
+  storage_encrypted               = var.storage_encrypted
   apply_immediately               = var.apply_immediate
-  engine_mode        	            = var.engine_mode
-  skip_final_snapshot	            = var.skip_final_snapshot
+  engine_mode                     = var.engine_mode
+  skip_final_snapshot             = var.skip_final_snapshot
   final_snapshot_identifier       = "${var.vpc_name}-${var.final_snapshot_identifier}"
-  snapshot_identifier             = var.aurora_snapshot_identifier == "" ? null : var.aurora_snapshot_identifier 
+  snapshot_identifier             = var.aurora_snapshot_identifier == "" ? null : var.aurora_snapshot_identifier
   backup_retention_period         = var.backup_retention_period
   preferred_backup_window         = var.preferred_backup_window
   db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.aurora_cdis_pg.name
@@ -41,7 +41,7 @@ resource "aws_rds_cluster" "postgresql" {
   }
 
   lifecycle {
-    ignore_changes  = [kms_key_id, engine_version]
+    ignore_changes = [kms_key_id, engine_version]
   }
 }
 
@@ -49,11 +49,11 @@ resource "aws_rds_cluster" "postgresql" {
 
 resource "aws_rds_cluster_instance" "postgresql" {
   db_subnet_group_name = aws_rds_cluster.postgresql.db_subnet_group_name
-  identifier         	 = "${var.vpc_name}-${var.cluster_instance_identifier}"
-  cluster_identifier 	 = aws_rds_cluster.postgresql.id
-  instance_class	     = var.cluster_instance_class
-  engine             	 = aws_rds_cluster.postgresql.engine
-  engine_version     	 = aws_rds_cluster.postgresql.engine_version
+  identifier           = "${var.vpc_name}-${var.cluster_instance_identifier}"
+  cluster_identifier   = aws_rds_cluster.postgresql.id
+  instance_class       = var.cluster_instance_class
+  engine               = aws_rds_cluster.postgresql.engine
+  engine_version       = aws_rds_cluster.postgresql.engine_version
 
   lifecycle {
     ignore_changes = [engine_version]
@@ -67,7 +67,7 @@ resource "aws_rds_cluster_instance" "postgresql" {
 
 # Local variable to hold aurora creds
 locals {
-  aurora-creds-template     = <<AURORACREDS
+  aurora-creds-template = <<AURORACREDS
 {
     "aurora": {
         "db_host": "${aws_rds_cluster.postgresql.endpoint}",
@@ -86,10 +86,10 @@ resource "local_sensitive_file" "aurora_creds" {
 }
 
 module "secrets_manager" {
-  count       = var.secrets_manager_enabled ? 1 : 0
-  source      = "../secrets_manager"
-  vpc_name    = var.vpc_name
-  secret	    = templatefile("${path.module}/secrets_manager.tftpl", {
+  count    = var.secrets_manager_enabled ? 1 : 0
+  source   = "../secrets_manager"
+  vpc_name = var.vpc_name
+  secret = templatefile("${path.module}/secrets_manager.tftpl", {
     hostname = aws_rds_cluster.postgresql.endpoint
     database = "postgres"
     username = aws_rds_cluster.postgresql.master_username
@@ -102,11 +102,11 @@ module "secrets_manager" {
 # and https://www.postgresql.org/docs/9.6/static/runtime-config-query.html#RUNTIME-CONFIG-QUERY-ENABLE
 # for detail parameter descriptions
 locals {
-  pg_family_version = replace( var.cluster_engine_version ,"/\\.[0-9]/", "" )
+  pg_family_version = replace(var.cluster_engine_version, "/\\.[0-9]/", "")
 
-	# Yoinked from devplanet
+  # Yoinked from devplanet
   pg_instance_class_mem = "GREATEST({DBInstanceClassMemory/63963136*1024},65536)"
-  pg_vcpu = "GREATEST(${DBInstanceVCPU/2},8)"
+  pg_vcpu               = "GREATEST(${DBInstanceVCPU / 2},8)"
 }
 
 resource "aws_rds_cluster_parameter_group" "aurora_cdis_pg" {
@@ -176,7 +176,7 @@ resource "aws_rds_cluster_parameter_group" "aurora_cdis_pg" {
   }
 
   lifecycle {
-    ignore_changes  = all
+    ignore_changes = all
   }
 }
 
@@ -187,8 +187,8 @@ resource "aws_iam_role" "lambda_rds_check_role" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Action    = "sts:AssumeRole",
-      Effect    = "Allow",
+      Action = "sts:AssumeRole",
+      Effect = "Allow",
       Principal = {
         Service = "lambda.amazonaws.com"
       }
@@ -214,13 +214,13 @@ resource "aws_iam_role_policy" "lambda_rds_check_policy" {
         Resource = "arn:aws:logs:*:*:*"
       },
       {
-        Action = ["rds:DescribePendingMaintenanceActions"],
-        Effect = "Allow",
+        Action   = ["rds:DescribePendingMaintenanceActions"],
+        Effect   = "Allow",
         Resource = "*"
       },
       {
-        Action = ["cloudwatch:PutMetricData"],
-        Effect = "Allow",
+        Action   = ["cloudwatch:PutMetricData"],
+        Effect   = "Allow",
         Resource = "*"
       }
     ]
@@ -229,7 +229,7 @@ resource "aws_iam_role_policy" "lambda_rds_check_policy" {
 
 resource "aws_lambda_function" "rds_upgrade_checker" {
   count            = var.deploy_rds_check_lambda ? 1 : 0
-  filename         = "lambda_function_payload.zip" 
+  filename         = "lambda_function_payload.zip"
   function_name    = "rds-upgrade-checker"
   role             = aws_iam_role.lambda_rds_check_role[0].arn
   handler          = "lambda_function.lambda_handler"
@@ -240,7 +240,7 @@ resource "aws_lambda_function" "rds_upgrade_checker" {
 }
 
 resource "aws_cloudwatch_event_rule" "rds_upgrade_schedule" {
-  count              = var.deploy_rds_check_lambda ? 1 : 0
+  count               = var.deploy_rds_check_lambda ? 1 : 0
   name                = "rds-upgrade-schedule"
   schedule_expression = "rate(12 hours)"
 }

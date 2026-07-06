@@ -21,5 +21,5 @@ output "aurora_cluster_master_username" {
 output "aurora_cluster_master_password" {
   description = "Aurora cluster master user's password"
   value       = aws_rds_cluster.postgresql.master_password
-  sensitive  = true
+  sensitive   = true
 }
