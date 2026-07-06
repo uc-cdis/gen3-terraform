@@ -103,6 +103,10 @@ module "secrets_manager" {
 # for detail parameter descriptions
 locals {
   pg_family_version = replace( var.cluster_engine_version ,"/\\.[0-9]/", "" )
+
+	# Yoinked from devplanet
+  pg_instance_class_mem = "GREATEST({DBInstanceClassMemory/63963136*1024},65536)"
+  pg_vcpu = "GREATEST(${DBInstanceVCPU/2},8)"
 }
 
 resource "aws_rds_cluster_parameter_group" "aurora_cdis_pg" {
@@ -145,6 +149,30 @@ resource "aws_rds_cluster_parameter_group" "aurora_cdis_pg" {
   parameter {
     name  = "password_encryption"
     value = "scram-sha-256"
+  }
+
+  # Setting for pgvector performance
+  parameter {
+    name  = "maintenance_work_mem"
+    value = locals.pg_instantce_class_mem
+  }
+
+  # Setting for pgvector performance
+  parameter {
+    name  = "max_parallel_maintainance_workers"
+    value = locals.pg_vcpu
+  }
+
+  # Setting for pgvector performance
+  parameter {
+    name  = "max_parallel_workers"
+    value = locals.pg_vcpu
+  }
+
+  # Setting for pgvector performance
+  parameter {
+    name  = "workmem"
+    value = locals.pg_instantce_class_mem
   }
 
   lifecycle {
