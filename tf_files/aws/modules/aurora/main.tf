@@ -171,7 +171,7 @@ resource "aws_rds_cluster_parameter_group" "aurora_cdis_pg" {
 
   # Setting for pgvector performance
   parameter {
-    name  = "workmem"
+    name  = "work_mem"
     value = locals.pg_instance_class_mem
   }
 
