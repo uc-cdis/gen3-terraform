@@ -61,3 +61,10 @@ resource "aws_iam_role_policy_attachment" "attach_policy" {
   role       = module.iam_role.role_id
   policy_arn = module.iam_role_policy.arn
 }
+
+resource "aws_iam_role_policy_attachment" "additional_policies" {
+  for_each = var.additional_policy_arns
+
+  role       = module.iam_role.role_id
+  policy_arn = each.value
+}
