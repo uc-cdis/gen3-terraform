@@ -768,4 +768,159 @@ resource "aws_iam_role_policy" "grafana-role-policy" {
   })
 }
 
+resource "aws_iam_role" "efs-csi-controller-role" {
+  count = var.namespace == "default" && var.deploy_s3_files ? 1 : 0
+  name        = "${var.vpc_name}--kube-system--efs-csi-controller"
+  description = "IRSA role for the EFS CSI controller with S3 Files support for ${var.vpc_name}"
+  path        = "/gen3_service/"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider_arn}"
+        }
+
+        Action = "sts:AssumeRoleWithWebIdentity"
+
+        Condition = {
+          StringEquals = {
+            "${var.oidc_provider_arn}:sub" = "system:serviceaccount:kube-system:efs-csi-controller-sa"
+            "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "efs-csi-controller-efs-policy" {
+  count = var.namespace == "default" && var.deploy_s3_files ? 1 : 0
+  role       = aws_iam_role.efs-csi-controller-role[0].name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "efs-csi-controller-s3-files-policy" {
+  count = var.namespace == "default" && var.deploy_s3_files ? 1 : 0
+  role       = aws_iam_role.efs-csi-controller-role[0].name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonS3FilesCSIDriverPolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "efs-csi-controller-s3-files-client-policy" {
+  count = var.namespace == "default" && var.deploy_s3_files ? 1 : 0
+  role       = aws_iam_role.efs-csi-controller-role[0].name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FilesClientFullAccess"
+}
+
+resource "aws_iam_role" "efs-csi-node-role" {
+  count = var.namespace == "default" && var.deploy_s3_files ? 1 : 0
+  name        = "${var.vpc_name}--kube-system--efs-csi-node"
+  description = "IRSA role for EFS CSI node pods with S3 Files support for ${var.vpc_name}"
+  path        = "/gen3_service/"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider_arn}"
+        }
+
+        Action = "sts:AssumeRoleWithWebIdentity"
+
+        Condition = {
+          StringEquals = {
+            "${var.oidc_provider_arn}:sub" = "system:serviceaccount:kube-system:efs-csi-node-sa"
+            "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "efs-csi-node-s3-policy" {
+  count = var.namespace == "default" && var.deploy_s3_files ? 1 : 0
+  name = "efs-csi-node-gen3wf-s3-policy"
+  role = aws_iam_role.efs-csi-node-role[0].id
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Sid    = "ListGen3WorkflowBuckets"
+        Effect = "Allow"
+
+        Action = [
+          "s3:GetBucketLocation",
+          "s3:GetBucketVersioning",
+          "s3:ListBucket",
+          "s3:ListBucketMultipartUploads",
+          "s3:ListBucketVersions"
+        ]
+
+        Resource = [
+          "arn:aws:s3:::gen3wf-*"
+        ]
+      },
+      {
+        Sid    = "ReadGen3WorkflowObjects"
+        Effect = "Allow"
+
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectAcl",
+          "s3:GetObjectAttributes",
+          "s3:GetObjectTagging",
+          "s3:GetObjectVersion",
+          "s3:GetObjectVersionAcl",
+          "s3:GetObjectVersionAttributes",
+          "s3:GetObjectVersionTagging",
+          "s3:ListMultipartUploadParts"
+        ]
+
+        Resource = [
+          "arn:aws:s3:::gen3wf-*/*"
+        ]
+      },
+      {
+        Sid    = "WriteGen3WorkflowObjects"
+        Effect = "Allow"
+
+        Action = [
+          "s3:AbortMultipartUpload",
+          "s3:DeleteObject",
+          "s3:DeleteObjectTagging",
+          "s3:DeleteObjectVersion",
+          "s3:DeleteObjectVersionTagging",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:PutObjectTagging"
+        ]
+
+        Resource = [
+          "arn:aws:s3:::gen3wf-*/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "efs-csi-node-s3-files-client-policy" {
+  count = var.namespace == "default" && var.deploy_s3_files ? 1 : 0
+  role       = aws_iam_role.efs-csi-node-role[0].name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FilesClientFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "efs-csi-node-efs-utils-policy" {
+  count = var.namespace == "default" && var.deploy_s3_files ? 1 : 0
+  role       = aws_iam_role.efs-csi-node-role[0].name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonElasticFileSystemsUtils"
+}
+
 # TODO Add ssjdispatcher
