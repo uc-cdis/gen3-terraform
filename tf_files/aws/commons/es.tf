@@ -58,5 +58,10 @@ resource "aws_iam_role" "esproxy-role" {
 }
 EDOC
 
+  inline_policy = <<EDOC
+{
+    
+}
+EDOC
   path = "/gen3-service/"
 }
