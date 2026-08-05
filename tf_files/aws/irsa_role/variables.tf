@@ -60,3 +60,9 @@ variable "policy_description" {
 variable "policy_json" {
   description = "Basically the actual policy in JSON"
 }
+
+variable "additional_policy_arns" {
+  description = "Additional managed policy ARNs to attach to the IRSA role"
+  type        = set(string)
+  default     = []
+}

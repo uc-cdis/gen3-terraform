@@ -68,8 +68,13 @@ variable "deploy_external_secrets" {
 variable "deploy_grafana" {
   description = "Deploy grafana"
   type        = bool
+  default     = false  
+}
+
+variable "deploy_s3_files" {
+  description = "Create IRSA roles for the EFS CSI driver with S3 Files support"
+  type        = bool
   default     = false
-  
 }
 
 variable "deploy_s3_mountpoint" {
