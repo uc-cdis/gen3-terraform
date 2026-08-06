@@ -500,7 +500,8 @@ resource "aws_iam_role_policy" "aws-load-balancer-role-policy" {
           "elasticloadbalancing:CreateListener",
           "elasticloadbalancing:DeleteListener",
           "elasticloadbalancing:CreateRule",
-          "elasticloadbalancing:DeleteRule"
+          "elasticloadbalancing:DeleteRule",
+          "elasticloadbalancing:SetRulePriorities"
         ]
         Effect   = "Allow"
         Resource = "*"
