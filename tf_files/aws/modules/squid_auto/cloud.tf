@@ -174,6 +174,7 @@ EOF
     device_name = "/dev/xvda"
     ebs {
       volume_size = var.squid_instance_drive_size
+      encrypted   = true
     }
   }
 
