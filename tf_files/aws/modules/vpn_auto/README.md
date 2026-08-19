@@ -33,9 +33,17 @@ The module creates, per environment:
 - An IAM role granting CloudWatch Logs, that bucket, and Session Manager
 - A Route53 CNAME pointing `env_vpn_name` at the NLB
 
-The instance's userdata installs docker and the CloudWatch agent, then runs the
-openvpn image as a systemd unit. Nothing is cloned from git at boot, so a deleted
-branch cannot break a replacement instance.
+Nothing is cloned from git at boot, so a deleted branch cannot break a replacement
+instance. Responsibilities are split between the instance and the container:
+
+| | Owns |
+|---|---|
+| userdata, on the host | docker, dnsmasq and its refresh timer, the CloudWatch agent, the `openvpn-container` unit |
+| the container | OpenVPN, the PKI, the iptables forwarding rules |
+
+dnsmasq deliberately runs on the host rather than in the container. Clients are pushed
+the instance's own address as their resolver, so DNS has to keep answering across
+container restarts and image pulls.
 
 ### Why the instances are disposable
 
@@ -113,8 +121,7 @@ DNS at the new NLB once the new stack is verified, then retire the old one.
 ### Split horizon DNS
 
 While connected, some hostnames must resolve to an internal load balancer rather than
-the public one. Set `dnsmasq_overrides` and the container renders the dnsmasq config and
-keeps the addresses current:
+the public one. Set `dnsmasq_overrides`:
 
 ```hcl
 dnsmasq_overrides = {
@@ -122,7 +129,23 @@ dnsmasq_overrides = {
 }
 ```
 
-Adding another service behind an internal load balancer is a tfvars change, not a script change.
+Adding another service behind an internal load balancer is a tfvars change, not a
+script change. The module renders `/etc/dnsmasq.conf` and installs
+`update-dnsmasq.sh` on a systemd timer that resolves each internal load balancer and
+writes its current addresses to `/etc/dnsmasq.hosts`.
+
+Internal ALB addresses move when the load balancer is recreated or scaled, so this is
+rechecked every five minutes. The previous setup ran the equivalent once a day from
+root's crontab, which left a whole day where clients could not reach a service whose
+addresses had changed.
+
+To check what is currently being served:
+
+```bash
+cat /etc/dnsmasq.hosts
+systemctl list-timers update-dnsmasq.timer
+journalctl -u update-dnsmasq.service --since -1h
+```
 
 ## 6. Outputs
 

@@ -4,8 +4,60 @@ locals {
   # The container renders these into openvpn.conf as `push "route <net> <mask>"`
   pushed_routes = join(";", var.pushed_routes)
 
-  # hostname=internal-lb-dns-name pairs, consumed by update-dnsmasq.sh
-  dnsmasq_overrides = join(";", [for host, lb in var.dnsmasq_overrides : "${host}=${lb}"])
+  # hostname=internal-lb-dns-name pairs, consumed by update-dnsmasq.sh on the host
+  dnsmasq_overrides  = join(";", [for host, lb in var.dnsmasq_overrides : "${host}=${lb}"])
+  dnsmasq_hosts_file = "/etc/dnsmasq.hosts"
+
+  # The VPC resolver's link local address. Reachable from any subnet, and stable no
+  # matter which VPC this lands in.
+  upstream_dns = "169.254.169.253"
+
+  dnsmasq_conf = templatefile("${path.module}/files/dnsmasq.conf", {
+    hosts_file   = local.dnsmasq_hosts_file
+    upstream_dns = local.upstream_dns
+  })
+
+  update_dnsmasq_service = templatefile("${path.module}/files/update-dnsmasq.service", {
+    dnsmasq_overrides = local.dnsmasq_overrides
+    hosts_file        = local.dnsmasq_hosts_file
+    script_path       = "/usr/local/bin/update-dnsmasq.sh"
+  })
+
+  cloudwatch_config = jsonencode({
+    agent = {
+      run_as_user = "root"
+    }
+    logs = {
+      logs_collected = {
+        files = {
+          collect_list = [
+            {
+              file_path       = "/var/log/messages"
+              log_group_name  = aws_cloudwatch_log_group.vpn_log_group.name
+              log_stream_name = "messages-{instance_id}"
+            },
+            {
+              file_path       = "/var/log/secure"
+              log_group_name  = aws_cloudwatch_log_group.vpn_log_group.name
+              log_stream_name = "secure-{instance_id}"
+            },
+            {
+              file_path       = "/var/log/bootstrapping_script.log"
+              log_group_name  = aws_cloudwatch_log_group.vpn_log_group.name
+              log_stream_name = "bootstrap-{instance_id}"
+            },
+            {
+              # OpenVPN writes its client status table here, so this is the record of
+              # who was connected when
+              file_path       = "/etc/openvpn/openvpn-status.log"
+              log_group_name  = aws_cloudwatch_log_group.vpn_log_group.name
+              log_stream_name = "openvpn-status-{instance_id}"
+            },
+          ]
+        }
+      }
+    }
+  })
 }
 
 resource "aws_cloudwatch_log_group" "vpn_log_group" {
@@ -120,7 +172,7 @@ resource "aws_lb_listener" "vpn_tcp" {
   }
 }
 
-# lighttpd, serves the QR codes used to enroll TOTP
+# Serves the QR codes used to enroll TOTP
 resource "aws_lb_target_group" "vpn_qr" {
   name     = "${var.env_vpn_name}-qr-tg"
   port     = 443
@@ -241,114 +293,26 @@ resource "aws_launch_template" "vpn" {
     http_put_response_hop_limit = 2
   }
 
-  # Everything the VPN needs lives in the image. No repo is cloned at boot, so a
-  # stale branch reference can never break a replacement instance again.
-  user_data = base64encode(<<-EOF
-    MIME-Version: 1.0
-    Content-Type: multipart/mixed; boundary="BOUNDARY"
-
-    --BOUNDARY
-    Content-Type: text/x-shellscript; charset="us-ascii"
-
-    #!/bin/bash
-    set -euo pipefail
-    exec > >(tee /var/log/bootstrapping_script.log) 2>&1
-
-    hostnamectl set-hostname ${var.env_cloud_name}
-    echo "127.0.1.1 ${var.env_cloud_name}" >> /etc/hosts
-
-    dnf update -y
-    dnf install -y docker amazon-cloudwatch-agent
-
-    # The VPN needs to forward between the tun device and the VPC
-    cat > /etc/sysctl.d/99-openvpn.conf <<'SYSCTL'
-    net.ipv4.ip_forward = 1
-    SYSCTL
-    sysctl --system
-
-    systemctl enable --now docker
-
-    cat > /etc/cloudwatch-config.json <<'CWA'
-    {
-      "agent": { "run_as_user": "root" },
-      "logs": {
-        "logs_collected": {
-          "files": {
-            "collect_list": [
-              {
-                "file_path": "/var/log/messages",
-                "log_group_name": "${aws_cloudwatch_log_group.vpn_log_group.name}",
-                "log_stream_name": "messages-{instance_id}"
-              },
-              {
-                "file_path": "/var/log/secure",
-                "log_group_name": "${aws_cloudwatch_log_group.vpn_log_group.name}",
-                "log_stream_name": "secure-{instance_id}"
-              },
-              {
-                "file_path": "/var/log/bootstrapping_script.log",
-                "log_group_name": "${aws_cloudwatch_log_group.vpn_log_group.name}",
-                "log_stream_name": "bootstrap-{instance_id}"
-              },
-              {
-                "file_path": "/etc/openvpn/openvpn-status.log",
-                "log_group_name": "${aws_cloudwatch_log_group.vpn_log_group.name}",
-                "log_stream_name": "openvpn-status-{instance_id}"
-              }
-            ]
-          }
-        }
-      }
-    }
-    CWA
-    /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
-      -a fetch-config -m ec2 -c file:/etc/cloudwatch-config.json -s
-
-    mkdir -p /etc/openvpn
-
-    # Run the VPN as a systemd unit so docker restarts and instance reboots both
-    # come back cleanly, and so the iptables rules get reapplied every start
-    cat > /etc/systemd/system/openvpn-container.service <<'UNIT'
-    [Unit]
-    Description=OpenVPN server container
-    After=docker.service network-online.target
-    Requires=docker.service
-    Wants=network-online.target
-
-    [Service]
-    Restart=always
-    RestartSec=10
-    TimeoutStartSec=0
-    ExecStartPre=-/usr/bin/docker rm -f openvpn
-    ExecStartPre=/usr/bin/docker pull quay.io/cdis/openvpn:${var.vpn_image_tag}
-    ExecStart=/usr/bin/docker run --rm --name openvpn \
-      --network host \
-      --cap-add NET_ADMIN \
-      --device /dev/net/tun \
-      -v /etc/openvpn:/etc/openvpn \
-      -e VPN_NLB_NAME=${var.env_vpn_name} \
-      -e CLOUD_NAME=${var.env_cloud_name} \
-      -e CWL_GROUP=${aws_cloudwatch_log_group.vpn_log_group.name} \
-      -e CSOC_VPN_SUBNET=${var.csoc_vpn_subnet} \
-      -e CSOC_VM_SUBNET=${var.csoc_vm_subnet} \
-      -e PUSHED_ROUTES='${local.pushed_routes}' \
-      -e DNSMASQ_OVERRIDES='${local.dnsmasq_overrides}' \
-      -e S3_BUCKET=${aws_s3_bucket.vpn_certs_and_files.bucket} \
-      -e ACCOUNT_ID=${data.aws_caller_identity.current.account_id} \
-      -e AWS_DEFAULT_REGION=${data.aws_region.current.name} \
-      quay.io/cdis/openvpn:${var.vpn_image_tag}
-    ExecStop=/usr/bin/docker stop openvpn
-
-    [Install]
-    WantedBy=multi-user.target
-    UNIT
-
-    systemctl daemon-reload
-    systemctl enable --now openvpn-container.service
-
-    --BOUNDARY--
-  EOF
-  )
+  # Everything the VPN needs lives in the image and the units below. No repo is
+  # cloned at boot, so a stale branch reference cannot break a replacement instance.
+  user_data = base64encode(templatefile("${path.module}/files/userdata.sh.tpl", {
+    env_cloud_name         = var.env_cloud_name
+    env_vpn_name           = var.env_vpn_name
+    vpn_image              = "quay.io/cdis/openvpn:${var.vpn_image_tag}"
+    cwl_group              = aws_cloudwatch_log_group.vpn_log_group.name
+    csoc_vpn_subnet        = var.csoc_vpn_subnet
+    csoc_vm_subnet         = var.csoc_vm_subnet
+    pushed_routes          = local.pushed_routes
+    s3_bucket              = aws_s3_bucket.vpn_certs_and_files.bucket
+    account_id             = data.aws_caller_identity.current.account_id
+    region                 = data.aws_region.current.name
+    dnsmasq_hosts_file     = local.dnsmasq_hosts_file
+    cloudwatch_config      = local.cloudwatch_config
+    dnsmasq_conf           = local.dnsmasq_conf
+    update_dnsmasq_script  = file("${path.module}/files/update-dnsmasq.sh")
+    update_dnsmasq_service = local.update_dnsmasq_service
+    update_dnsmasq_timer   = file("${path.module}/files/update-dnsmasq.timer")
+  }))
 
   tag_specifications {
     resource_type = "instance"

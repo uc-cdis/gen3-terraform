@@ -1,0 +1,15 @@
+[Unit]
+Description=Refresh split horizon DNS entries for the VPN every few minutes
+Documentation=https://github.com/uc-cdis/openvpn
+
+[Timer]
+# Internal load balancer addresses change when the load balancer is recreated or
+# scaled. The previous setup checked once a day from root's crontab, so clients could
+# spend most of a day unable to reach a service after its addresses moved.
+OnBootSec=1min
+OnUnitActiveSec=5min
+AccuracySec=30s
+Unit=update-dnsmasq.service
+
+[Install]
+WantedBy=timers.target
