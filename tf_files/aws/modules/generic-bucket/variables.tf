@@ -47,7 +47,14 @@ variable "versioning" {
 }
 
 variable "policy_role_arn" {
-  default = ""
+  description = "Principal(s) to grant policy_actions on the bucket. Accepts a single ARN or a list of ARNs. Empty means no bucket policy is created."
+  type        = list(string)
+  default     = []
+
+  # Terragrunt passes inputs as TF_VAR_ environment variables, which are parsed
+  # against the declared type. Without an explicit type this was inferred as a
+  # string, so a list of ARNs arrived as one literal "[\"arn:...\",\"arn:...\"]"
+  # principal and S3 rejected the policy with MalformedPolicy.
 }
 
 variable "policy_actions" {
