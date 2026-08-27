@@ -87,8 +87,14 @@ resource "aws_s3_bucket_versioning" "name" {
   }
 }
 
+locals {
+  # Drop empty entries so an explicitly-passed "" or [""] means "no policy"
+  # rather than a policy with an empty principal, which S3 rejects.
+  bucket_policy_principals = compact(var.policy_role_arn)
+}
+
 resource "aws_s3_bucket_policy" "mybucket" {
-  count  = var.policy_role_arn != "" ? 1 : 0
+  count  = length(local.bucket_policy_principals) > 0 ? 1 : 0
   bucket = aws_s3_bucket.mybucket.id
   policy = jsonencode({
     Version = "2012-10-17",
@@ -96,7 +102,7 @@ resource "aws_s3_bucket_policy" "mybucket" {
       {
         Effect    = "Allow",
         Principal = {
-          "AWS" = var.policy_role_arn
+          "AWS" = local.bucket_policy_principals
         },
         Action    = var.policy_actions,
         Resource  = [aws_s3_bucket.mybucket.arn, "${aws_s3_bucket.mybucket.arn}/*"]
