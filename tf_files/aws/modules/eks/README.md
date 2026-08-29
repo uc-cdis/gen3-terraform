@@ -47,7 +47,7 @@ users_policy = "test-commons"
 
 | Name | Description | Type | Default |
 |------|-------------|:----:|:-----:|
-| vpc_name | Usually the same name as the commons. This VPC must exists arelady otherwise, the execution will fail. Additionally, it worth mentioning that logging and vpc must esist before running this. | string | n/a |
+| vpc_name | Usually the same name as the commons. This VPC must exists arelady otherwise, the execution will fail. Additionally, it worth mentioning that logging and vpc must exist before running this. | string | n/a |
 | ec2_keyname | An existing key pair in EC2 that we want in the k8s worker nodes. | string | n/a |
 | users_policy | This is the policy that was created before that allows the cluster to access the users bucket in bionimbus. Usually the same name as the VPC, but not always. | string | n/a |
 

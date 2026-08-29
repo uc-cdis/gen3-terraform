@@ -2,7 +2,7 @@
 
 variable "eks_version" {
   description = "value for eks version"
-  default     = "1.24"
+  default     = "1.36"
 }
 variable "region" {
   description = "value for region"
@@ -261,4 +261,11 @@ variable "fence_secret_key" {
 
 variable "upload_bucket" {
   default = ""
+}
+
+variable "postgresql_version" {
+  default = "14.5"
+}
+variable "postgresql_engine_version" {
+  default = "aurora-postgresql"
 }
