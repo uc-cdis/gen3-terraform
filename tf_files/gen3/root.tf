@@ -42,6 +42,7 @@ locals {
       manifestservice_service_account = var.manifestservice_enabled ? aws_iam_role.manifestservice-role[0].arn : null
       metadata_enabled = var.metadata_enabled
       netpolicy_enabled = var.netpolicy_enabled
+      ohdsi_enabled = var.ohdsi_enabled
       peregrine_enabled = var.peregrine_enabled
       pidgin_enabled = var.pidgin_enabled
       portal_enabled = var.portal_enabled

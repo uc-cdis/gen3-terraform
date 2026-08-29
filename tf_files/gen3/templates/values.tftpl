@@ -186,6 +186,15 @@ peregrine:
 pidgin:
   enabled: ${pidgin_enabled}
 
+
+ohdsi-atlas:
+  enabled: ${ohdsi_enabled}
+  externalSecrets:
+    dbcreds: "${vpc_name}-${namespace}-ohdsi-creds"
+
+ohdsi-webapi:
+  enabled: ${ohdsi_enabled}
+
 portal:
   enabled: ${portal_enabled}
 
