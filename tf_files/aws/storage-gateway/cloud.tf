@@ -24,7 +24,7 @@ resource "aws_instance" "storage-gw-server" {
   root_block_device {
     # Get volume size from var permanently
     volume_size = var.size
-    volume_type = "gp2"
+    volume_type = "gp3"
     encrypted   = true
   }
 

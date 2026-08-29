@@ -95,7 +95,7 @@ resource "aws_instance" "login" {
   ami                    = data.aws_ami.ubuntu.id
   subnet_id              = var.csoc_subnet_id
   instance_type          = "t2.micro"
-  monitoring             = true
+  monitoring             = false
   key_name               = var.ssh_key_name
   vpc_security_group_ids = [aws_security_group.ssh.id, aws_security_group.local.id]
   iam_instance_profile   = aws_iam_instance_profile.child_role_profile.name
