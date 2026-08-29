@@ -2,6 +2,12 @@ variable "vpc_name" {
   type = string
 }
 
+variable "region" {
+  description = "AWS region where the pipeline resources will be deployed"
+  type        = string
+  default     = "us-east-1"
+}
+
 
 variable "subnet_name" {
   type = string
@@ -9,7 +15,8 @@ variable "subnet_name" {
 }
 
 variable "base_image" {
-  type = string
+  type        = string
+  description = "Base image ARN for the pipeline. The default targets us-east-1; override with the equivalent ARN for your target region."
   default = "arn:aws:imagebuilder:us-east-1:aws:image/amazon-linux-2-ecs-optimized-kernel-5-x86/x.x.x"
 }
 

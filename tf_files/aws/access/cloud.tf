@@ -10,12 +10,14 @@ terraform {
   }
 }
 
+data "aws_region" "current" {}
+
 resource "aws_s3_bucket" "access" {
   bucket = var.access_url
 }
 
 locals {
-  s3_origin_id = "S3-Website-${var.access_url}.s3-website-us-east-1.amazonaws.com"
+  s3_origin_id = "S3-Website-${var.access_url}.s3-website-${data.aws_region.current.name}.amazonaws.com"
 }
 
 

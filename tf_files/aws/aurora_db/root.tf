@@ -103,7 +103,7 @@ resource "null_resource" "db_restore" {
 if [[ ${var.db_job_role_arn} != "" ]]; then
   CREDENTIALS=(`aws sts assume-role --role-arn ${var.db_job_role_arn} --role-session-name "db-migration-cli" --query "[Credentials.AccessKeyId,Credentials.SecretAccessKey,Credentials.SessionToken]" --output text`)
   unset AWS_PROFILE
-  export AWS_DEFAULT_REGION=us-east-1
+  export AWS_DEFAULT_REGION=${data.aws_region.current.name}
   export AWS_ACCESS_KEY_ID="$${CREDENTIALS[0]}"
   export AWS_SECRET_ACCESS_KEY="$${CREDENTIALS[1]}"
   export AWS_SESSION_TOKEN="$${CREDENTIALS[2]}"
@@ -138,7 +138,7 @@ resource "null_resource" "db_dump" {
 if [[ ${var.db_job_role_arn} != "" ]]; then
   CREDENTIALS=(`aws sts assume-role --role-arn ${var.db_job_role_arn} --role-session-name "db-migration-cli" --query "[Credentials.AccessKeyId,Credentials.SecretAccessKey,Credentials.SessionToken]" --output text`)
   unset AWS_PROFILE
-  export AWS_DEFAULT_REGION=us-east-1
+  export AWS_DEFAULT_REGION=${data.aws_region.current.name}
   export AWS_ACCESS_KEY_ID="$${CREDENTIALS[0]}"
   export AWS_SECRET_ACCESS_KEY="$${CREDENTIALS[1]}"
   export AWS_SESSION_TOKEN="$${CREDENTIALS[2]}"

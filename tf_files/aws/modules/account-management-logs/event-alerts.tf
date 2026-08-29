@@ -23,7 +23,7 @@ module "alerting-lambda" {
   lambda_function_name         = "${var.account_name}-security-alert-lambda"
   lambda_function_description  = "Checking for things that should or might not happend"
   lambda_function_iam_role_arn = module.role-for-lambda.role_arn
-  lambda_function_env          = {"topic"="arn:aws:sns:us-east-1:433568766270:planx-csoc-alerts-for-bsd-security"}
+  lambda_function_env          = {"topic"=var.csoc_alerts_sns_arn}
   lambda_function_handler      = "security_alerts.lambda_handler"
 }
 

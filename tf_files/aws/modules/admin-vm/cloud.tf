@@ -104,7 +104,7 @@ resource "aws_instance" "login" {
 #Proxy configuration and hostname assigment for the adminVM
 echo http_proxy=http://cloud-proxy.internal.io:3128 >> /etc/environment
 echo https_proxy=http://cloud-proxy.internal.io:3128/ >> /etc/environment
-echo no_proxy="localhost,127.0.0.1,localaddress,169.254.169.254,.internal.io,logs.us-east-1.amazonaws.com"  >> /etc/environment
+echo no_proxy="localhost,127.0.0.1,localaddress,169.254.169.254,.internal.io,logs.${var.aws_region}.amazonaws.com"  >> /etc/environment
 echo 'Acquire::http::Proxy "http://cloud-proxy.internal.io:3128";' >> /etc/apt/apt.conf.d/01proxy
 echo 'Acquire::https::Proxy "http://cloud-proxy.internal.io:3128";' >> /etc/apt/apt.conf.d/01proxy
 echo '127.0.1.1 ${var.child_name}_admin' | sudo tee --append /etc/hosts
@@ -134,13 +134,13 @@ sudo mkdir -p /home/ubuntu/.aws
 sudo cat <<EOT  >> /home/ubuntu/.aws/config
 [default]
 output = json
-region = us-east-1
+region = ${var.aws_region}
 role_session_name = gen3-adminvm
 role_arn = arn:aws:iam::${var.child_account_id}:role/csoc_adminvm
 credential_source = Ec2InstanceMetadata
 [profile ${var.child_name}]
 output = json
-region = us-east-1
+region = ${var.aws_region}
 role_session_name = gen3-adminvm
 role_arn = arn:aws:iam::${var.child_account_id}:role/csoc_adminvm
 credential_source = Ec2InstanceMetadata
