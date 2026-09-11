@@ -81,6 +81,9 @@ sed -i 's/^exit/#exit/' /etc/rc.local
 #sudo echo exit 0 >> /etc/rc.local
 echo "iptables-restore < /etc/iptables.conf" | sudo tee -a /etc/rc.local
 echo exit 0 | sudo tee -a /etc/rc.local
+# rc-local.service is disabled by default on Ubuntu 18.04+; enable it so the
+# rc.local iptables restore actually runs on every boot.
+systemctl enable rc-local
 
 
 #####################

@@ -24,3 +24,8 @@ sudo git config --global --add safe.directory /home/ubuntu/cloud-automation
 sudo git config --global --add safe.directory /home/ec2-user/cloud-automation
 sudo git config --global --add safe.directory /home/sftpuser/cloud-automation
 sudo bash "${bootstrap_path}${bootstrap_script}" 2>&1 | sudo tee --append /var/log/bootstrapping_script.log
+# squidvm.sh installs /etc/iptables.conf and the if-up.d hook but does not
+# apply the rules; eth0 is already up when user_data runs so the hook never
+# fires on first boot. Apply immediately so squid intercepts traffic without
+# requiring a reboot.
+sudo iptables-restore < /etc/iptables.conf

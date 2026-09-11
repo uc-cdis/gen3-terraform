@@ -146,6 +146,8 @@ fi
     git pull
   fi
   chown -R $USER. $CLOUD_AUTOMATION
+  # git 2.35.2+ rejects operations in directories owned by a different user.
+  git config --global --add safe.directory $CLOUD_AUTOMATION
 
   echo "127.0.1.1 ${var.env_squid_name}" | tee --append /etc/hosts
   hostnamectl set-hostname ${var.env_squid_name}
@@ -207,6 +209,14 @@ resource "aws_autoscaling_group" "squid_auto" {
   launch_template {
     id      = module.launch_template.id
     version = "$Latest"
+  }
+
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 50
+      instance_warmup        = 300
+    }
   }
 
   tag {

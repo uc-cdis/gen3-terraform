@@ -9,3 +9,12 @@ output "latest_version" {
 output "name" {
   value = aws_launch_template.this.name
 }
+
+output "instance_type" {
+  value = aws_launch_template.this.instance_type
+}
+
+output "user_data_decoded" {
+  value     = var.user_data
+  sensitive = true
+}

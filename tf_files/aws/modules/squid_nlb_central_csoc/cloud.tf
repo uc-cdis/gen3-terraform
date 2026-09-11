@@ -241,7 +241,7 @@ module "launch_template" {
   security_group_ids          = [aws_security_group.squidnlb_in.id, aws_security_group.squidnlb_out.id]
   associate_public_ip_address = true
   volume_size                 = 30
-  user_data = templatefile("${path.module}/../../../../flavors/squid_nlb/userdata.sh.tpl", {
+  user_data = templatefile("${path.module}/../squidnlb/userdata.sh.tpl", {
     hostname         = var.env_nlb_name
     bootstrap_path   = var.bootstrap_path
     bootstrap_script = var.bootstrap_script
@@ -266,7 +266,15 @@ resource "aws_autoscaling_group" "squid_nlb" {
     version = "$Latest"
   }
 
-   tag {
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 50
+      instance_warmup        = 300
+    }
+  }
+
+  tag {
     key                 = "Name"
     value               = "${var.env_nlb_name}_autoscaling_grp_member"
     propagate_at_launch = true
