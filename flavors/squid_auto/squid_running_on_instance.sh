@@ -81,6 +81,9 @@ sed -i 's/^exit/#exit/' /etc/rc.local
 #sudo echo exit 0 >> /etc/rc.local
 echo "iptables-restore < /etc/iptables.conf" | sudo tee -a /etc/rc.local
 echo exit 0 | sudo tee -a /etc/rc.local
+# rc-local.service is disabled by default on Ubuntu 18.04+; enable it so the
+# rc.local iptables restore actually runs on every boot.
+systemctl enable rc-local
 
 
 #####################
@@ -168,8 +171,14 @@ cp -rp /home/ubuntu/cloud-automation /home/sftpuser
 cp /home/sftpuser/cloud-automation/files/authorized_keys/squid_authorized_keys_user /home/sftpuser/.ssh/authorized_keys
 chown -R sftpuser. /home/sftpuser
 
+# git 2.35.2+ rejects operations in directories owned by a different user.
+# The root crontab runs updatewhitelist.sh which calls git pull in these
+# directories after ownership has been transferred to ubuntu/sftpuser.
+git config --global --add safe.directory /home/ubuntu/cloud-automation
+git config --global --add safe.directory /home/ec2-user/cloud-automation
+git config --global --add safe.directory /home/sftpuser/cloud-automation
 
-# Copy the updatewhitelist.sh script to the home directory 
+# Copy the updatewhitelist.sh script to the home directory
 
 cp  ${SUB_FOLDER}flavors/squid_auto/updatewhitelist.sh /home/ubuntu
 chmod +x /home/ubuntu/updatewhitelist.sh

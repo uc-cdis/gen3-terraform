@@ -89,22 +89,19 @@ resource "aws_route_table_association" "squid_auto0" {
 
 
 # Auto scaling group for squid auto
-resource "aws_launch_template" "squid_auto" {
-  name_prefix   = "${var.env_squid_name}-lt"
-  instance_type = var.squid_instance_type
-  image_id      = var.ssm_parameter_name != "" ? var.ssm_parameter_name : data.aws_ami.public_squid_ami.id
-  key_name      = var.ssh_key_name != "" ? var.ssh_key_name : null
+module "launch_template" {
+  source = "../launch_template"
 
-  iam_instance_profile {
-    name = aws_iam_instance_profile.squid-auto_role_profile.name
-  }
-
-  network_interfaces {
-    associate_public_ip_address = true
-    security_groups             = [aws_security_group.squidauto_in.id, aws_security_group.squidauto_out.id]
-  }
-
-  user_data = sensitive(base64encode( <<EOF
+  name_prefix                 = "${var.env_squid_name}-lt"
+  instance_type               = var.squid_instance_type
+  image_id                    = var.ssm_parameter_name != "" ? var.ssm_parameter_name : data.aws_ami.public_squid_ami.id
+  key_name                    = var.ssh_key_name
+  iam_instance_profile_name   = aws_iam_instance_profile.squid-auto_role_profile.name
+  security_group_ids          = [aws_security_group.squidauto_in.id, aws_security_group.squidauto_out.id]
+  associate_public_ip_address = true
+  volume_size                 = var.squid_instance_drive_size
+  name_tag                    = var.env_squid_name
+  user_data                   = <<EOF
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="BOUNDARY"
 
@@ -113,7 +110,8 @@ Content-Type: text/x-shellscript; charset="us-ascii"
 
 #!/bin/bash
 EC2_INSTANCE_ID="`wget -q -O - http://169.254.169.254/latest/meta-data/instance-id`"
-aws ec2 modify-instance-attribute --no-source-dest-check --instance-id $EC2_INSTANCE_ID --region ${data.aws_region.current.name}
+EC2_REGION="`wget -q -O - http://169.254.169.254/latest/meta-data/placement/region`"
+aws ec2 modify-instance-attribute --no-source-dest-check --instance-id $EC2_INSTANCE_ID --region $EC2_REGION
 DISTRO=$(awk -F '[="]*' '/^NAME/ { print $2 }' < /etc/os-release)
 USER="ubuntu"
 if [[ $DISTRO == "Amazon Linux" ]]; then
@@ -149,6 +147,8 @@ fi
     git pull
   fi
   chown -R $USER. $CLOUD_AUTOMATION
+  # git 2.35.2+ rejects operations in directories owned by a different user.
+  git config --global --add safe.directory $CLOUD_AUTOMATION
 
   echo "127.0.1.1 ${var.env_squid_name}" | tee --append /etc/hosts
   hostnamectl set-hostname ${var.env_squid_name}
@@ -168,25 +168,6 @@ fi
 ) > /var/log/bootstrapping_script.log
 --BOUNDARY--
 EOF
-  ))
-
-  block_device_mappings {
-    device_name = "/dev/xvda"
-    ebs {
-      volume_size = var.squid_instance_drive_size
-    }
-  }
-
-  tag_specifications {
-    resource_type = "instance"
-    tags = {
-      Name = "${var.env_squid_name}"
-    }
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "null_resource" "service_depends_on" {
@@ -227,8 +208,16 @@ resource "aws_autoscaling_group" "squid_auto" {
   depends_on              = [null_resource.service_depends_on, aws_route_table_association.squid_auto0]
 
   launch_template {
-    id      = aws_launch_template.squid_auto.id
+    id      = module.launch_template.id
     version = "$Latest"
+  }
+
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 50
+      instance_warmup        = 300
+    }
   }
 
   tag {

@@ -230,60 +230,24 @@ resource "aws_vpc_endpoint_service" "squid_nlb" {
 }
 
 # Auto scaling group for squid nlb
-resource "aws_launch_template" "squid_nlb" {
-  name_prefix   = "${var.env_nlb_name}-lt"
-  instance_type = "t3.xlarge"
-  image_id      = data.aws_ami.public_squid_ami.id
-  key_name      = var.ssh_key_name
+module "launch_template" {
+  source = "../launch_template"
 
-  iam_instance_profile {
-    name = aws_iam_instance_profile.squid-nlb_role_profile.name
-  }
+  name_prefix                 = "${var.env_nlb_name}-lt"
+  instance_type               = "t3.xlarge"
+  image_id                    = data.aws_ami.public_squid_ami.id
+  key_name                    = var.ssh_key_name
+  iam_instance_profile_name   = aws_iam_instance_profile.squid-nlb_role_profile.name
+  security_group_ids          = [aws_security_group.squidnlb_in.id, aws_security_group.squidnlb_out.id]
+  associate_public_ip_address = true
+  volume_size                 = 30
+  user_data = templatefile("${path.module}/../squidnlb/userdata.sh.tpl", {
+    hostname         = var.env_nlb_name
+    bootstrap_path   = var.bootstrap_path
+    bootstrap_script = var.bootstrap_script
+  })
 
-  network_interfaces {
-    associate_public_ip_address = true
-    security_groups             = [aws_security_group.squidnlb_in.id, aws_security_group.squidnlb_out.id]
-  }
-
-  user_data = sensitive(base64encode( <<EOF
-#!/bin/bash
-cd /home/ubuntu
-sudo git clone https://github.com/uc-cdis/cloud-automation.git
-sudo chown -R ubuntu. /home/ubuntu/cloud-automation
-cd /home/ubuntu/cloud-automation
-git pull
-# this is just temporary to test stuff from my branch; not needed once it is merged
-#git checkout fix/squidnlbloggingfixv1
-#git pull
-#####
-sudo chown -R ubuntu. /home/ubuntu/cloud-automation
-
-echo "127.0.1.1 ${var.env_nlb_name}" | sudo tee --append /etc/hosts
-sudo hostnamectl set-hostname ${var.env_nlb_name}
-
-sudo apt -y update
-sudo DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade| sudo tee --append /var/log/bootstrapping_script.log
-
-sudo apt-get autoremove -y
-sudo apt-get clean
-sudo apt-get autoclean
-
-cd /home/ubuntu
-sudo bash "${var.bootstrap_path}${var.bootstrap_script}" 2>&1 |sudo tee --append /var/log/bootstrapping_script.log
-EOF
-  ))
-  block_device_mappings {
-    device_name = "/dev/xvda"
-    ebs {
-      volume_size = 30
-    }
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  depends_on = [aws_iam_instance_profile.squid-nlb_role_profile]  
+  depends_on = [aws_iam_instance_profile.squid-nlb_role_profile]
 }
 
 resource "aws_autoscaling_group" "squid_nlb" {
@@ -298,11 +262,19 @@ resource "aws_autoscaling_group" "squid_nlb" {
   vpc_zone_identifier  = [aws_subnet.squid_pub0.id, aws_subnet.squid_pub1.id, aws_subnet.squid_pub2.id, aws_subnet.squid_pub3.id, aws_subnet.squid_pub4.id, aws_subnet.squid_pub5.id]
   
   launch_template {
-    id      = aws_launch_template.squid_nlb.id
+    id      = module.launch_template.id
     version = "$Latest"
   }
 
-   tag {
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 50
+      instance_warmup        = 300
+    }
+  }
+
+  tag {
     key                 = "Name"
     value               = "${var.env_nlb_name}_autoscaling_grp_member"
     propagate_at_launch = true
