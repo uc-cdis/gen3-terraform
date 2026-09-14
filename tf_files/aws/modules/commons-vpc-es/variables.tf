@@ -40,8 +40,13 @@ variable "es_linked_role" {
 }
 
 variable "role_arn" {
-  description = "The ARN of the role to use for ES"
-  default     = ""
+  description = "ARN of the IAM role or user to grant ES access. Must be set explicitly so Terraform tracks the dependency from the ES domain back to the IAM principal; omitting it forces a data-source lookup by name which breaks implicit ordering on the first apply."
+  type        = string
+
+  validation {
+    condition     = var.role_arn != ""
+    error_message = "role_arn must be provided explicitly. Passing an empty string causes the module to look up the IAM principal by name via a data source, breaking the implicit dependency and introducing a race condition on first apply."
+  }
 }
 
 variable "deploy_cloudwatch_alarm" {
