@@ -45,6 +45,11 @@ generate_qr_code() {
     string=$( python3 -c "import pyotp; print( pyotp.totp.TOTP('$totp_secret').provisioning_uri('$vpn_username', issuer_name='$CLOUD_NAME') )" )
     $( python3 -c "import qrcode; qrcode.make('$string').save('${qrcode_out}')" )
     # vpn_creds_url="https://${FQDN}/$uuid.svg"
+    # S3BUCKET comes from settings.sh, which entrypoint.sh writes at container start.
+    # On the older hosts it was substituted in at install time and nothing exported it,
+    # so this line failed with "S3BUCKET: unbound variable" mid reissue: the user ended
+    # up with a new certificate and no second factor, unable to authenticate.
+    : "${S3BUCKET:?S3BUCKET is not set; source /etc/openvpn/bin/settings.sh first}"
     s3Path="s3://${S3BUCKET}/qrcodes/${vpn_username}.png"
     aws s3 cp ${qrcode_out} ${s3Path}
     signedUrl="$(aws s3 presign "$s3Path" --expires-in "$((60*60*48))")"
