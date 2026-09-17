@@ -106,7 +106,7 @@ locals {
 
   # Yoinked from devplanet
   pg_instance_class_mem = "GREATEST({DBInstanceClassMemory/63963136*1024},65536)"
-  pg_vcpu               = "GREATEST(${DBInstanceVCPU / 2},8)"
+  pg_vcpu               = "GREATEST($${DBInstanceVCPU / 2},8)"
 }
 
 resource "aws_rds_cluster_parameter_group" "aurora_cdis_pg" {
