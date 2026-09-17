@@ -9,8 +9,8 @@ output "vpn_fqdn" {
 }
 
 output "vpn_s3_bucket_name" {
-  description = "Bucket holding the VPN PKI and client configs"
-  value       = aws_s3_bucket.vpn_certs_and_files.bucket
+  description = "Bucket holding the VPN PKI, whether this stack's own or one adopted via s3_prefix_override"
+  value       = local.pki_bucket_name
 }
 
 output "vpn_asg_name" {

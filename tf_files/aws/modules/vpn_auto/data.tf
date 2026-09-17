@@ -36,15 +36,19 @@ data "aws_iam_policy_document" "vpn_policy_document" {
     resources = local.pki_bucket_arns
   }
 
-  # Read and write, but only on this stack's own bucket
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:DeleteObject",
-    ]
-    resources = ["${aws_s3_bucket.vpn_certs_and_files.arn}/*"]
+  # Read and write, but only on this stack's own bucket, and only when it has one.
+  # A stack adopting another VPN's PKI gets the read only statement below instead.
+  dynamic "statement" {
+    for_each = local.create_pki_bucket ? [1] : []
+    content {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+      ]
+      resources = ["${aws_s3_bucket.vpn_certs_and_files[0].arn}/*"]
+    }
   }
 
   # Lets the instance turn off its own source/dest check at boot, which AWS requires

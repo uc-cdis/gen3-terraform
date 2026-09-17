@@ -9,8 +9,14 @@ locals {
   # recovery silently fails and the container builds a fresh CA that invalidates every
   # client config in circulation.
   override_pki_bucket = var.s3_prefix_override != "" ? split("/", var.s3_prefix_override)[0] : ""
+
+  # Only worth having a bucket of our own when we are not adopting someone else's PKI
+  create_pki_bucket = var.s3_prefix_override == ""
+
+  # What the container is told to use, and what the IAM policy is written against
+  pki_bucket_name = local.create_pki_bucket ? aws_s3_bucket.vpn_certs_and_files[0].bucket : local.override_pki_bucket
   pki_bucket_arns = distinct(compact([
-    aws_s3_bucket.vpn_certs_and_files.arn,
+    local.create_pki_bucket ? aws_s3_bucket.vpn_certs_and_files[0].arn : "",
     local.override_pki_bucket != "" ? "arn:aws:s3:::${local.override_pki_bucket}" : "",
   ]))
 
@@ -235,8 +241,13 @@ resource "aws_lb_listener" "vpn_ssh" {
 ## ----- Certs bucket -------
 
 # The PKI gets pushed here so a replacement instance recovers the existing certs
-# instead of generating a new CA and invalidating every client config
+# instead of generating a new CA and invalidating every client config.
+#
+# Not created when s3_prefix_override is set. In that case the stack reads another
+# VPN's PKI read only and never writes, so its own bucket would be created and then
+# sit empty forever.
 resource "aws_s3_bucket" "vpn_certs_and_files" {
+  count  = local.create_pki_bucket ? 1 : 0
   bucket = "vpn-certs-and-files-${var.env_vpn_name}"
 
   tags = {
@@ -247,7 +258,8 @@ resource "aws_s3_bucket" "vpn_certs_and_files" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "vpn_certs_and_files" {
-  bucket = aws_s3_bucket.vpn_certs_and_files.id
+  count  = local.create_pki_bucket ? 1 : 0
+  bucket = aws_s3_bucket.vpn_certs_and_files[0].id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -257,7 +269,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "vpn_certs_and_fil
 }
 
 resource "aws_s3_bucket_versioning" "vpn_certs_and_files" {
-  bucket = aws_s3_bucket.vpn_certs_and_files.id
+  count  = local.create_pki_bucket ? 1 : 0
+  bucket = aws_s3_bucket.vpn_certs_and_files[0].id
 
   versioning_configuration {
     status = "Enabled"
@@ -265,7 +278,8 @@ resource "aws_s3_bucket_versioning" "vpn_certs_and_files" {
 }
 
 resource "aws_s3_bucket_public_access_block" "vpn_certs_and_files" {
-  bucket = aws_s3_bucket.vpn_certs_and_files.id
+  count  = local.create_pki_bucket ? 1 : 0
+  bucket = aws_s3_bucket.vpn_certs_and_files[0].id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -319,7 +333,7 @@ resource "aws_launch_template" "vpn" {
     s3_prefix_override     = var.s3_prefix_override
     client_ca_mode         = var.client_ca_mode
     acm_pca_ca_arn         = var.acm_pca_ca_arn
-    s3_bucket              = aws_s3_bucket.vpn_certs_and_files.bucket
+    s3_bucket              = local.pki_bucket_name
     account_id             = data.aws_caller_identity.current.account_id
     region                 = data.aws_region.current.name
     dnsmasq_hosts_file     = local.dnsmasq_hosts_file
