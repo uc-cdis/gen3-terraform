@@ -54,6 +54,6 @@ dnsmasq_overrides = {
 # to your branch while testing the image, then move it to master once merged.
 vpn_image_tag = "master"
 
-vpn_instance_type = "m6i.large"
+vpn_instance_type = "c6i.large"
 
 organization_name = "Basic Services"

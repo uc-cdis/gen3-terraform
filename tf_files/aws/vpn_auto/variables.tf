@@ -47,7 +47,7 @@ variable "dnsmasq_overrides" {
 }
 
 variable "vpn_instance_type" {
-  default = "m6i.large"
+  default = "c6i.large"
 }
 
 variable "vpn_instance_drive_size" {

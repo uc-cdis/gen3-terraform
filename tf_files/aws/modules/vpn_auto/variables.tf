@@ -76,15 +76,16 @@ variable "dnsmasq_overrides" {
 }
 
 variable "vpn_instance_type" {
-  # The live prod VPN sat on m5.xlarge averaging 1.3% CPU and 882MB of 15.7GB, so 4 vCPU
-  # and 16GB was never needed. m6i.large keeps 8GB, which leaves room above the ~460MB
-  # the hardened image's security agents use, and gives 12.5 Gbit of network against the
-  # m5's 10. Non-burstable on purpose: t3 credits can throttle a sustained transfer.
+  # Measured rather than guessed. The live prod VPN averaged 1.3% CPU and 882MB on
+  # m5.xlarge, and this stack on m6i.large sat at 0.00 load using 853MB of 7.8GB while
+  # serving a real tunnel. 4GB is ample: roughly 500MB of that 853MB is the gold image's
+  # own security agents, not OpenVPN.
   #
-  # OpenVPN's data channel is single threaded, so a newer faster core matters more here
-  # than core count.
+  # Non-burstable on purpose. OpenVPN's data channel is single threaded, so throughput
+  # depends on sustained single-core speed, and t3 CPU credits can throttle mid transfer.
+  # c6i also keeps 12.5 Gbit of network, more than the m5.xlarge this replaced.
   description = "Instance type for the VPN instances"
-  default     = "m6i.large"
+  default     = "c6i.large"
 }
 
 variable "vpn_instance_drive_size" {

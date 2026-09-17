@@ -106,7 +106,7 @@ DNS at the new NLB once the new stack is verified, then retire the old one.
 |------|-------------|:----:|:-----:|
 | pushed_routes | Routes pushed to clients | list | `["10.128.0.0/12", "172.16.0.0/12"]` |
 | dnsmasq_overrides | hostname to internal LB DNS name, for split horizon DNS | map | `{}` |
-| vpn_instance_type | Instance type | string | `m6i.large` |
+| vpn_instance_type | Instance type | string | `c6i.large` |
 | vpn_instance_drive_size | Root volume size in GB | number | `30` |
 | vpn_availability_zones | AZs to use, empty means all available | list | `[]` |
 | ami_account_id | Account owning the AMI | string | `137112412989` |
