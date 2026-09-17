@@ -50,9 +50,10 @@ dnsmasq_overrides = {
   "monitoring.planx-pla.net" = "internal-k8s-monitori-grafanai-b1234ccd6c-1110695366.us-east-1.elb.amazonaws.com"
 }
 
-# Tag of quay.io/cdis/openvpn to run. Pin to a branch tag while testing.
-vpn_image_tag = "main"
+# Tag of quay.io/cdis/openvpn to run. CI tags images with the branch name, so pin this
+# to your branch while testing the image, then move it to master once merged.
+vpn_image_tag = "master"
 
-vpn_instance_type = "m5.xlarge"
+vpn_instance_type = "m6i.large"
 
 organization_name = "Basic Services"

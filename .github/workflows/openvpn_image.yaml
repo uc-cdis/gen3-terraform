@@ -1,0 +1,35 @@
+name: Build openvpn image
+
+# The openvpn image source lives in flavors/openvpn, alongside the vpn_auto module that
+# deploys it. Only build when that directory changes, so terraform-only commits do not
+# push a new image tag.
+on:
+  push:
+    paths:
+      - 'flavors/openvpn/**'
+      - '.github/workflows/openvpn_image.yaml'
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths:
+      - 'flavors/openvpn/**'
+      - '.github/workflows/openvpn_image.yaml'
+
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  openvpn:
+    name: Build Image and Push
+    uses: uc-cdis/.github/.github/workflows/image_build_push.yaml@master
+    with:
+      DOCKERFILE_LOCATION: "./flavors/openvpn/Dockerfile"
+      DOCKERFILE_BUILD_CONTEXT: "./flavors/openvpn"
+      OVERRIDE_REPO_NAME: "openvpn"
+      BUILD_PLATFORMS: "linux/amd64"
+      USE_QUAY_ONLY: true
+    secrets:
+      ECR_AWS_ACCESS_KEY_ID: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
+      ECR_AWS_SECRET_ACCESS_KEY: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
+      QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+      QUAY_ROBOT_TOKEN: ${{ secrets.QUAY_ROBOT_TOKEN }}

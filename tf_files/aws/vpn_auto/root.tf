@@ -20,6 +20,7 @@ module "vpn_auto" {
   csoc_vm_subnet               = var.csoc_vm_subnet
   env_pub_subnet_routetable_id = var.env_pub_subnet_routetable_id
   csoc_planx_dns_zone_id       = var.csoc_planx_dns_zone_id
+  enable_deletion_protection   = var.enable_deletion_protection
   manage_dns_record            = var.manage_dns_record
   dns_record_name              = var.dns_record_name
   dns_record_ttl               = var.dns_record_ttl
@@ -33,6 +34,9 @@ module "vpn_auto" {
   ami_account_id               = var.ami_account_id
   image_name_search_criteria   = var.image_name_search_criteria
   ssm_parameter_name           = var.ssm_parameter_name
+  client_ca_mode               = var.client_ca_mode
+  acm_pca_ca_arn               = var.acm_pca_ca_arn
+  s3_prefix_override           = var.s3_prefix_override
   vpn_image_tag                = var.vpn_image_tag
   organization_name            = var.organization_name
   cluster_desired_capacity     = var.cluster_desired_capacity

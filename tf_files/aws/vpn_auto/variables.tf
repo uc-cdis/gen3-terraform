@@ -14,6 +14,11 @@ variable "env_pub_subnet_routetable_id" {}
 
 variable "csoc_planx_dns_zone_id" {}
 
+variable "enable_deletion_protection" {
+  type    = bool
+  default = true
+}
+
 variable "manage_dns_record" {
   type    = bool
   default = true
@@ -42,7 +47,7 @@ variable "dnsmasq_overrides" {
 }
 
 variable "vpn_instance_type" {
-  default = "m5.xlarge"
+  default = "m6i.large"
 }
 
 variable "vpn_instance_drive_size" {
@@ -66,8 +71,20 @@ variable "ssm_parameter_name" {
   default = ""
 }
 
+variable "client_ca_mode" {
+  default = "easyrsa"
+}
+
+variable "acm_pca_ca_arn" {
+  default = ""
+}
+
+variable "s3_prefix_override" {
+  default = ""
+}
+
 variable "vpn_image_tag" {
-  default = "main"
+  default = "master"
 }
 
 variable "organization_name" {

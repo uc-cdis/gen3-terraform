@@ -4,6 +4,16 @@ locals {
   # The container renders these into openvpn.conf as `push "route <net> <mask>"`
   pushed_routes = join(";", var.pushed_routes)
 
+  # Buckets the instance needs PKI access to. When adopting another VPN's PKI via
+  # s3_prefix_override, that bucket has to be readable and writable too, otherwise the
+  # recovery silently fails and the container builds a fresh CA that invalidates every
+  # client config in circulation.
+  override_pki_bucket = var.s3_prefix_override != "" ? split("/", var.s3_prefix_override)[0] : ""
+  pki_bucket_arns = distinct(compact([
+    aws_s3_bucket.vpn_certs_and_files.arn,
+    local.override_pki_bucket != "" ? "arn:aws:s3:::${local.override_pki_bucket}" : "",
+  ]))
+
   # hostname=internal-lb-dns-name pairs, consumed by update-dnsmasq.sh on the host
   dnsmasq_overrides  = join(";", [for host, lb in var.dnsmasq_overrides : "${host}=${lb}"])
   dnsmasq_hosts_file = "/etc/dnsmasq.hosts"
@@ -135,11 +145,14 @@ resource "aws_route_table_association" "vpn" {
 ## ----- Load balancer -------
 
 resource "aws_lb" "vpn_nlb" {
-  name                             = "${var.env_vpn_name}-nlb"
-  internal                         = false
-  load_balancer_type               = "network"
-  subnets                          = aws_subnet.vpn_pub[*].id
-  enable_deletion_protection       = true
+  name               = "${var.env_vpn_name}-nlb"
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = aws_subnet.vpn_pub[*].id
+  # On by default: this is how people get into the environment, so it should not be
+  # removable by accident. Turn it off for throwaway stacks, otherwise destroy fails
+  # and the subnets cannot be released until the flag is flipped by hand.
+  enable_deletion_protection       = var.enable_deletion_protection
   enable_cross_zone_load_balancing = true
 
   tags = {
@@ -303,6 +316,9 @@ resource "aws_launch_template" "vpn" {
     csoc_vpn_subnet        = var.csoc_vpn_subnet
     csoc_vm_subnet         = var.csoc_vm_subnet
     pushed_routes          = local.pushed_routes
+    s3_prefix_override     = var.s3_prefix_override
+    client_ca_mode         = var.client_ca_mode
+    acm_pca_ca_arn         = var.acm_pca_ca_arn
     s3_bucket              = aws_s3_bucket.vpn_certs_and_files.bucket
     account_id             = data.aws_caller_identity.current.account_id
     region                 = data.aws_region.current.name

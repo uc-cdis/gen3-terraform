@@ -1,8 +1,8 @@
 # TL;DR
 
 Brings up an OpenVPN endpoint as an autoscaling group behind a network load balancer.
-OpenVPN runs from the [uc-cdis/openvpn](https://github.com/uc-cdis/openvpn) container image,
-so the instance itself is disposable.
+OpenVPN runs from a container image whose source lives in
+[`flavors/openvpn`](../../../../flavors/openvpn), so the instance itself is disposable.
 
 This replaces `vpn_nlb_central_csoc`, which installed OpenVPN onto the host at boot by
 cloning cloud-automation and running a bootstrap script.
@@ -106,14 +106,15 @@ DNS at the new NLB once the new stack is verified, then retire the old one.
 |------|-------------|:----:|:-----:|
 | pushed_routes | Routes pushed to clients | list | `["10.128.0.0/12", "172.16.0.0/12"]` |
 | dnsmasq_overrides | hostname to internal LB DNS name, for split horizon DNS | map | `{}` |
-| vpn_instance_type | Instance type | string | `m5.xlarge` |
+| vpn_instance_type | Instance type | string | `m6i.large` |
 | vpn_instance_drive_size | Root volume size in GB | number | `30` |
 | vpn_availability_zones | AZs to use, empty means all available | list | `[]` |
 | ami_account_id | Account owning the AMI | string | `137112412989` |
 | image_name_search_criteria | AMI name filter | string | `al2023-ami-2023*-x86_64` |
 | ssm_parameter_name | Pin an AMI id, skips the lookup | string | `""` |
-| vpn_image_tag | Tag of `quay.io/cdis/openvpn` to run | string | `main` |
+| vpn_image_tag | Tag of `quay.io/cdis/openvpn` to run | string | `master` |
 | organization_name | Tagging | string | `Basic Services` |
+| enable_deletion_protection | Deletion protection on the NLB. Off for throwaway stacks, or destroy cannot release the subnets | bool | `true` |
 | cluster_desired_capacity | Desired instances | number | `1` |
 | cluster_min_size | Minimum instances | number | `1` |
 | cluster_max_size | Maximum instances | number | `2` |
@@ -177,6 +178,36 @@ docker exec -it openvpn /etc/openvpn/bin/create_vpn_user.sh <username>
 docker exec -it openvpn /etc/openvpn/bin/revoke_user.sh <username>
 docker exec -it openvpn /etc/openvpn/bin/user_status.sh
 ```
+
+### Removing a stack
+
+Everything here is deletable, but ordering matters and one flag gets in the way.
+
+`enable_deletion_protection` defaults to `true` on the NLB, so `terraform destroy` fails
+until it is turned off. Set `enable_deletion_protection = false`, apply that one change,
+then destroy:
+
+```bash
+terraform apply -var enable_deletion_protection=false
+terraform destroy
+```
+
+The subnets are the last thing to go and will refuse to delete while anything still
+holds an ENI in them. Terraform handles its own resources in the right order, but check
+for strays first if the subnets do not release:
+
+```bash
+aws ec2 describe-network-interfaces \
+  --filters "Name=subnet-id,Values=<subnet-id>" \
+  --query "NetworkInterfaces[].{IP:PrivateIpAddress,Desc:Description}"
+```
+
+This is worth checking before assuming an old range is reusable. The subnets from the
+original `csoc-*-vpn` stacks look free, but four of the twelve host an unrelated NLB and
+EFS mount targets, so neither of those `/25`s can be reclaimed as a block.
+
+The S3 bucket is versioned, so a `destroy` leaves it if it still has objects. That is
+deliberate: it holds the CA, and losing it invalidates every client config.
 
 ### Replacing an instance
 

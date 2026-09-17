@@ -22,6 +22,27 @@ echo "=== bootstrapping ${env_cloud_name} ==="
 hostnamectl set-hostname ${env_cloud_name}
 echo "127.0.1.1 ${env_cloud_name}" >> /etc/hosts
 
+# AWS drops any packet whose source address is not the instance's own, which breaks
+# forwarding for VPN clients. The instance turns the check off for itself at boot, so a
+# replacement gets it too; doing this by hand or in terraform would not survive the ASG
+# launching a new instance. Same approach squid's userdata uses.
+TOKEN=$(curl -sf -X PUT "http://169.254.169.254/latest/api/token" \
+  -H "X-aws-ec2-metadata-token-ttl-seconds: 300" 2>/dev/null || true)
+if [ -n "$TOKEN" ]; then
+  EC2_INSTANCE_ID=$(curl -sf -H "X-aws-ec2-metadata-token: $TOKEN" \
+    http://169.254.169.254/latest/meta-data/instance-id)
+else
+  EC2_INSTANCE_ID=$(curl -sf http://169.254.169.254/latest/meta-data/instance-id)
+fi
+if [ -n "$EC2_INSTANCE_ID" ]; then
+  aws ec2 modify-instance-attribute --no-source-dest-check \
+    --instance-id "$EC2_INSTANCE_ID" --region ${region} \
+    && echo "source/dest check disabled for $EC2_INSTANCE_ID" \
+    || echo "WARNING: could not disable source/dest check, forwarding may fail" >&2
+else
+  echo "WARNING: could not read instance id from metadata" >&2
+fi
+
 dnf update -y
 # bind-utils for dig and procps-ng for pkill, both used by update-dnsmasq.sh. Named
 # explicitly rather than relied on as transitive dependencies.
@@ -80,8 +101,10 @@ systemctl daemon-reload
 systemctl enable --now dnsmasq
 
 # Populate the overrides before OpenVPN starts handing out this resolver, otherwise the
-# first clients to connect cannot resolve the internal names.
-if ! /usr/local/bin/update-dnsmasq.sh; then
+# first clients to connect cannot resolve the internal names. Run through systemd rather
+# than calling the script directly, so it picks up the same Environment= the timer uses
+# instead of running with an empty DNSMASQ_OVERRIDES.
+if ! systemctl start update-dnsmasq.service; then
   echo "initial dnsmasq refresh did not fully succeed, the timer will retry" >&2
 fi
 
@@ -120,6 +143,9 @@ ExecStart=/usr/bin/docker run --rm --name openvpn \
   -e CSOC_VPN_SUBNET=${csoc_vpn_subnet} \
   -e CSOC_VM_SUBNET=${csoc_vm_subnet} \
   -e PUSHED_ROUTES='${pushed_routes}' \
+  -e S3_PREFIX_OVERRIDE='${s3_prefix_override}' \
+  -e CLIENT_CA_MODE=${client_ca_mode} \
+  -e ACM_PCA_CA_ARN='${acm_pca_ca_arn}' \
   -e S3_BUCKET=${s3_bucket} \
   -e ACCOUNT_ID=${account_id} \
   -e AWS_DEFAULT_REGION=${region} \

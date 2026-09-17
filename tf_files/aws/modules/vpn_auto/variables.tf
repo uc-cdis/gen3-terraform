@@ -30,6 +30,12 @@ variable "csoc_planx_dns_zone_id" {
   description = "Route53 zone id used to add the VPN CNAME"
 }
 
+variable "enable_deletion_protection" {
+  description = "Deletion protection on the NLB. Leave on for real stacks, turn off for throwaway ones so terraform destroy can release the subnets"
+  type        = bool
+  default     = true
+}
+
 variable "manage_dns_record" {
   description = "Whether this module owns the CNAME. Set false if DNS is cut over by hand during a blue/green"
   type        = bool
@@ -70,8 +76,15 @@ variable "dnsmasq_overrides" {
 }
 
 variable "vpn_instance_type" {
+  # The live prod VPN sat on m5.xlarge averaging 1.3% CPU and 882MB of 15.7GB, so 4 vCPU
+  # and 16GB was never needed. m6i.large keeps 8GB, which leaves room above the ~460MB
+  # the hardened image's security agents use, and gives 12.5 Gbit of network against the
+  # m5's 10. Non-burstable on purpose: t3 credits can throttle a sustained transfer.
+  #
+  # OpenVPN's data channel is single threaded, so a newer faster core matters more here
+  # than core count.
   description = "Instance type for the VPN instances"
-  default     = "m5.xlarge"
+  default     = "m6i.large"
 }
 
 variable "vpn_instance_drive_size" {
@@ -101,9 +114,41 @@ variable "ssm_parameter_name" {
   default     = ""
 }
 
+# Trust anchor for client certificates.
+#
+# easyrsa  the container generates its own CA and issues client certs. Users get a zip
+#          and a TOTP QR code.
+# acmpca   clients present the mTLS certificate already deployed to their laptop, which
+#          Viscosity reads from the macOS Keychain. Nothing for us to issue or distribute.
+#
+# The second factor is unchanged either way, so acmpca on its own is still two factor.
+variable "client_ca_mode" {
+  description = "Where client certs are trusted from: easyrsa or acmpca"
+  default     = "easyrsa"
+
+  validation {
+    condition     = contains(["easyrsa", "acmpca"], var.client_ca_mode)
+    error_message = "client_ca_mode must be easyrsa or acmpca."
+  }
+}
+
+variable "acm_pca_ca_arn" {
+  description = "ACM-PCA certificate authority whose clients are trusted. Required when client_ca_mode is acmpca"
+  default     = ""
+}
+
+# Point the stack at an existing VPN's PKI in S3 instead of its own bucket, so the CA,
+# ta.key and server cert are adopted rather than regenerated. That is what lets client
+# configs already in circulation keep working against a new stack.
+# Format: <bucket>/<name>, eg vpn-certs-and-files-csoc-dev-vpn-2024/csoc-dev-vpn-2024
+variable "s3_prefix_override" {
+  description = "Existing S3 PKI prefix to adopt. Empty means use this stack's own bucket"
+  default     = ""
+}
+
 variable "vpn_image_tag" {
-  description = "Tag of the quay.io/cdis/openvpn image to run"
-  default     = "main"
+  description = "Tag of the quay.io/cdis/openvpn image to run. CI tags images with the branch name, so this is master for released builds and the branch name while testing"
+  default     = "master"
 }
 
 variable "organization_name" {
