@@ -277,16 +277,6 @@ resource "aws_s3_bucket_versioning" "vpn_certs_and_files" {
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "vpn_certs_and_files" {
-  count  = local.create_pki_bucket ? 1 : 0
-  bucket = aws_s3_bucket.vpn_certs_and_files[0].id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
 ## ----- Compute -------
 
 resource "aws_launch_template" "vpn" {
