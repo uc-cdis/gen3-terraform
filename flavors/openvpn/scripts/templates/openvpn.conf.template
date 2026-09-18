@@ -1,0 +1,92 @@
+#Listen Port
+lport 1194
+
+# Protocol TCP|UDP
+proto #PROTO#
+
+#Device to use
+dev tun
+persist-key
+persist-tun
+
+#certificates
+# #CA_PATH# is the trust anchor for client certs. Either the easy-rsa CA we generate, or
+# the CTDS AWS INTERNAL ROOT CA when CLIENT_CA_MODE=acmpca, so that the mTLS certs
+# already deployed to laptops are accepted directly from the macOS Keychain.
+ca #CA_PATH#
+cert /etc/openvpn/easy-rsa/pki/issued/#FQDN#.crt
+key /etc/openvpn/easy-rsa/pki/private/#FQDN#.key  # This file should be kept secret
+# ECDH rather than a generated dh.pem. Preferred over finite field DH, and it removes
+# the 4096 bit parameter generation that otherwise added minutes to a first boot.
+dh none
+ecdh-curve secp384r1
+tls-auth /etc/openvpn/easy-rsa/pki/ta.key 0 # This file is secret
+#CRL_VERIFY#
+
+# Only accept certs that carry the TLS client auth EKU. The laptop certs are issued with
+# it; this stops a server cert from the same CA being used to connect as a client.
+remote-cert-tls client
+
+#Password script
+auth-user-pass-verify  /etc/openvpn/bin/auth-user-pass-verify.sh via-env
+script-security 3 # execve
+
+# Cipher suite. GCM is an AEAD cipher, so it authenticates as well as encrypts.
+# data-ciphers is what 2.6 negotiates on; cipher is kept as the fallback for
+# clients old enough not to support negotiation.
+data-ciphers AES-256-GCM:AES-128-GCM
+data-ciphers-fallback AES-256-CBC
+cipher AES-256-GCM
+
+# auth controls the tls-auth HMAC as well as the data channel, and it must match the
+# client exactly or the server silently discards the initial packet and the connection
+# resets before TLS even starts.
+#
+# The client configs already in circulation set no "auth", so they default to SHA1.
+# Setting SHA256 here breaks all 61 of them. Left at the default until the configs are
+# reissued; the data channel is AES-GCM, which authenticates on its own, so this only
+# affects the control channel HMAC.
+#auth SHA256
+
+# Matches the VPN these clients were issued against, which runs comp-lzo. The existing
+# configs all carry "comp-lzo", so the client compresses its outbound data; the server
+# has to decompress it or the packets are silently dropped. "allow-compression asym"
+# was tried and is not enough: the control channel stays up, the client reports
+# "compression: lzo", and zero packets arrive on tun0.
+#
+# This is a compatibility wart, not a preference. Compressing before encrypting leaks
+# plaintext length (VORACLE) and upstream disabled it by default in 2.5, so this should
+# go once the client configs are reissued without comp-lzo. Change both sides together.
+comp-lzo
+
+#DHCP Information
+server #VPN_SUBNET_BASE# #VPN_SUBNET_MASK#
+ifconfig-pool-persist ipp.txt
+
+# Routes and DNS pushed to clients. Both are rendered by entrypoint.sh:
+# routes come from PUSHED_ROUTES, the DNS address is this instance's own private
+# ip read from instance metadata at start. It must not be hardcoded, or a
+# replacement instance hands clients a DNS server that no longer exists.
+#PUSHED_ROUTES#
+#PUSHED_DNS#
+
+#log and security
+user openvpn
+group openvpn
+keepalive 10 120
+status openvpn-status.log
+verb 4
+
+# set this to the max number of clients that should be connected at a time
+max-clients 250
+
+#Reauth timeout, with 2fa this will force disconnect unless the TOTP lifetime is longer
+#  In client side config you need to set "reneg-sec 0"
+#  Openvpn uses the lower of the two (Server/Client) values
+#  43200 == 12 hrs
+reneg-sec 43200
+
+
+client-config-dir /etc/openvpn/clients.d/
+tmp-dir /etc/openvpn/clients.d/tmp/
+client-connect /etc/openvpn/bin/client-connect.sh

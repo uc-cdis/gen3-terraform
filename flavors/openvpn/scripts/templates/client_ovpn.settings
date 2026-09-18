@@ -1,0 +1,34 @@
+client
+dev tun
+proto tcp
+remote $EXTHOST 1194
+resolv-retry infinite
+nobind
+persist-key
+persist-tun
+
+# Must line up with the server. It advertises AES-256-GCM and negotiates via
+# data-ciphers; leaving the old "cipher AES-256-CBC" here made clients ask for a
+# cipher the server no longer prefers.
+data-ciphers AES-256-GCM:AES-128-GCM
+data-ciphers-fallback AES-256-CBC
+
+# No "auth" here either. It sets the tls-auth HMAC digest, which has to match the server
+# exactly, and the server stays on the SHA1 default so the configs already issued keep
+# working. Change both sides together, never one.
+
+# No comp-lzo. The server does not offer compression, and compressing before
+# encryption leaks plaintext length (VORACLE).
+
+# remote-cert-tls replaces ns-cert-type, which is deprecated and removed in
+# newer clients. Same effect: refuse to connect to something that is not a server cert.
+remote-cert-tls server
+
+verb 4
+key-direction 1
+auth-user-pass
+
+# TOTP based auth, so the credentials cannot be reused on renegotiation. The server
+# sets reneg-sec 43200 and openvpn takes the lower of the two, so 0 here means the
+# server's value wins rather than forcing a reauth mid session.
+reneg-sec 0
