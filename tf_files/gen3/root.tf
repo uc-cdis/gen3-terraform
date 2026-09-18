@@ -33,7 +33,7 @@ locals {
       gen3ff_tag = var.gen3ff_tag
       guppy_enabled = var.guppy_enabled
       hatchery_enabled = var.hatchery_enabled
-      hatchery_service_account = aws_iam_role.hatchery-role[0].arn
+      hatchery_service_account = var.hatchery_enabled ? aws_iam_role.hatchery-role[0].arn : ""
       hostname = var.hostname
       indexd_enabled = var.indexd_enabled
       indexd_prefix = var.indexd_prefix
