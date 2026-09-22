@@ -256,7 +256,6 @@ resource "aws_iam_role_policy" "hatchery-role-policy" {
           "dynamodb:Query",
           "dynamodb:Scan",
           "dynamodb:BatchWrite*",
-          "dynamodb:CreateTable",
           "dynamodb:Delete*",
           "dynamodb:Update*",
           "dynamodb:PutItem",
@@ -264,17 +263,15 @@ resource "aws_iam_role_policy" "hatchery-role-policy" {
         Resource = ["arn:aws:dynamodb:*:*:table/*"]
       },
       {
-        # IAM calls made by sharedworkspace.go and iam.go to create/update per-user
-        # workspace roles. Scoped to hatchery-shared-* prefix per the role naming
-        # convention used in sharedWorkspaceRoleName.
+        # IAM calls made by sharedworkspace.go to create/update per-user IRSA
+        # roles. Uses PutRolePolicy (inline policy) only — no managed policies.
+        # Scoped to hatchery-shared-* per sharedWorkspaceRoleName convention.
         Sid    = "WorkspaceRoleManagement"
         Effect = "Allow"
         Action = [
           "iam:GetRole",
           "iam:CreateRole",
           "iam:PutRolePolicy",
-          "iam:CreatePolicy",
-          "iam:AttachRolePolicy",
         ]
         Resource = ["arn:aws:iam::*:role/hatchery-shared-*"]
       },
@@ -309,6 +306,7 @@ resource "aws_iam_role_policy" "hatchery-role-policy" {
           "iam:DeletePolicyVersion",
           "iam:ListRoles",
           "iam:CreateRole",
+          "iam:TagRole",
           "iam:AttachRolePolicy",
           "iam:CreateUser",
           "iam:AttachUserPolicy",
