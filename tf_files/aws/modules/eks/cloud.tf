@@ -285,8 +285,8 @@ resource "aws_route_table_association" "public_kube" {
   }
 }
 
-# Delete ALBs created out-of-band by the AWS Load Balancer Controller before the cluster is destroyed.
-# Terraform has no visibility into these resources, so without this they orphan in the VPC and block subnet deletion.
+# Delete ALBs and security groups created out-of-band by the AWS Load Balancer Controller before the cluster is destroyed.
+# Terraform has no visibility into these resources, so without this they orphan in the VPC and block subnet/VPC deletion.
 resource "terraform_data" "lbc_alb_cleanup" {
   triggers_replace = {
     vpc_id = local.vpc_id
@@ -298,18 +298,45 @@ resource "terraform_data" "lbc_alb_cleanup" {
     command = <<-EOT
       VPC_ID="${self.triggers_replace.vpc_id}"
       REGION="${self.triggers_replace.region}"
+
+      echo "==> Deleting LBC-managed ALBs in VPC $VPC_ID..."
       ARNS=$(aws elbv2 describe-load-balancers --region "$REGION" \
         --query "LoadBalancers[?VpcId=='$VPC_ID'].LoadBalancerArn" --output text 2>/dev/null || true)
-      if [ -z "$ARNS" ] || [ "$ARNS" = "None" ]; then
+      if [ -n "$ARNS" ] && [ "$ARNS" != "None" ]; then
+        for arn in $ARNS; do
+          echo "    Deleting ALB: $arn"
+          aws elbv2 delete-load-balancer --region "$REGION" --load-balancer-arn "$arn" || true
+        done
+        echo "==> Waiting 20s for ENIs to release..."
+        sleep 20
+      else
         echo "==> No ALBs found in VPC $VPC_ID"
-        exit 0
       fi
-      for arn in $ARNS; do
-        echo "==> Deleting LBC-managed ALB: $arn"
-        aws elbv2 delete-load-balancer --region "$REGION" --load-balancer-arn "$arn" || true
-      done
-      echo "==> Waiting 20s for ENIs to release..."
-      sleep 20
+
+      echo "==> Deleting LBC-managed security groups in VPC $VPC_ID..."
+      SGS=$(aws ec2 describe-security-groups --region "$REGION" \
+        --filters "Name=vpc-id,Values=$VPC_ID" \
+        --query 'SecurityGroups[?GroupName!=`default`].GroupId' --output text 2>/dev/null || true)
+      if [ -n "$SGS" ] && [ "$SGS" != "None" ]; then
+        for sg in $SGS; do
+          INGRESS=$(aws ec2 describe-security-groups --group-ids "$sg" --region "$REGION" \
+            --query 'SecurityGroups[0].IpPermissions' --output json 2>/dev/null || echo "[]")
+          EGRESS=$(aws ec2 describe-security-groups --group-ids "$sg" --region "$REGION" \
+            --query 'SecurityGroups[0].IpPermissionsEgress' --output json 2>/dev/null || echo "[]")
+          [ "$INGRESS" != "[]" ] && [ "$INGRESS" != "null" ] && \
+            aws ec2 revoke-security-group-ingress --group-id "$sg" --region "$REGION" \
+              --ip-permissions "$INGRESS" 2>/dev/null || true
+          [ "$EGRESS" != "[]" ] && [ "$EGRESS" != "null" ] && \
+            aws ec2 revoke-security-group-egress --group-id "$sg" --region "$REGION" \
+              --ip-permissions "$EGRESS" 2>/dev/null || true
+        done
+        for sg in $SGS; do
+          echo "    Deleting SG: $sg"
+          aws ec2 delete-security-group --group-id "$sg" --region "$REGION" 2>/dev/null || true
+        done
+      else
+        echo "==> No non-default security groups found in VPC $VPC_ID"
+      fi
     EOT
   }
 }
