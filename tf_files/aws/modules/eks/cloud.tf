@@ -285,12 +285,30 @@ resource "aws_route_table_association" "public_kube" {
   }
 }
 
-# Delete ALBs and security groups created out-of-band by the AWS Load Balancer Controller before the cluster is destroyed.
-# Terraform has no visibility into these resources, so without this they orphan in the VPC and block subnet/VPC deletion.
+# Query ALBs and target groups the LBC created — not managed by Terraform, but surfaced here for
+# observability (visible in plan/output) and captured in triggers_replace for the destroy provisioner.
+# triggers_replace is a point-in-time snapshot; the provisioner also does a live VPC sweep to catch
+# anything the LBC created after the last apply.
+data "aws_lbs" "lbc" {
+  tags = {
+    "kubernetes.io/cluster/${var.vpc_name}" = "owned"
+  }
+}
+
+data "aws_resourcegroupstaggingapi_resources" "lbc_target_groups" {
+  resource_type_filters = ["elasticloadbalancing:targetgroup"]
+  tag_filter {
+    key    = "kubernetes.io/cluster/${var.vpc_name}"
+    values = ["owned"]
+  }
+}
+
 resource "terraform_data" "lbc_alb_cleanup" {
   triggers_replace = {
-    vpc_id = local.vpc_id
-    region = data.aws_region.current.name
+    vpc_id   = local.vpc_id
+    region   = data.aws_region.current.name
+    alb_arns = jsonencode(data.aws_lbs.lbc.arns)
+    tg_arns  = jsonencode(data.aws_resourcegroupstaggingapi_resources.lbc_target_groups.resource_tag_mapping_list[*].resource_arn)
   }
 
   provisioner "local-exec" {
@@ -299,18 +317,42 @@ resource "terraform_data" "lbc_alb_cleanup" {
       VPC_ID="${self.triggers_replace.vpc_id}"
       REGION="${self.triggers_replace.region}"
 
-      echo "==> Deleting LBC-managed ALBs in VPC $VPC_ID..."
-      ARNS=$(aws elbv2 describe-load-balancers --region "$REGION" \
+      # Known ALBs captured at last apply — delete these first
+      echo "==> Deleting known LBC ALBs (captured at apply)..."
+      for arn in $(echo '${self.triggers_replace.alb_arns}' | jq -r '.[]' 2>/dev/null); do
+        echo "    Deleting ALB: $arn"
+        aws elbv2 delete-load-balancer --region "$REGION" --load-balancer-arn "$arn" 2>/dev/null || true
+      done
+
+      # Sweep by VPC to catch ALBs created after the last apply
+      echo "==> Sweeping for any remaining ALBs in VPC $VPC_ID..."
+      EXTRA=$(aws elbv2 describe-load-balancers --region "$REGION" \
         --query "LoadBalancers[?VpcId=='$VPC_ID'].LoadBalancerArn" --output text 2>/dev/null || true)
-      if [ -n "$ARNS" ] && [ "$ARNS" != "None" ]; then
-        for arn in $ARNS; do
+      if [ -n "$EXTRA" ] && [ "$EXTRA" != "None" ]; then
+        for arn in $EXTRA; do
           echo "    Deleting ALB: $arn"
           aws elbv2 delete-load-balancer --region "$REGION" --load-balancer-arn "$arn" || true
         done
-        echo "==> Waiting 20s for ENIs to release..."
-        sleep 20
-      else
-        echo "==> No ALBs found in VPC $VPC_ID"
+      fi
+      echo "==> Waiting 20s for ENIs to release..."
+      sleep 20
+
+      # Known target groups captured at last apply via aws_resourcegroupstaggingapi_resources
+      echo "==> Deleting known LBC target groups (captured at apply)..."
+      for tg in $(echo '${self.triggers_replace.tg_arns}' | jq -r '.[]' 2>/dev/null); do
+        echo "    Deleting target group: $tg"
+        aws elbv2 delete-target-group --region "$REGION" --target-group-arn "$tg" 2>/dev/null || true
+      done
+
+      # Sweep by VPC to catch target groups created after the last apply
+      echo "==> Sweeping for any remaining target groups in VPC $VPC_ID..."
+      EXTRA_TGS=$(aws elbv2 describe-target-groups --region "$REGION" \
+        --query "TargetGroups[?VpcId=='$VPC_ID'].TargetGroupArn" --output text 2>/dev/null || true)
+      if [ -n "$EXTRA_TGS" ] && [ "$EXTRA_TGS" != "None" ]; then
+        for tg in $EXTRA_TGS; do
+          echo "    Deleting target group: $tg"
+          aws elbv2 delete-target-group --region "$REGION" --target-group-arn "$tg" 2>/dev/null || true
+        done
       fi
 
       echo "==> Deleting LBC-managed security groups in VPC $VPC_ID..."
@@ -336,6 +378,18 @@ resource "terraform_data" "lbc_alb_cleanup" {
         done
       else
         echo "==> No non-default security groups found in VPC $VPC_ID"
+      fi
+
+      echo "==> Deleting VPC endpoints in VPC $VPC_ID..."
+      ENDPOINTS=$(aws ec2 describe-vpc-endpoints --region "$REGION" \
+        --filters "Name=vpc-id,Values=$VPC_ID" "Name=vpc-endpoint-state,Values=available,pending" \
+        --query 'VpcEndpoints[].VpcEndpointId' --output text 2>/dev/null || true)
+      if [ -n "$ENDPOINTS" ] && [ "$ENDPOINTS" != "None" ]; then
+        aws ec2 delete-vpc-endpoints --region "$REGION" --vpc-endpoint-ids $ENDPOINTS 2>/dev/null || true
+        echo "==> Waiting 15s for endpoints to delete..."
+        sleep 15
+      else
+        echo "==> No VPC endpoints found in VPC $VPC_ID"
       fi
     EOT
   }
