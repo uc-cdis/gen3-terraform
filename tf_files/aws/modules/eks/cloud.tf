@@ -285,6 +285,35 @@ resource "aws_route_table_association" "public_kube" {
   }
 }
 
+# Delete ALBs created out-of-band by the AWS Load Balancer Controller before the cluster is destroyed.
+# Terraform has no visibility into these resources, so without this they orphan in the VPC and block subnet deletion.
+resource "terraform_data" "lbc_alb_cleanup" {
+  triggers_replace = {
+    vpc_id = local.vpc_id
+    region = data.aws_region.current.name
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<-EOT
+      VPC_ID="${self.triggers_replace.vpc_id}"
+      REGION="${self.triggers_replace.region}"
+      ARNS=$(aws elbv2 describe-load-balancers --region "$REGION" \
+        --query "LoadBalancers[?VpcId=='$VPC_ID'].LoadBalancerArn" --output text 2>/dev/null || true)
+      if [ -z "$ARNS" ] || [ "$ARNS" = "None" ]; then
+        echo "==> No ALBs found in VPC $VPC_ID"
+        exit 0
+      fi
+      for arn in $ARNS; do
+        echo "==> Deleting LBC-managed ALB: $arn"
+        aws elbv2 delete-load-balancer --region "$REGION" --load-balancer-arn "$arn" || true
+      done
+      echo "==> Waiting 20s for ENIs to release..."
+      sleep 20
+    EOT
+  }
+}
+
 # The actual EKS cluster
 
 resource "aws_eks_cluster" "eks_cluster" {
