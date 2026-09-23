@@ -1,3 +1,22 @@
+resource "terraform_data" "waf_disassociate" {
+  triggers_replace = aws_wafv2_web_acl.waf.arn
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<-EOT
+      REGION=$(echo "${self.triggers_replace}" | cut -d: -f4)
+      for r in $(aws wafv2 list-resources-for-web-acl \
+        --web-acl-arn "${self.triggers_replace}" \
+        --scope REGIONAL --region "$REGION" \
+        --query 'ResourceArns[]' --output text 2>/dev/null); do
+        case "$r" in None|"") continue;; esac
+        echo "disassociating $r from WAF before delete"
+        aws wafv2 disassociate-web-acl --resource-arn "$r" --region "$REGION"
+      done
+    EOT
+  }
+}
+
 resource "aws_wafv2_web_acl" "waf" {
   name  = "${var.vpc_name}-waf"
   description = "WAF per environment for tailored security."
