@@ -178,9 +178,11 @@ resource "aws_iam_role_policy" "gitops-role-policy" {
 }
 
 resource "aws_iam_role" "hatchery-role" {
-  count = var.hatchery_enabled ? 1 : 0
-  name = "${var.vpc_name}-${var.namespace}-hatchery-sa"
+  count       = var.hatchery_enabled ? 1 : 0
+  name        = "${var.vpc_name}-${var.namespace}-hatchery-sa"
   description = "Role for hatchery service account for ${var.vpc_name}"
+  path        = "/gen3_service/"
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -192,7 +194,7 @@ resource "aws_iam_role" "hatchery-role" {
         Action = "sts:AssumeRole"
       },
       {
-        Sid = ""
+        Sid    = ""
         Effect = "Allow"
         Principal = {
           Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider_arn}"
@@ -201,7 +203,7 @@ resource "aws_iam_role" "hatchery-role" {
         Condition = {
           StringEquals = {
             "${var.oidc_provider_arn}:sub" = [
-              "system:serviceaccount:${var.namespace}:hatchery-sa"
+              "system:serviceaccount:${var.namespace}:hatchery-service-account"
             ]
             "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
           }
@@ -209,33 +211,137 @@ resource "aws_iam_role" "hatchery-role" {
       }
     ]
   })
-
-  path = "/gen3-service/"
 }
 
 resource "aws_iam_role_policy" "hatchery-role-policy" {
-  name = "hatchery-role-policy"
-  role = aws_iam_role.hatchery-role[0].id
+  count = var.hatchery_enabled ? 1 : 0
+  name  = "hatchery-role-policy"
+  role  = aws_iam_role.hatchery-role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Action = [
-          "sts:AssumeRole"
-        ]
+        Sid      = "AssumeCsocAdminRole"
         Effect   = "Allow"
+        Action   = ["sts:AssumeRole"]
+        Resource = ["arn:aws:iam::*:role/csoc_adminvm*"]
+      },
+      {
+        Sid      = "AssumeImageBuilderReaderRole"
+        Effect   = "Allow"
+        Action   = ["sts:AssumeRole"]
+        Resource = ["arn:aws:iam::${var.nextflow_imagebuilder_account_id}:role/nextflow-imagebuilder-reader"]
+      },
+      {
+        Sid      = "CostExplorer"
+        Effect   = "Allow"
+        Action   = ["ce:GetCostAndUsage"]
+        Resource = ["*"]
+      },
+      {
+        Sid      = "EC2Management"
+        Effect   = "Allow"
+        Action   = ["ec2:*"]
+        Resource = ["*"]
+      },
+      {
+        Sid    = "DynamoDB"
+        Effect = "Allow"
+        Action = [
+          "dynamodb:BatchGet*",
+          "dynamodb:DescribeStream",
+          "dynamodb:DescribeTable",
+          "dynamodb:Get*",
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:BatchWrite*",
+          "dynamodb:Delete*",
+          "dynamodb:Update*",
+          "dynamodb:PutItem",
+        ]
+        Resource = ["arn:aws:dynamodb:*:*:table/*"]
+      },
+      {
+        # IAM calls made by sharedworkspace.go to create/update per-user IRSA
+        # roles. Uses PutRolePolicy (inline policy) only — no managed policies.
+        # Scoped to hatchery-shared-* per sharedWorkspaceRoleName convention.
+        Sid    = "WorkspaceRoleManagement"
+        Effect = "Allow"
+        Action = [
+          "iam:GetRole",
+          "iam:CreateRole",
+          "iam:PutRolePolicy",
+          "iam:TagRole",
+        ]
+        Resource = ["arn:aws:iam::*:role/hatchery-shared-*"]
+      },
+      {
+        # s3:HeadObject and s3:PutObject for .keep placeholder files written by
+        # ensureKeepFiles in sharedworkspace.go before mounting workspace volumes.
+        Sid    = "SharedWorkspaceKeepFiles"
+        Effect = "Allow"
+        Action = [
+          "s3:HeadObject",
+          "s3:PutObject",
+        ]
         Resource = [
-          "arn:aws:iam::*:role/csoc_adminvm*"
+          "arn:aws:s3:::*${var.vpc_name}*",
+          "arn:aws:s3:::*${var.vpc_name}*/*",
         ]
       },
       {
+        Sid    = "CreateNextflowBatchWorkspaces"
+        Effect = "Allow"
         Action = [
-          "ec2:*"
+          "batch:DescribeComputeEnvironments",
+          "batch:CreateComputeEnvironment",
+          "batch:UpdateComputeEnvironment",
+          "batch:ListJobs",
+          "batch:CreateJobQueue",
+          "batch:TagResource",
+          "iam:ListPolicies",
+          "iam:CreatePolicy",
+          "iam:ListPolicyVersions",
+          "iam:CreatePolicyVersion",
+          "iam:DeletePolicyVersion",
+          "iam:ListRoles",
+          "iam:CreateRole",
+          "iam:TagRole",
+          "iam:AttachRolePolicy",
+          "iam:CreateUser",
+          "iam:AttachUserPolicy",
+          "iam:ListAccessKeys",
+          "iam:CreateAccessKey",
+          "iam:DeleteAccessKey",
+          "kms:CreateKey",
+          "kms:CreateAlias",
+          "kms:DescribeKey",
+          "kms:TagResource",
+          "s3:CreateBucket",
+          "s3:PutEncryptionConfiguration",
+          "s3:PutBucketPolicy",
+          "s3:PutLifecycleConfiguration",
         ]
+        Resource = ["*"]
+      },
+      {
+        Sid    = "CreateSlrForNextflowBatchWorkspaces"
+        Effect = "Allow"
+        Action = ["iam:CreateServiceLinkedRole"]
+        Resource = ["arn:aws:iam::*:role/aws-service-role/batch.amazonaws.com/*"]
+        Condition = {
+          StringLike = {
+            "iam:AWSServiceName" = "batch.amazonaws.com"
+          }
+        }
+      },
+      {
+        Sid      = "PassRoleForNextflowBatchWorkspaces"
         Effect   = "Allow"
-        Resource = "*"
-      }
+        Action   = ["iam:PassRole"]
+        Resource = ["arn:aws:iam::*:role/*ecsInstanceRole"]
+      },
     ]
   })
 }
