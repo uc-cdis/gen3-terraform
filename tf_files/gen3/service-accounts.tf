@@ -272,6 +272,7 @@ resource "aws_iam_role_policy" "hatchery-role-policy" {
           "iam:GetRole",
           "iam:CreateRole",
           "iam:PutRolePolicy",
+          "iam:TagRole",
         ]
         Resource = ["arn:aws:iam::*:role/hatchery-shared-*"]
       },
