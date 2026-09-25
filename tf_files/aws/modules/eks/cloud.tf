@@ -285,6 +285,127 @@ resource "aws_route_table_association" "public_kube" {
   }
 }
 
+# Query ALBs and target groups the LBC created — not managed by Terraform, but surfaced here for
+# observability (visible in plan/output) and captured in triggers_replace for the destroy provisioner.
+# triggers_replace is a point-in-time snapshot; the provisioner also does a live VPC sweep to catch
+# anything the LBC created after the last apply.
+data "aws_lbs" "lbc" {
+  tags = {
+    "kubernetes.io/cluster/${var.vpc_name}" = "owned"
+  }
+}
+
+data "aws_resourcegroupstaggingapi_resources" "lbc_target_groups" {
+  resource_type_filters = ["elasticloadbalancing:targetgroup"]
+  tag_filter {
+    key    = "kubernetes.io/cluster/${var.vpc_name}"
+    values = ["owned"]
+  }
+}
+
+resource "terraform_data" "lbc_alb_cleanup" {
+  triggers_replace = {
+    vpc_id   = local.vpc_id
+    vpc_name = var.vpc_name
+    region   = data.aws_region.current.name
+    alb_arns = jsonencode(data.aws_lbs.lbc.arns)
+    tg_arns  = jsonencode(data.aws_resourcegroupstaggingapi_resources.lbc_target_groups.resource_tag_mapping_list[*].resource_arn)
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<-EOT
+      VPC_ID="${self.triggers_replace.vpc_id}"
+      VPC_NAME="${self.triggers_replace.vpc_name}"
+      REGION="${self.triggers_replace.region}"
+
+      # Known ALBs captured at last apply — delete these first
+      echo "==> Deleting known LBC ALBs (captured at apply)..."
+      for arn in $(echo '${self.triggers_replace.alb_arns}' | jq -r '.[]' 2>/dev/null); do
+        echo "    Deleting ALB: $arn"
+        aws elbv2 delete-load-balancer --region "$REGION" --load-balancer-arn "$arn" 2>/dev/null || true
+      done
+
+      # Sweep by VPC to catch ALBs created after the last apply
+      echo "==> Sweeping for any remaining ALBs in VPC $VPC_ID..."
+      EXTRA=$(aws elbv2 describe-load-balancers --region "$REGION" \
+        --query "LoadBalancers[?VpcId=='$VPC_ID'].LoadBalancerArn" --output text 2>/dev/null || true)
+      if [ -n "$EXTRA" ] && [ "$EXTRA" != "None" ]; then
+        for arn in $EXTRA; do
+          echo "    Deleting ALB: $arn"
+          aws elbv2 delete-load-balancer --region "$REGION" --load-balancer-arn "$arn" || true
+        done
+      fi
+      echo "==> Waiting 20s for ENIs to release..."
+      sleep 20
+
+      # Known target groups captured at last apply via aws_resourcegroupstaggingapi_resources
+      echo "==> Deleting known LBC target groups (captured at apply)..."
+      for tg in $(echo '${self.triggers_replace.tg_arns}' | jq -r '.[]' 2>/dev/null); do
+        echo "    Deleting target group: $tg"
+        aws elbv2 delete-target-group --region "$REGION" --target-group-arn "$tg" 2>/dev/null || true
+      done
+
+      # Sweep by VPC to catch target groups created after the last apply
+      echo "==> Sweeping for any remaining target groups in VPC $VPC_ID..."
+      EXTRA_TGS=$(aws elbv2 describe-target-groups --region "$REGION" \
+        --query "TargetGroups[?VpcId=='$VPC_ID'].TargetGroupArn" --output text 2>/dev/null || true)
+      if [ -n "$EXTRA_TGS" ] && [ "$EXTRA_TGS" != "None" ]; then
+        for tg in $EXTRA_TGS; do
+          echo "    Deleting target group: $tg"
+          aws elbv2 delete-target-group --region "$REGION" --target-group-arn "$tg" 2>/dev/null || true
+        done
+      fi
+
+      # Only delete SGs tagged as LBC-owned — avoids clobbering Terraform-managed EKS SGs
+      echo "==> Deleting LBC-managed security groups in VPC $VPC_ID..."
+      SGS=$(aws ec2 describe-security-groups --region "$REGION" \
+        --filters "Name=vpc-id,Values=$VPC_ID" \
+                  "Name=tag-key,Values=elbv2.k8s.aws/cluster" \
+        --query 'SecurityGroups[].GroupId' --output text 2>/dev/null || true)
+      # Fall back to kubernetes.io/cluster tag (older LBC versions)
+      SGS2=$(aws ec2 describe-security-groups --region "$REGION" \
+        --filters "Name=vpc-id,Values=$VPC_ID" \
+                  "Name=tag-key,Values=kubernetes.io/cluster/$VPC_NAME" \
+                  "Name=tag-value,Values=owned" \
+        --query 'SecurityGroups[].GroupId' --output text 2>/dev/null || true)
+      SGS=$(echo "$SGS $SGS2" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+      if [ -n "$SGS" ] && [ "$SGS" != "None" ]; then
+        for sg in $SGS; do
+          INGRESS=$(aws ec2 describe-security-groups --group-ids "$sg" --region "$REGION" \
+            --query 'SecurityGroups[0].IpPermissions' --output json 2>/dev/null || echo "[]")
+          EGRESS=$(aws ec2 describe-security-groups --group-ids "$sg" --region "$REGION" \
+            --query 'SecurityGroups[0].IpPermissionsEgress' --output json 2>/dev/null || echo "[]")
+          [ "$INGRESS" != "[]" ] && [ "$INGRESS" != "null" ] && \
+            aws ec2 revoke-security-group-ingress --group-id "$sg" --region "$REGION" \
+              --ip-permissions "$INGRESS" 2>/dev/null || true
+          [ "$EGRESS" != "[]" ] && [ "$EGRESS" != "null" ] && \
+            aws ec2 revoke-security-group-egress --group-id "$sg" --region "$REGION" \
+              --ip-permissions "$EGRESS" 2>/dev/null || true
+        done
+        for sg in $SGS; do
+          echo "    Deleting SG: $sg"
+          aws ec2 delete-security-group --group-id "$sg" --region "$REGION" 2>/dev/null || true
+        done
+      else
+        echo "==> No LBC-managed security groups found in VPC $VPC_ID"
+      fi
+
+      echo "==> Deleting VPC endpoints in VPC $VPC_ID..."
+      ENDPOINTS=$(aws ec2 describe-vpc-endpoints --region "$REGION" \
+        --filters "Name=vpc-id,Values=$VPC_ID" "Name=vpc-endpoint-state,Values=available,pending" \
+        --query 'VpcEndpoints[].VpcEndpointId' --output text 2>/dev/null || true)
+      if [ -n "$ENDPOINTS" ] && [ "$ENDPOINTS" != "None" ]; then
+        aws ec2 delete-vpc-endpoints --region "$REGION" --vpc-endpoint-ids $ENDPOINTS 2>/dev/null || true
+        echo "==> Waiting 15s for endpoints to delete..."
+        sleep 15
+      else
+        echo "==> No VPC endpoints found in VPC $VPC_ID"
+      fi
+    EOT
+  }
+}
+
 # The actual EKS cluster
 
 resource "aws_eks_cluster" "eks_cluster" {
