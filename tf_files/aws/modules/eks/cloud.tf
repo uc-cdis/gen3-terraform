@@ -306,6 +306,7 @@ data "aws_resourcegroupstaggingapi_resources" "lbc_target_groups" {
 resource "terraform_data" "lbc_alb_cleanup" {
   triggers_replace = {
     vpc_id   = local.vpc_id
+    vpc_name = var.vpc_name
     region   = data.aws_region.current.name
     alb_arns = jsonencode(data.aws_lbs.lbc.arns)
     tg_arns  = jsonencode(data.aws_resourcegroupstaggingapi_resources.lbc_target_groups.resource_tag_mapping_list[*].resource_arn)
@@ -315,6 +316,7 @@ resource "terraform_data" "lbc_alb_cleanup" {
     when    = destroy
     command = <<-EOT
       VPC_ID="${self.triggers_replace.vpc_id}"
+      VPC_NAME="${self.triggers_replace.vpc_name}"
       REGION="${self.triggers_replace.region}"
 
       # Known ALBs captured at last apply — delete these first
@@ -355,10 +357,19 @@ resource "terraform_data" "lbc_alb_cleanup" {
         done
       fi
 
+      # Only delete SGs tagged as LBC-owned — avoids clobbering Terraform-managed EKS SGs
       echo "==> Deleting LBC-managed security groups in VPC $VPC_ID..."
       SGS=$(aws ec2 describe-security-groups --region "$REGION" \
         --filters "Name=vpc-id,Values=$VPC_ID" \
-        --query 'SecurityGroups[?GroupName!=`default`].GroupId' --output text 2>/dev/null || true)
+                  "Name=tag-key,Values=elbv2.k8s.aws/cluster" \
+        --query 'SecurityGroups[].GroupId' --output text 2>/dev/null || true)
+      # Fall back to kubernetes.io/cluster tag (older LBC versions)
+      SGS2=$(aws ec2 describe-security-groups --region "$REGION" \
+        --filters "Name=vpc-id,Values=$VPC_ID" \
+                  "Name=tag-key,Values=kubernetes.io/cluster/$VPC_NAME" \
+                  "Name=tag-value,Values=owned" \
+        --query 'SecurityGroups[].GroupId' --output text 2>/dev/null || true)
+      SGS=$(echo "$SGS $SGS2" | tr ' ' '\n' | sort -u | tr '\n' ' ')
       if [ -n "$SGS" ] && [ "$SGS" != "None" ]; then
         for sg in $SGS; do
           INGRESS=$(aws ec2 describe-security-groups --group-ids "$sg" --region "$REGION" \
@@ -377,7 +388,7 @@ resource "terraform_data" "lbc_alb_cleanup" {
           aws ec2 delete-security-group --group-id "$sg" --region "$REGION" 2>/dev/null || true
         done
       else
-        echo "==> No non-default security groups found in VPC $VPC_ID"
+        echo "==> No LBC-managed security groups found in VPC $VPC_ID"
       fi
 
       echo "==> Deleting VPC endpoints in VPC $VPC_ID..."
