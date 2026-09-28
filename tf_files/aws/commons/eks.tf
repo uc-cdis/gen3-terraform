@@ -58,5 +58,5 @@ module "eks" {
   csoc_account_id                  = var.csoc_account_id
   k8s_bootstrap_resources          = var.k8s_bootstrap_resources
   ha_squid_single_instance         = var.ha_squid_single_instance
-  depends_on                       = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id, module.cdis_vpc.squid_auto]
+  depends_on                       = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id]
 }
