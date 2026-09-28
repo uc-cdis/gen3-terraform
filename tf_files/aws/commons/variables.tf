@@ -1134,6 +1134,7 @@ variable "base_rules" {
     priority = number
     override_to_count = list(string)
     override_to_allow = list(string)
+    override_to_challenge = optional(list(string), [])
     count = bool
   }))
   default = [
@@ -1251,6 +1252,12 @@ variable "country_codes" {
     "VE",
     "NG"
   ]
+}
+
+variable "geo_rule_group_capacity" {
+  description = "WCU capacity of the 'geo' custom rule group. Changing it forces replacement, so match existing groups when importing."
+  type = number
+  default = 10
 }
 
 variable "force_delete_bucket" {
