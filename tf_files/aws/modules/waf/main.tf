@@ -45,6 +45,15 @@ resource "aws_wafv2_web_acl" "waf" {
               name = rule_action_override.value
             }
           }
+          dynamic "rule_action_override" {
+            for_each = lookup(rule.value, "override_to_challenge", [])
+            content {
+              action_to_use {
+                challenge {}
+              }
+              name = rule_action_override.value
+            }
+          }
         }
       }
 
@@ -204,7 +213,7 @@ resource "aws_wafv2_rule_group" "geo_restriction" {
   name        = "geo"
   description = "A custom rule group to restrict by Country Code."
   scope       = "REGIONAL"
-  capacity    = 10
+  capacity    = var.geo_rule_group_capacity
   rule {
     name     = "geoblock"
     priority = 0
