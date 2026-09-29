@@ -1,0 +1,62 @@
+# Serves the TOTP enrollment QR codes.
+#
+# Replaces the lighttpd config, which is not packaged for AL2023. Two differences
+# worth knowing about:
+#
+#  - https only. The old config also served the same directory unencrypted on port 80.
+#    A QR code encodes the user's TOTP secret, so it should never go out in plaintext.
+#  - autoindex off. Directory listing let anyone who reached the endpoint enumerate
+#    every QR code waiting to be collected.
+#
+# Codes are still deleted by the cron entry after 48 hours.
+
+user openvpn openvpn;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    access_log /var/log/nginx/access.log;
+
+    sendfile        on;
+    keepalive_timeout 65;
+    server_tokens   off;
+
+    server {
+        listen 443 ssl;
+        listen [::]:443 ssl;
+
+        ssl_certificate     /etc/nginx/certs/server.pem;
+        ssl_certificate_key /etc/nginx/certs/server.pem;
+
+        ssl_protocols       TLSv1.2 TLSv1.3;
+        ssl_prefer_server_ciphers on;
+        ssl_ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256;
+
+        root /var/www/qrcode;
+        index index.html;
+
+        # No directory listing, a code is only retrievable if you know its name
+        autoindex off;
+
+        add_header X-Content-Type-Options nosniff;
+        add_header X-Frame-Options DENY;
+        # These are single use secrets, they should not be cached anywhere
+        add_header Cache-Control "no-store, no-cache, must-revalidate";
+
+        location ~ /\. {
+            deny all;
+        }
+
+        location ~* \.(php|pl|fcgi|inc)$ {
+            deny all;
+        }
+    }
+}

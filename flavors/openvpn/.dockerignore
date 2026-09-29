@@ -1,0 +1,7 @@
+.git
+.github
+.pre-commit-config.yaml
+.secrets.baseline
+**/__pycache__
+**/*.pyc
+**/*.pyo
