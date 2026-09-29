@@ -13,7 +13,7 @@ locals {
       aws-es-proxy_enabled = var.aws-es-proxy_enabled
       dbgap_enabled = var.dbgap_enabled
       dd_enabled = var.dd_enabled
-      external_secrets_operator_iam_role = var.deploy_external_secrets ? aws_iam_role.external-secrets-role[0].arn : null
+      external_secrets_operator_iam_role = var.deploy_external_secrets ? aws_iam_role.external-secrets-role[0].arn : ""
       deploy_grafana = var.deploy_grafana
       deploy_s3_mountpoint = var.deploy_s3_mountpoint
       dicom-server_enabled = var.dicom-server_enabled
@@ -25,7 +25,7 @@ locals {
       fence_config_secret_name = aws_secretsmanager_secret.fence_config.name
       fence_enabled = var.fence_enabled
       fence_jwt_keys = aws_secretsmanager_secret.fence-jwt-keys.name
-      fence_service_account = var.fence_enabled ? aws_iam_role.fence-role[0].arn : null
+      fence_service_account = var.fence_enabled ? aws_iam_role.fence-role[0].arn : ""
       frontend_root = var.gen3ff_enabled ? "gen3ff" : "portal"
       gitops_file = var.gitops_path != "" ? indent(4, file(var.gitops_path)) : "{}"
       gen3ff_enabled = var.gen3ff_enabled
@@ -39,7 +39,7 @@ locals {
       indexd_prefix = var.indexd_prefix
       ingress_enabled = var.ingress_enabled
       manifestservice_enabled = var.manifestservice_enabled
-      manifestservice_service_account = var.manifestservice_enabled ? aws_iam_role.manifestservice-role[0].arn : null
+      manifestservice_service_account = var.manifestservice_enabled ? aws_iam_role.manifestservice-role[0].arn : ""
       metadata_enabled = var.metadata_enabled
       netpolicy_enabled = var.netpolicy_enabled
       peregrine_enabled = var.peregrine_enabled
