@@ -106,7 +106,7 @@ locals {
 
   # Yoinked from devplanet
   pg_instance_class_mem = "GREATEST({DBInstanceClassMemory/63963136*1024},65536)"
-  pg_vcpu               = "GREATEST(${DBInstanceVCPU / 2},8)"
+  pg_vcpu               = "GREATEST($${DBInstanceVCPU / 2},8)"
 }
 
 resource "aws_rds_cluster_parameter_group" "aurora_cdis_pg" {
@@ -154,25 +154,25 @@ resource "aws_rds_cluster_parameter_group" "aurora_cdis_pg" {
   # Setting for pgvector performance
   parameter {
     name  = "maintenance_work_mem"
-    value = locals.pg_instance_class_mem
+    value = local.pg_instance_class_mem
   }
 
   # Setting for pgvector performance
   parameter {
     name  = "max_parallel_maintainance_workers"
-    value = locals.pg_vcpu
+    value = local.pg_vcpu
   }
 
   # Setting for pgvector performance
   parameter {
     name  = "max_parallel_workers"
-    value = locals.pg_vcpu
+    value = local.pg_vcpu
   }
 
   # Setting for pgvector performance
   parameter {
     name  = "work_mem"
-    value = locals.pg_instance_class_mem
+    value = local.pg_instance_class_mem
   }
 
   lifecycle {
