@@ -203,7 +203,7 @@ resource "aws_iam_role" "hatchery-role" {
         Condition = {
           StringEquals = {
             "${var.oidc_provider_arn}:sub" = [
-              "system:serviceaccount:${var.namespace}:hatchery-service-account"
+              "system:serviceaccount:${var.namespace}:hatchery-sa"
             ]
             "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
           }
