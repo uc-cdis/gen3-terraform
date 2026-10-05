@@ -277,14 +277,18 @@ resource "aws_iam_role_policy" "hatchery-role-policy" {
         Resource = ["arn:aws:iam::*:role/hatchery-shared-*"]
       },
       {
-        Sid    = "SharedSoftwareKeepFiles"
+        Sid    = "SoftwareBucketKeepFiles"
         Effect = "Allow"
-        Action = [
-          "s3:HeadObject",
-          "s3:PutObject",
-        ]
+        Action = ["s3:HeadObject", "s3:PutObject"]
         Resource = [
-          "arn:aws:s3:::${var.hatchery_software_bucket}*",
+          "arn:aws:s3:::${var.hatchery_software_bucket}*/*.keep",
+        ]
+      },
+      {
+        Sid    = "SoftwareBucketRead"
+        Effect = "Allow"
+        Action = ["s3:GetObject"]
+        Resource = [
           "arn:aws:s3:::${var.hatchery_software_bucket}*/*",
         ]
       },
