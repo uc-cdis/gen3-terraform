@@ -277,17 +277,15 @@ resource "aws_iam_role_policy" "hatchery-role-policy" {
         Resource = ["arn:aws:iam::*:role/hatchery-shared-*"]
       },
       {
-        # s3:HeadObject and s3:PutObject for .keep placeholder files written by
-        # ensureKeepFiles in sharedworkspace.go before mounting workspace volumes.
-        Sid    = "SharedWorkspaceKeepFiles"
+        Sid    = "SharedSoftwareKeepFiles"
         Effect = "Allow"
         Action = [
           "s3:HeadObject",
           "s3:PutObject",
         ]
         Resource = [
-          "arn:aws:s3:::*${var.vpc_name}*",
-          "arn:aws:s3:::*${var.vpc_name}*/*",
+          "arn:aws:s3:::${var.hatchery_software_bucket}*",
+          "arn:aws:s3:::${var.hatchery_software_bucket}*/*",
         ]
       },
       {

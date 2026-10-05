@@ -154,6 +154,11 @@ variable "hatchery_enabled" {
   default     = true
 }
 
+variable "hatchery_software_bucket" {
+  descrition = "Shared software bucket"
+  type       = string
+}
+
 variable "nextflow_imagebuilder_account_id" {
   description = "AWS account ID hosting the nextflow-imagebuilder-reader role used by hatchery"
   default     = "143731057154"
