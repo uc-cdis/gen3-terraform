@@ -155,8 +155,14 @@ variable "hatchery_enabled" {
 }
 
 variable "hatchery_software_bucket" {
-  descrition = "Shared software bucket"
-  type       = string
+  description = "Shared software bucket"
+  type        = string
+}
+
+variable "hatchery_software_bucket_kms_key_arn" {
+  description = "KMS key ARN for the squashfs software bucket (SSE-KMS). Leave empty for unencrypted buckets."
+  type        = string
+  default     = ""
 }
 
 variable "nextflow_imagebuilder_account_id" {

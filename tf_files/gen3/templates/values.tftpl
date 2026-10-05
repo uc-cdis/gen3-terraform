@@ -104,6 +104,7 @@ guppy:
 
 hatchery:
   enabled: ${hatchery_enabled}
+  oidcProviderArn: "arn:aws:iam::${account_id}:oidc-provider/${oidc_provider_arn}"
 
   hatchery:
     sidecarContainer:

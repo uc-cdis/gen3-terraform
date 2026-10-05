@@ -177,6 +177,15 @@ resource "aws_iam_role_policy" "gitops-role-policy" {
   })
 }
 
+locals {
+  hatchery_kms_statements = var.hatchery_software_bucket_kms_key_arn != "" ? [{
+    Sid      = "SoftwareBucketKMS"
+    Effect   = "Allow"
+    Action   = ["kms:Decrypt", "kms:DescribeKey"]
+    Resource = [var.hatchery_software_bucket_kms_key_arn]
+  }] : []
+}
+
 resource "aws_iam_role" "hatchery-role" {
   count       = var.hatchery_enabled ? 1 : 0
   name        = "${var.vpc_name}-${var.namespace}-hatchery-sa"
@@ -220,7 +229,7 @@ resource "aws_iam_role_policy" "hatchery-role-policy" {
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
+    Statement = concat([
       {
         Sid      = "AssumeCsocAdminRole"
         Effect   = "Allow"
@@ -344,7 +353,7 @@ resource "aws_iam_role_policy" "hatchery-role-policy" {
         Action   = ["iam:PassRole"]
         Resource = ["arn:aws:iam::*:role/*ecsInstanceRole"]
       },
-    ]
+    ], local.hatchery_kms_statements)
   })
 }
 
