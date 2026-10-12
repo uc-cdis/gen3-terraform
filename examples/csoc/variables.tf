@@ -42,6 +42,7 @@ variable "es_linked_role" {
 variable "revproxy_arn" {
   description = "The ARN of the certificate in ACM"
   type        = string
+  default     = ""
 }
 
 variable "create_gitops_infra" {
@@ -235,8 +236,10 @@ variable "workflow_asg_min_size" {
   default = 0
 }
 
+# IRSA needs the cluster's OIDC provider, which the eks module only creates
+# when this is set (see bootstrap.tf).
 variable "iam-serviceaccount" {
-  default = false
+  default = true
 }
 
 variable "oidc_eks_thumbprint" {
@@ -281,7 +284,7 @@ variable "single_az_for_jupyter" {
 
 variable "sns_topic_arn" {
   description = "SNS topic ARN for alerts"
-  default     = "arn:aws:sns:us-east-1:433568766270:planx-csoc-alerts-topic"
+  default     = ""
 }
 
 variable "activation_id" {
@@ -307,8 +310,10 @@ variable "fips_enabled_ami" {
   default = "ami-0de87e3680dcb13ec"
 }
 
+# Without an ASG or Karpenter the cluster has no worker nodes. A standalone
+# CSOC is small and steady, so a fixed ASG is the simpler choice.
 variable "use_asg" {
-  default = false
+  default = true
 } 
 
 variable "use_karpenter" {
@@ -503,4 +508,62 @@ variable "sqs_kms_key_id" {
   description = "KMS Key ID to use for server-side encryption. If not provided, the default AWS managed key will be used."
   type        = string
   default     = ""
+}
+
+# ---------------------------------------------------------------------------
+# Standalone CSOC bootstrap (bootstrap.tf)
+# ---------------------------------------------------------------------------
+
+variable "state_bucket" {
+  description = "Bucket holding Terraform state and the gen3-admin environment registry; the CSOC API role is granted access to it"
+  type        = string
+  default     = ""
+}
+
+variable "csoc_hostname" {
+  description = "Hostname the CSOC portal is served on. Defaults to hostname"
+  type        = string
+  default     = ""
+}
+
+variable "keycloak_hostname" {
+  description = "Hostname Keycloak is served on, e.g. keycloak.example.org"
+  type        = string
+  default     = ""
+}
+
+variable "hosted_zone_id" {
+  description = "Route53 public hosted zone for the hostnames; used to validate the certificate"
+  type        = string
+  default     = ""
+}
+
+variable "certificate_arn" {
+  description = "Existing ACM certificate covering csoc_hostname and keycloak_hostname. When empty and hosted_zone_id is set, one is created"
+  type        = string
+  default     = ""
+}
+
+variable "csoc_namespace" {
+  description = "Namespace the CSOC chart is installed into"
+  type        = string
+  default     = "csoc"
+}
+
+variable "csoc_service_account" {
+  description = "Service account the CSOC API runs as"
+  type        = string
+  default     = "csoc"
+}
+
+variable "csoc_api_policy_arns" {
+  description = "Extra IAM policies for the CSOC API role, e.g. so it can provision commons itself"
+  type        = list(string)
+  default     = []
+}
+
+variable "cluster_admin_arns" {
+  description = "IAM principals to grant cluster admin, in addition to whoever runs this Terraform"
+  type        = list(string)
+  default     = []
 }
