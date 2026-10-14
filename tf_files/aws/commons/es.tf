@@ -1,5 +1,5 @@
-locals{
-  es_role = "${var.vpc_name}-esproxy-sa"
+locals {
+  es_role      = "${var.vpc_name}-esproxy-sa"
   es_role_name = var.es_role_override != "" ? var.deploy_es_role ? "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/gen3-service/${local.es_role}" : var.es_role_override : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/gen3-service/${local.es_role}"
 }
 
@@ -15,18 +15,18 @@ module "commons_vpc_es" {
   organization_name         = var.organization_name
   es_version                = var.es_version
   es_linked_role            = var.es_linked_role
-  role_arn                  = var.deploy_es_role ? local.es_role_name : var.es_role_override != "" ? var.es_role_override : ""
+  role_arn                  = var.deploy_es_role ? aws_iam_role.esproxy-role[0].arn : var.es_role_override != "" ? var.es_role_override : ""
   deploy_cloudwatch_alarm   = var.deploy_cloudwatch_alarm
   slack_webhook_secret_name = var.slack_webhook_secret_name
   es_name                   = var.es_name
-  depends_on              = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id]
+  depends_on                = [module.cdis_vpc.vpc_id, module.cdis_vpc.vpc_peering_id]
 }
 
 
 resource "aws_iam_role" "esproxy-role" {
-  count = var.deploy_es_role ? 1 : 0
-  name = local.es_role
-  description = "Role for ES proxy service account for ${var.vpc_name}"
+  count              = var.deploy_es_role ? 1 : 0
+  name               = local.es_role
+  description        = "Role for ES proxy service account for ${var.vpc_name}"
   assume_role_policy = <<EDOC
 {
     "Version": "2012-10-17",
