@@ -51,7 +51,7 @@ S3_BUCKETS:
   # Name of the actual s3 bucket
   ${upload_bucket}:
     cred: 'fence-bot'
-    region: us-east-1
+    region: ${region}
 
 dbGaP:
  parent_to_child_studies_mapping: {}

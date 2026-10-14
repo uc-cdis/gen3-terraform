@@ -23,6 +23,7 @@ resource "aws_secretsmanager_secret_version" "fence_config" {
         cognito_discovery_url = var.cognito_discovery_url
         cognito_client_id     = var.cognito_client_id
         cognito_client_secret = var.cognito_client_secret
+        region                = data.aws_region.current.name
       })
       
   lifecycle {

@@ -88,6 +88,7 @@ resource "local_file" "user_yaml_workflow" {
   filename = "./users-repo/.github/workflows/user-yaml-push.yaml"
   content  = templatefile("${path.module}/templates/user-yaml-push.tftpl", {
     useryaml_s3_path = var.useryaml_s3_path
+    region           = data.aws_region.current.name
   })
   depends_on = [null_resource.config_setup, helm_release.gen3]
 }
