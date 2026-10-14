@@ -24,3 +24,5 @@ kube/services/fluentd/dockerlogs/
 *.cache
 *pyc
 !doc/terraform
+*terragrunt.hcl
+*.terragrunt-cache

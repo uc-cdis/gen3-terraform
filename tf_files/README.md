@@ -14,7 +14,7 @@ $ terraform init --backend-config ./vars1.tfvars --backend-config ./vars2.tfvars
 * tf_files/aws - rules for resources in an AWS commons VPC
 * tf_files/configs - templates supporting tf_files/aws
 * tf_files/aws_user_vpc - rules for resources in an AWS VPC for user VM's
-* tf_files/modules - terraform modules that can be shared between different stacks
+* tf_files/shared/modules - terraform modules that can be shared between different stacks
 
 The [gen3 helper scripts](../gen3/README.md) standardize and simplify this process.
 
