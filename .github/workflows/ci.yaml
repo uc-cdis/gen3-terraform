@@ -1,7 +1,6 @@
 name: CI
 
 on:
-  # run on pushed commits to master and on new commits on pull requests
   push:
     branches:
       - master
@@ -15,3 +14,14 @@ jobs:
     with:
       python-poetry: 'false'
     secrets: inherit
+
+  terraform-test:
+    name: terraform test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: "latest"
+      - uses: extractions/setup-just@v2
+      - run: just test
