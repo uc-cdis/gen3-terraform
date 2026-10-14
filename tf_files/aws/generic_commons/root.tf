@@ -335,6 +335,7 @@ module "es" {
 
   vpc_name       = var.vpc_name
   es_linked_role = false
+  role_arn       = aws_iam_user.es_user.arn
   depends_on = [
     module.vpc,
     aws_cloudwatch_log_group.main_log_group

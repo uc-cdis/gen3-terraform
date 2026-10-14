@@ -2,10 +2,13 @@ locals{
   cidrs  = var.secondary_cidr_block != "" ? [var.env_vpc_cidr, var.peering_cidr, var.secondary_cidr_block] : [var.env_vpc_cidr, var.peering_cidr]
   cidrs2 = var.secondary_cidr_block != "" ? [var.env_vpc_cidr, var.secondary_cidr_block] : [var.env_vpc_cidr]
   bootstrap_script = var.ha_squid_single_instance ? "squid_running_on_docker_single_instance.sh" : var.bootstrap_script
+  _ssh_admin_keys_file = var.ssh_admin_keys_ssm_parameter_name != "" ? data.aws_ssm_parameter.ssh_admin_keys_file[0].value : var.ssh_admin_keys_file
+  _ssh_user_keys_file  = var.ssh_user_keys_ssm_parameter_name != "" ? data.aws_ssm_parameter.ssh_user_keys_file[0].value : var.ssh_user_keys_file
+
   generated_squid_bootstrap_vars = compact([
     var.ssh_keys_repo != "" ? "ssh_keys_repo=${var.ssh_keys_repo}" : "",
-    var.ssh_admin_keys_file != "" ? "ssh_admin_keys_file=${var.ssh_admin_keys_file}" : "",
-    var.ssh_user_keys_file != "" ? "ssh_user_keys_file=${var.ssh_user_keys_file}" : "",
+    local._ssh_admin_keys_file != "" ? "ssh_admin_keys_file=${local._ssh_admin_keys_file}" : "",
+    local._ssh_user_keys_file != "" ? "ssh_user_keys_file=${local._ssh_user_keys_file}" : "",
 
     var.whitelist_repo != "" ? "whitelist_repo=${var.whitelist_repo}" : "",
     var.ftp_whitelist_file != "" ? "ftp_whitelist_file=${var.ftp_whitelist_file}" : "",
