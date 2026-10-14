@@ -21,6 +21,14 @@ output "lb_controller_role_arn" {
   value = aws_iam_role.irsa["lb-controller"].arn
 }
 
+output "external_secrets_role_arn" {
+  value = aws_iam_role.irsa["external-secrets"].arn
+}
+
+output "csoc_secret_prefix" {
+  value = local.csoc_secret_prefix
+}
+
 output "csoc_api_role_arn" {
   value = aws_iam_role.irsa["csoc-api"].arn
 }

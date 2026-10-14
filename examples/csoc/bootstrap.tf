@@ -4,8 +4,10 @@
 #
 #   - IRSA roles for the AWS Load Balancer Controller (the CSOC and Keycloak
 #     ingresses are ALBs), the EBS CSI driver (Keycloak's Postgres and the CSOC
-#     API need volumes), and the CSOC API itself (it keeps its environment
-#     registry in the Terraform state bucket).
+#     API need volumes), External Secrets Operator (it copies the CSOC's
+#     secrets out of Secrets Manager), and the CSOC API itself (it keeps its
+#     environment registry in the Terraform state bucket, and opens GitOps PRs
+#     with the GitHub App key in Secrets Manager).
 #   - The EBS CSI driver add-on. EKS no longer provisions EBS volumes without
 #     it, so PVCs on a fresh cluster stay Pending.
 #   - Optionally an ACM certificate for the CSOC and Keycloak hostnames,
@@ -27,10 +29,18 @@ locals {
   certificate_arn    = local.create_certificate ? aws_acm_certificate_validation.csoc[0].certificate_arn : var.certificate_arn
 
   irsa = {
-    lb-controller = { namespace = "kube-system", service_account = "aws-load-balancer-controller" }
-    ebs-csi       = { namespace = "kube-system", service_account = "ebs-csi-controller-sa" }
-    csoc-api      = { namespace = var.csoc_namespace, service_account = var.csoc_service_account }
+    lb-controller    = { namespace = "kube-system", service_account = "aws-load-balancer-controller" }
+    ebs-csi          = { namespace = "kube-system", service_account = "ebs-csi-controller-sa" }
+    external-secrets = { namespace = "external-secrets", service_account = "external-secrets" }
+    csoc-api         = { namespace = var.csoc_namespace, service_account = var.csoc_service_account }
   }
+
+  # The CSOC's secrets: the GitHub App key, Keycloak's admin login and client
+  # secret, and the portal's NextAuth secrets. The wizard and install-csoc
+  # create them under this prefix; nothing else here can read them. Secrets
+  # Manager appends a random suffix to every secret's ARN, hence the "*".
+  csoc_secret_prefix = "gen3-csoc/${var.vpc_name}/"
+  csoc_secrets_arn   = "arn:${data.aws_partition.current.partition}:secretsmanager:${var.aws_region}:${local.account_number}:secret:${local.csoc_secret_prefix}*"
 }
 
 data "aws_iam_policy_document" "irsa_trust" {
@@ -100,6 +110,37 @@ resource "aws_iam_role_policy" "csoc_api_state" {
   name   = "state-bucket"
   role   = aws_iam_role.irsa["csoc-api"].id
   policy = data.aws_iam_policy_document.csoc_api_state[0].json
+}
+
+# External Secrets reads the CSOC's secrets, and only those.
+data "aws_iam_policy_document" "external_secrets" {
+  statement {
+    actions   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
+    resources = [local.csoc_secrets_arn]
+  }
+}
+
+resource "aws_iam_role_policy" "external_secrets" {
+  name   = "csoc-secrets"
+  role   = aws_iam_role.irsa["external-secrets"].id
+  policy = data.aws_iam_policy_document.external_secrets.json
+}
+
+# The CSOC API reads the GitHub App key to open GitOps PRs, and replaces it
+# when the repo is reconnected. It cannot read the CSOC's other secrets.
+data "aws_iam_policy_document" "csoc_api_github_app" {
+  statement {
+    actions = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret", "secretsmanager:PutSecretValue"]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:secretsmanager:${var.aws_region}:${local.account_number}:secret:${local.csoc_secret_prefix}github-app-*",
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "csoc_api_github_app" {
+  name   = "gitops-github-app"
+  role   = aws_iam_role.irsa["csoc-api"].id
+  policy = data.aws_iam_policy_document.csoc_api_github_app.json
 }
 
 # Extra permissions for CSOC to provision commons on its own. Empty by
