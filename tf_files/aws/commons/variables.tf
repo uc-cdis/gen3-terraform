@@ -525,7 +525,7 @@ variable "deploy_argocd" {
 }
 
 variable "argocd_version" {
-  default = "7.8.2"
+  default = "10.1.4"
 }
 
 variable "deploy_external_secrets_operator" {
@@ -533,7 +533,7 @@ variable "deploy_external_secrets_operator" {
 }
 
 variable "external_secrets_operator_version" {
-  default = "0.14.0"
+  default = "2.8.0"
 }
 
 variable "ec2_keyname" {
@@ -544,11 +544,11 @@ variable "instance_type" {
   default = "t3.large"
 }
 
-variable "jupyter_instance_type"{
+variable "jupyter_instance_type" {
   default = "t3.large"
 }
 
-variable "workflow_instance_type"{
+variable "workflow_instance_type" {
   default = "t3.2xlarge"
 }
 

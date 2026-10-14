@@ -5,8 +5,8 @@ data "aws_caller_identity" "current" {}
 data "aws_ecrpublic_authorization_token" "token" {}
 
 data "aws_rds_engine_version" "postgresql" {
-  engine  = "aurora-postgresql"
-  version = "14.5"
+  engine  = var.postgresql_engine_version
+  version = var.postgresql_version
 }
 
 data "aws_iam_policy_document" "aws_load_balancer_controller" {
@@ -104,6 +104,7 @@ data "aws_iam_policy_document" "aws_load_balancer_controller" {
   statement {
     actions = [
       "ec2:CreateTags",
+      "ec2:DeleteTags",
     ]
     effect = "Allow"
     resources = [
