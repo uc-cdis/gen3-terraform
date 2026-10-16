@@ -989,6 +989,18 @@ variable "hatchery_enabled" {
   default     = true
 }
 
+variable "hatchery_software_bucket" {
+  description = "Shared software bucket"
+  type        = string
+  default     = ""
+}
+
+variable "hatchery_software_bucket_kms_key_arn" {
+  description = "KMS key ARN for the squashfs software bucket (SSE-KMS). Leave empty for unencrypted buckets."
+  type        = string
+  default     = ""
+}
+
 variable "indexd_enabled" {
   description = "Enable indexd"
   type        = bool

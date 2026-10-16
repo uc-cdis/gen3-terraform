@@ -21,6 +21,9 @@ module "gen3_deployment" {
   fence_enabled           = var.fence_enabled
   guppy_enabled           = var.guppy_enabled
   hatchery_enabled        = var.hatchery_enabled
+  hatchery_software_bucket             = var.hatchery_software_bucket
+  hatchery_software_bucket_kms_key_arn = var.hatchery_software_bucket_kms_key_arn
+  oidc_provider_arn       = trimprefix(module.eks.0.cluster_oidc_provider_url, "https://")
   hostname                = var.hostname
   indexd_enabled          = var.indexd_enabled
   indexd_prefix           = var.indexd_prefix

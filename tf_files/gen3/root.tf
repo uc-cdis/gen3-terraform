@@ -34,7 +34,7 @@ locals {
       guppy_enabled = var.guppy_enabled
       hatchery_enabled = var.hatchery_enabled
       hatchery_service_account = var.hatchery_enabled ? aws_iam_role.hatchery-role[0].arn : ""
-      oidc_provider_arn = var.oidc_provider_arn
+      oidc_provider_url = var.oidc_provider_arn
       hostname = var.hostname
       indexd_enabled = var.indexd_enabled
       indexd_prefix = var.indexd_prefix

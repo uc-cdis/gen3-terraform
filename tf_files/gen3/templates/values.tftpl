@@ -104,9 +104,9 @@ guppy:
 
 hatchery:
   enabled: ${hatchery_enabled}
-  oidcProviderArn: "arn:aws:iam::${account_id}:oidc-provider/${oidc_provider_arn}"
 
   hatchery:
+    oidcProviderArn: "arn:aws:iam::${account_id}:oidc-provider/${oidc_provider_url}"
     sidecarContainer:
       cpu-limit: '0.1'
       memory-limit: 256Mi
