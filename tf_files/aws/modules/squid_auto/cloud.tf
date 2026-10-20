@@ -239,7 +239,7 @@ resource "aws_autoscaling_group" "squid_auto" {
 
   tag {
     key                 = "Environment"
-    value               = var.organization_name
+    value               = var.env_vpc_name
     propagate_at_launch = true
   }
 }
