@@ -276,6 +276,7 @@ EOF
     device_name = "/dev/xvda"
     ebs {
       volume_size = 30
+      encrypted   = true
     }
   }
 
