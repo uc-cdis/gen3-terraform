@@ -58,6 +58,7 @@ module "eks" {
   vpc_name                         = var.vpc_name
   vpc_id                           = var.vpc_id != "" ? var.vpc_id : module.vpc.vpc_id
   squid_asg_name                   = module.vpc.squid_auto
+  private_kube_subnet_id           = aws_subnet.private_kube.id
   ec2_keyname                      = var.ec2_keyname
   instance_type                    = var.instance_type
   peering_cidr                     = var.peering_cidr
@@ -170,6 +171,33 @@ resource "aws_route_table" "private_kube" {
     Environment               = var.vpc_name
     Organization              = var.organization_name
   }
+}
+
+# The squid gw_checks lambda runs here. It finds a healthy Squid and points
+# eks_private's default route at it, so it cannot itself depend on that
+# route: this subnet reaches AWS through the NAT gateway instead, as in
+# tf_files/aws/commons (for_squid_lambda, int_services).
+resource "aws_subnet" "private_kube" {
+  vpc_id                  = module.vpc.vpc_id
+  cidr_block              = cidrsubnet(var.vpc_cidr_block, 4, 2)
+  map_public_ip_on_launch = false
+  availability_zone       = var.availability_zones[0]
+  tags = {
+    Name         = "int_services"
+    Environment  = var.vpc_name
+    Organization = var.organization_name
+  }
+}
+
+resource "aws_route_table_association" "private_kube" {
+  subnet_id      = aws_subnet.private_kube.id
+  route_table_id = aws_route_table.private_kube.id
+}
+
+resource "aws_route" "for_squid_lambda" {
+  route_table_id         = aws_route_table.private_kube.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = module.vpc.nat_gw_id
 }
 
 # resource "aws_iam_policy" "configbucket_reader" {
