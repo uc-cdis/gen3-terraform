@@ -28,3 +28,6 @@ output "cluster_oidc_provider_url" {
 output "karpenter_deployed" {
   value = var.k8s_bootstrap_resources && var.use_karpenter && var.deploy_karpenter_in_k8s ? helm_release.karpenter[0].status : "no"
 }
+output "cluster_oidc_provider_arn" {
+  value = aws_iam_openid_connect_provider.identity_provider[0].arn
+}
