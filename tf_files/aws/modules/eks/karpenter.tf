@@ -294,6 +294,10 @@ resource "helm_release" "karpenter" {
   # repository_password = data.aws_ecrpublic_authorization_token.token.password
   chart               = "karpenter"
   version             = var.karpenter_version
+  # On a new VPC the controller's image pull waits for the squid gw_checks
+  # lambda to give the private subnets their default route, and then for the
+  # pull back-off: five minutes (the default) is not always enough.
+  timeout             = 900
 
   set {
     name  = "settings.clusterName"
