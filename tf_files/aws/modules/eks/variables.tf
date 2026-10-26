@@ -283,3 +283,22 @@ variable "karpenter_instance_categories" {
   description = "EC2 instance categories (the letter before the generation: c, m, r, t...) the default NodePool may use."
   default     = ["r"]
 }
+
+# IDs of what the vpc module created, so the lookups here wait for each.
+# Empty: found by name and tag, as before.
+variable "nat_gateway_id" {
+  default = ""
+}
+
+variable "public_route_table_id" {
+  default = ""
+}
+
+variable "local_security_group_id" {
+  default = ""
+}
+
+variable "vpc_zone_id" {
+  description = "The VPC's private internal.io zone."
+  default     = ""
+}

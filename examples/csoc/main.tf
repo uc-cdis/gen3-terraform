@@ -58,6 +58,10 @@ module "eks" {
   vpc_name                         = var.vpc_name
   vpc_id                           = var.vpc_id != "" ? var.vpc_id : module.vpc.vpc_id
   squid_asg_name                   = module.vpc.squid_auto
+  nat_gateway_id                   = module.vpc.nat_gw_id
+  public_route_table_id            = module.vpc.public_route_table_id
+  local_security_group_id          = module.vpc.security_group_local_id
+  vpc_zone_id                      = module.vpc.zone_zid
   private_kube_subnet_id           = aws_subnet.private_kube.id
   # The CSOC is a control plane: no spot interruptions, and no need for the
   # memory-optimised r family a commons' default uses.

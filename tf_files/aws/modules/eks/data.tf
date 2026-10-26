@@ -26,7 +26,10 @@ data "aws_vpcs" "vpcs" {
 # Since we need to access the internet through the proxy, let's find it
 # Also we want to access AWS stuff directly though an existing 
 # nat gateway instead than going through the proxy
+# Given by ID (vpc module outputs), each of these waits for what it looks up
+# to exist; found by name, it could be read before the vpc module made it.
 data "aws_nat_gateway" "the_gateway" {
+  id     = var.nat_gateway_id != "" ? var.nat_gateway_id : null
   vpc_id = data.aws_vpc.the_vpc.id
 
   tags = {
@@ -75,6 +78,7 @@ data "aws_vpc_endpoint_service" "sts" {
 
 # get the route to public kube 
 data "aws_route_table" "public_kube" {
+  route_table_id = var.public_route_table_id != "" ? var.public_route_table_id : null
   vpc_id      = data.aws_vpc.the_vpc.id
   tags = {
     Name = "main"
@@ -101,6 +105,7 @@ data "aws_ami" "eks_worker" {
 
 # grab the local traffic sec group
 data "aws_security_group" "local_traffic" {
+  id     = var.local_security_group_id != "" ? var.local_security_group_id : null
   vpc_id = data.aws_vpc.the_vpc.id
   name   = "local"
 }
@@ -128,8 +133,9 @@ data "aws_route_table" "private_kube_route_table" {
 
 #get the internal zone id
 data "aws_route53_zone" "vpczone" {
-  name        = "internal.io."
-  vpc_id      = data.aws_vpc.the_vpc.id
+  zone_id     = var.vpc_zone_id != "" ? var.vpc_zone_id : null
+  name        = var.vpc_zone_id != "" ? null : "internal.io."
+  vpc_id      = var.vpc_zone_id != "" ? null : data.aws_vpc.the_vpc.id
 }
 
 # let terraform compress our code and serve to lambda
