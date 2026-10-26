@@ -143,6 +143,33 @@ resource "aws_iam_role_policy" "csoc_api_github_app" {
   policy = data.aws_iam_policy_document.csoc_api_github_app.json
 }
 
+# The CSOC requests a certificate for each Gen3 commons it deploys, and writes
+# its DNS validation record. Records only in the CSOC's own zone, where the
+# commons' hostnames go.
+data "aws_iam_policy_document" "csoc_api_certs" {
+  count = var.hosted_zone_id != "" ? 1 : 0
+
+  statement {
+    actions   = ["acm:RequestCertificate", "acm:DescribeCertificate", "acm:ListCertificates", "acm:AddTagsToCertificate"]
+    resources = ["*"]
+  }
+  statement {
+    actions   = ["route53:ListHostedZonesByName", "route53:GetChange"]
+    resources = ["*"]
+  }
+  statement {
+    actions   = ["route53:GetHostedZone", "route53:ListResourceRecordSets", "route53:ChangeResourceRecordSets"]
+    resources = ["arn:${data.aws_partition.current.partition}:route53:::hostedzone/${var.hosted_zone_id}"]
+  }
+}
+
+resource "aws_iam_role_policy" "csoc_api_certs" {
+  count  = var.hosted_zone_id != "" ? 1 : 0
+  name   = "commons-certificates"
+  role   = aws_iam_role.irsa["csoc-api"].id
+  policy = data.aws_iam_policy_document.csoc_api_certs[0].json
+}
+
 # Extra permissions for CSOC to provision commons on its own. Empty by
 # default: the bootstrap only needs the registry.
 resource "aws_iam_role_policy_attachment" "csoc_api_extra" {
