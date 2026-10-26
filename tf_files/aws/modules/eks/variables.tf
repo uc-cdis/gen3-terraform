@@ -4,6 +4,11 @@ variable "vpc_id" {
   default = ""
 }
 
+variable "squid_asg_name" {
+  description = "The Squid autoscaling group, e.g. the vpc module's squid_auto output. Defaults to squid-auto-<vpc_name>."
+  default     = ""
+}
+
 variable "csoc_account_id" {
   default = "433568766270"
 }
@@ -43,6 +48,11 @@ variable "private_kube_subnet_id" {
 }
 
 variable "users_policy" {}
+
+variable "attach_users_bucket_policy" {
+  description = "Attach bucket_reader_cdis-gen3-users_<vpc_name>, which the commons VPC deployment creates, to the worker role."
+  default     = true
+}
 
 variable "worker_drive_size" {
   default = 30

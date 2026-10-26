@@ -4,9 +4,11 @@ data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
 
-# Assuming that there is only one VPC with the vpc_name
+# The VPC given by ID, else the only one named vpc_name. Given the ID (an
+# output of the vpc module), the lookups below wait for the VPC only when it
+# is being created, so the caller needs no depends_on on the whole vpc module.
 data "aws_vpc" "the_vpc" {
-  id = data.aws_vpcs.vpcs.ids[0]
+  id = coalesce(var.vpc_id, try(data.aws_vpcs.vpcs.ids[0], null))
 }
 
 # Let's get the availability zones for the region we are working on
@@ -106,7 +108,7 @@ data "aws_security_group" "local_traffic" {
 # we are going to use the same AZs used for the squid autoscaling group
 data "aws_autoscaling_group" "squid_auto" {
   count = var.ha_squid ? 1 : 0
-  name  = "squid-auto-${var.vpc_name}"
+  name  = var.squid_asg_name != "" ? var.squid_asg_name : "squid-auto-${var.vpc_name}"
 }
 
 data "aws_instances" "squid_proxy" {

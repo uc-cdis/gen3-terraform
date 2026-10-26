@@ -50,15 +50,22 @@ module "eks" {
     aws      = aws       # default account
     aws.csoc = aws.csoc  # satisfy aws.csoc in state/module
   }
-  depends_on                       = [module.vpc, aws_route_table.private_kube]
+  # The VPC and Squid come in as module.vpc outputs rather than through a
+  # depends_on on the whole module: with that, any pending change in vpc
+  # deferred every lookup in eks to apply time, and the plan replaced the
+  # cluster's subnets, security groups and route tables.
+  depends_on                       = [aws_route_table.private_kube]
   vpc_name                         = var.vpc_name
-  vpc_id                           = var.vpc_id
+  vpc_id                           = var.vpc_id != "" ? var.vpc_id : module.vpc.vpc_id
+  squid_asg_name                   = module.vpc.squid_auto
   ec2_keyname                      = var.ec2_keyname
   instance_type                    = var.instance_type
   peering_cidr                     = var.peering_cidr
   csoc_managed                     = var.csoc_managed
   secondary_cidr_block             = var.secondary_cidr_block
   users_policy                     = var.users_policy
+  # A CSOC has no user.yaml bucket policy to attach; see configbucket_reader below.
+  attach_users_bucket_policy       = false
   worker_drive_size                = var.worker_drive_size
   deploy_karpenter_in_k8s          = var.deploy_karpenter_in_k8s
   eks_version                      = var.eks_version
