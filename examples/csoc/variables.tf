@@ -313,20 +313,20 @@ variable "fips_enabled_ami" {
 # Without an ASG or Karpenter the cluster has no worker nodes. A standalone
 # CSOC is small and steady, so a fixed ASG is the simpler choice.
 variable "use_asg" {
-  default = true
+  default = false
 } 
 
 variable "use_karpenter" {
-  default = false
+  default = true
 }
 
 variable "deploy_karpenter_in_k8s" {
-  default = false
+  default = true
   description = "Allows you to enable the Karpenter Helm chart and associated resources without deploying the other parts of karpenter (i.e. the roles, permissions, and SQS queue)"
 }
 
 variable "karpenter_version" {
-  default = "1.0.8"
+  default = "1.9.0"
 }
 
 variable "spot_linked_role" {
@@ -351,7 +351,7 @@ variable "enable_vpc_endpoints" {
 }
 
 variable "k8s_bootstrap_resources" {
-  default = false
+  default = true
   description = "If set to true, creates resources for bootstrapping a kubernetes cluster (such as karpenter configs and helm releases)"
 }
 

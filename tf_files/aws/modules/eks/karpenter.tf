@@ -71,6 +71,8 @@ data "aws_iam_policy_document" "irsa" {
       "iam:PassRole",
       "iam:*InstanceProfile",
       "iam:ListInstanceProfiles",
+      "ec2:DescribeCapacityReservations",
+      "ec2:DescribeInstanceStatus",
       "ec2:DescribeImages",
       "ec2:RunInstances",
       "ec2:DescribeSubnets",
@@ -101,7 +103,7 @@ data "aws_iam_policy_document" "irsa" {
       "sqs:ReceiveMessage",
     ]
     effect   = "Allow"
-    resources = ["arn:aws:sqs:*:${local.account_id}:karpenter-sqs-vpc_name"]
+    resources = [aws_sqs_queue.this[0].arn]
   }
 
   statement {
@@ -309,12 +311,9 @@ resource "helm_release" "karpenter" {
   }
 
   set {
-    name  = "settings.aws.defaultInstanceProfile"
-    value = aws_iam_instance_profile.eks_node_instance_profile.id
-  }
-
-  set {
-    name  = "settings.aws.interruptionQueueName"
+    # Karpenter v1 names: settings.aws.* was removed, and the EC2NodeClass
+    # names the node role, so there is no default instance profile.
+    name  = "settings.interruptionQueue"
     value = aws_sqs_queue.this[0].name
   }
 
