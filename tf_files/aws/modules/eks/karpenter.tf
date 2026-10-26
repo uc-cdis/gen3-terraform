@@ -357,17 +357,14 @@ resource "kubectl_manifest" "karpenter_node_pool" {
           requirements:
           - key: karpenter.sh/capacity-type
             operator: In
-            values:
-            - on-demand
-            - spot
+            values: ${jsonencode(var.karpenter_capacity_types)}
           - key: kubernetes.io/arch
             operator: In
             values:
             - amd64
           - key: karpenter.k8s.aws/instance-category
             operator: In
-            values:
-            - r
+            values: ${jsonencode(var.karpenter_instance_categories)}
       disruption:
         consolidateAfter: 30s
         consolidationPolicy: WhenEmpty

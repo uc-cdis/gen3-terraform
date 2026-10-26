@@ -273,3 +273,13 @@ variable "ha_squid_single_instance" {
   description = "If true, deploy a single instance of squid in an autoscaling group"
   default     = false
 }
+
+variable "karpenter_capacity_types" {
+  description = "Capacity types the default NodePool may use: on-demand and/or spot."
+  default     = ["on-demand", "spot"]
+}
+
+variable "karpenter_instance_categories" {
+  description = "EC2 instance categories (the letter before the generation: c, m, r, t...) the default NodePool may use."
+  default     = ["r"]
+}

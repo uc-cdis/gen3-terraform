@@ -59,6 +59,10 @@ module "eks" {
   vpc_id                           = var.vpc_id != "" ? var.vpc_id : module.vpc.vpc_id
   squid_asg_name                   = module.vpc.squid_auto
   private_kube_subnet_id           = aws_subnet.private_kube.id
+  # The CSOC is a control plane: no spot interruptions, and no need for the
+  # memory-optimised r family a commons' default uses.
+  karpenter_capacity_types         = ["on-demand"]
+  karpenter_instance_categories    = ["c", "m", "t"]
   ec2_keyname                      = var.ec2_keyname
   instance_type                    = var.instance_type
   peering_cidr                     = var.peering_cidr
