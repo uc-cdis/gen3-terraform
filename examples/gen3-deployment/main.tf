@@ -9,72 +9,59 @@ provider "aws" {
 
 data "aws_caller_identity" "current" {}
 
-terraform {
-  backend "s3" {
-    # The bucket to store the Terraform state file in.
-    bucket = "<update with your own s3 bucket>" # Update to represent your environment
-    # The location of the Terraform state file within the bucket. Notice the bucket has to exist beforehand.
-    key = "gen3-commons/terraform.tfstate" # Update to represent your environment    
-    encrypt = "true"
-    # The region where the S3 bucket is located.
-    region = "<update with your region>"
-  }
-}
 
+
+# Updated locals block using variables
 locals {
   # This will be the name of the VPC, and will be used to identify most resources created within the module
-  vpc_name                      = "<update with your vpc name>"
+  vpc_name                      = var.vpc_name
   # The account number where the resources will be created in. This should be populated automatically through the AWS user/role you are using to run this module.
   account_number                = data.aws_caller_identity.current.account_id
   # The AWS region where the resources will be created in
-  aws_region                    = "<Update with your region>"  
+  aws_region                    = var.aws_region
   # The namespace your gen3 deployment will use. Default is good for first time deployments.
   ## If you want another deployment in the same cluster, copy paste the gen3 module block, create a new namespace local variable or manually update the namespace within the second instance of the module.
-  kubernetes_namespace          = "default"
+  kubernetes_namespace          = var.kubernetes_namespace
   # The availability zones where the resources will be created in. There should be 3 availability zones
   ## You can run aws ec2 describe-availability-zones --region <region> to get the list of availability zones in your region.
-  availability_zones            = ["<update with your availability zones>"] # ex. ["us-east-1a", "us-east-1c", "us-east-1d"]
+  availability_zones            = var.availability_zones
   # The hostname for your gen3 deployment. If you are creating another instance of the gen3 module set the hostname in it accordingly
-  hostname                      = "<update with your hostname>"
+  hostname                      = var.hostname
   # Service linked roles can only be created once per account. If you see an error that it is already created, set this to false.
-  es_linked_role                = true
+  es_linked_role                = var.es_linked_role
   # Service linked role for spot instances
-  spot_linked_role       = true
+  spot_linked_role              = var.spot_linked_role
   # The arn of the certificate in ACM
-  revproxy_arn                  = "<Update with your ACM certificate arn>"
+  revproxy_arn                  = var.revproxy_arn
   # Whether or not to create users/buckets needed for useryaml gitops management.
-  create_gitops_infra           = true
-  # THIS WILL OVERRIDE THE BUCKET CREATED AUTOMATICALLY, USE ONLY IF YOU WANT TO SUPPLY A BUCKET YOU'VE CREATED OUTSIDE OF THIS TERRAFORM!
-  user_supplied_users_bucket_name = ""
-  # The name of the S3 bucket where the user.yaml file will be stored. Notice this will be created by terraform, so you don't need to create it beforehand.
-  user_yaml_bucket_name = local.user_supplied_users_bucket_name != "" ? local.user_supplied_users_bucket_name : create_gitops_infra ? aws_s3_bucket.users_bucket.id : "YOU NEED TO SET A VALID BUCKET"
+  create_gitops_infra           = var.create_gitops_infra
+  # The name of the S3 bucket where the user.yaml file will be stored
+  user_yaml_bucket_name         = var.user_yaml_bucket_name
   # Your ssh key name to access the nodes in the EKS cluster
-  ssh_key                = ""
+  ssh_key                       = var.ssh_key
   # Set any tags you want to apply to all resources created by this module.
-  default_tags = {
-    Environment = local.vpc_name
-  }
-
+  default_tags = merge(var.default_tags, {
+    Environment = var.vpc_name
+  })
 
   ### Cognito setup
-  deploy_cognito = true
-  user_pool_name  = "${local.vpc_name}-pool"
-  app_client_name = "${local.vpc_name}-client"
-  domain_prefix = "${local.vpc_name}-auth"
-  callback_urls = [
-    "https://${local.hostname}/",
-    "https://${local.hostname}/login/",
-    "https://${local.hostname}/login/cognito/login/",
-    "https://${local.hostname}/user/",
-    "https://${local.hostname}/user/login/cognito/",
-    "https://${local.hostname}/user/login/cognito/login/",
+  deploy_cognito = var.deploy_cognito
+  user_pool_name = var.user_pool_name != null ? var.user_pool_name : "${var.vpc_name}-pool"
+  app_client_name = var.app_client_name != null ? var.app_client_name : "${var.vpc_name}-client"
+  domain_prefix = var.domain_prefix != null ? var.domain_prefix : "${var.vpc_name}-auth"
+  callback_urls = length(var.callback_urls) > 0 ? var.callback_urls : [
+    "https://${var.hostname}/",
+    "https://${var.hostname}/login/",
+    "https://${var.hostname}/login/cognito/login/",
+    "https://${var.hostname}/user/",
+    "https://${var.hostname}/user/login/cognito/",
   ]
-  logout_urls = [
-    "https://${local.hostname}/",
+  logout_urls = length(var.logout_urls) > 0 ? var.logout_urls : [
+    "https://${var.hostname}/",
   ]
-  allowed_oauth_flows  = ["code"]
-  allowed_oauth_scopes = ["email", "openid", "phone", "profile"]
-  supported_identity_providers = ["COGNITO"]
+  allowed_oauth_flows  = var.allowed_oauth_flows
+  allowed_oauth_scopes = var.allowed_oauth_scopes
+  supported_identity_providers = var.supported_identity_providers
 }
 
 module "commons" {
@@ -108,7 +95,7 @@ module "commons" {
   force_delete_bucket            = true
   enable_vpc_endpoints           = false
   cluster_engine_version         = "13"
-  user_yaml_bucket_name          = local.user_yaml_bucket_name
+  users_bucket_name              = local.user_yaml_bucket_name
 }
 
 module "gen3" {
