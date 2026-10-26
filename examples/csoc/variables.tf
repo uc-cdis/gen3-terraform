@@ -403,7 +403,17 @@ variable "organization_name" {
 
 variable "squid_image_search_criteria" {
   description = "Search criteria for squid AMI look up"
-  default = "amzn2-ami-hvm-*-x86_64-gp2"
+  default = "al2023-ami-2023*-x86_64"
+}
+
+variable "deploy_data_bucket" {
+  description = "Create a Gen3 commons data bucket (with its logs bucket, CloudTrail and fence-bot user). A CSOC does not need one."
+  default     = false
+}
+
+variable "data_bucket_name" {
+  description = "Name of the data bucket. Defaults to <vpc_name>-data-bucket-<account number>, since bucket names are global."
+  default     = ""
 }
 
 variable "squid_instance_drive_size" {
@@ -489,8 +499,8 @@ variable "commons_log_retention" {
 }
 
 variable "squid_image_ssm_parameter_name" {
-  description = "If provided, use this SSM parameter to get the AMI ID at launch time instead of squid_image_search_criteria"
-  default = "resolve:ssm:arn:aws:ssm:us-east-1:143731057154:parameter/gen3/squid-ami"
+  description = "If provided, use this SSM parameter to get the AMI ID at launch time instead of squid_image_search_criteria. The parameter must be readable from the deploying account."
+  default = ""
 }
   
 variable "force_delete_bucket" {

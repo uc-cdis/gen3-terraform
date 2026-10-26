@@ -59,15 +59,15 @@ output "cwlogs" {
 }
 
 output "fence-bot_id" {
-  value = module.fence-bot-user.fence-bot_id
+  value = one(module.fence-bot-user[*].fence-bot_id)
 }
 
 output "fence-bot_secret" {
-  value = module.fence-bot-user.fence-bot_secret
+  value = one(module.fence-bot-user[*].fence-bot_secret)
 }
 
 output "data-bucket_name" {
-  value = module.data-bucket.data-bucket_name
+  value = one(module.data-bucket[*].data-bucket_name)
 }
 
 output "squid_auto" {

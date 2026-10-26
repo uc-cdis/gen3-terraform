@@ -1,5 +1,10 @@
 variable "vpc_name" {}
 
+variable "bucket_name" {
+  description = "Name of the data bucket. Defaults to <vpc_name>-data-bucket; the logs bucket adds -logs."
+  default     = ""
+}
+
 variable "environment" {}
 
 variable "cloudwatchlogs_group" {}

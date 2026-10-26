@@ -112,6 +112,9 @@ module "vpc" {
   }
   ami_account_id                   = var.ami_account_id
   vpc_name                         = var.vpc_name
+  deploy_data_bucket               = var.deploy_data_bucket
+  # Bucket names are global: the account number keeps them from colliding.
+  data_bucket_name                 = var.data_bucket_name != "" ? var.data_bucket_name : "${var.vpc_name}-data-bucket-${local.account_number}"
   vpc_cidr_block                   = var.vpc_cidr_block
   secondary_cidr_block             = var.secondary_cidr_block
   vpc_flow_logs                    = var.vpc_flow_logs
