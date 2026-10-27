@@ -148,11 +148,11 @@ variable "instance_type" {
   default = "t3.large"
 }
 
-variable "jupyter_instance_type"{
+variable "jupyter_instance_type" {
   default = "t3.large"
 }
 
-variable "workflow_instance_type"{
+variable "workflow_instance_type" {
   default = "t3.2xlarge"
 }
 
@@ -189,7 +189,7 @@ variable "bootstrap_script" {
 }
 
 variable "jupyter_bootstrap_script" {
-  default =  "bootstrap.sh"
+  default = "bootstrap.sh"
 }
 
 variable "jupyter_worker_drive_size" {
@@ -197,7 +197,7 @@ variable "jupyter_worker_drive_size" {
 }
 
 variable "workflow_bootstrap_script" {
-  default =  "bootstrap.sh"
+  default = "bootstrap.sh"
 }
 
 variable "workflow_worker_drive_size" {
@@ -314,14 +314,14 @@ variable "fips_enabled_ami" {
 # CSOC is small and steady, so a fixed ASG is the simpler choice.
 variable "use_asg" {
   default = false
-} 
+}
 
 variable "use_karpenter" {
   default = true
 }
 
 variable "deploy_karpenter_in_k8s" {
-  default = true
+  default     = true
   description = "Allows you to enable the Karpenter Helm chart and associated resources without deploying the other parts of karpenter (i.e. the roles, permissions, and SQS queue)"
 }
 
@@ -351,7 +351,7 @@ variable "enable_vpc_endpoints" {
 }
 
 variable "k8s_bootstrap_resources" {
-  default = true
+  default     = true
   description = "If set to true, creates resources for bootstrapping a kubernetes cluster (such as karpenter configs and helm releases)"
 }
 
@@ -403,7 +403,7 @@ variable "organization_name" {
 
 variable "squid_image_search_criteria" {
   description = "Search criteria for squid AMI look up"
-  default = "al2023-ami-2023*-x86_64"
+  default     = "al2023-ami-2023*-x86_64"
 }
 
 variable "deploy_data_bucket" {
@@ -431,7 +431,7 @@ variable "squid_bootstrap_script" {
   default     = "squid_running_on_docker.sh"
 }
 
-variable  "deploy_single_proxy" {
+variable "deploy_single_proxy" {
   description = "Single instance plus HA"
   default     = false
 }
@@ -495,14 +495,14 @@ variable "send_logs_to_csoc" {
 
 variable "commons_log_retention" {
   description = "value in days for the cloudwatch log retention period"
-  default = "3653"
+  default     = "3653"
 }
 
 variable "squid_image_ssm_parameter_name" {
   description = "If provided, use this SSM parameter to get the AMI ID at launch time instead of squid_image_search_criteria. The parameter must be readable from the deploying account."
-  default = ""
+  default     = ""
 }
-  
+
 variable "force_delete_bucket" {
   description = "Force delete the data bucket"
   default     = false

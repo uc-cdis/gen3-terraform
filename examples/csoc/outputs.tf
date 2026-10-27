@@ -48,3 +48,7 @@ output "keycloak_hostname" {
 output "hosted_zone_id" {
   value = var.hosted_zone_id
 }
+
+output "external_dns_role_arn" {
+  value = aws_iam_role.irsa["external-dns"].arn
+}

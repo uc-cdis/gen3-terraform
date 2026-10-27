@@ -33,6 +33,8 @@ locals {
     ebs-csi          = { namespace = "kube-system", service_account = "ebs-csi-controller-sa" }
     external-secrets = { namespace = "external-secrets", service_account = "external-secrets" }
     csoc-api         = { namespace = var.csoc_namespace, service_account = var.csoc_service_account }
+    # Points each commons' hostname at its load balancer, in the zone below.
+    external-dns = { namespace = "external-dns", service_account = "external-dns" }
   }
 
   # The CSOC's secrets: the GitHub App key, Keycloak's admin login and client
@@ -232,4 +234,25 @@ resource "aws_acm_certificate_validation" "csoc" {
   count                   = local.create_certificate ? 1 : 0
   certificate_arn         = aws_acm_certificate.csoc[0].arn
   validation_record_fqdns = [for r in aws_route53_record.csoc_cert_validation : r.fqdn]
+}
+
+# external-dns writes the DNS records for the commons the CSOC deploys:
+# only in the CSOC's zone, and only records it owns (TXT ownership).
+data "aws_iam_policy_document" "external_dns" {
+  count = var.hosted_zone_id != "" ? 1 : 0
+  statement {
+    actions   = ["route53:ChangeResourceRecordSets", "route53:ListResourceRecordSets", "route53:ListTagsForResource"]
+    resources = ["arn:${data.aws_partition.current.partition}:route53:::hostedzone/${var.hosted_zone_id}"]
+  }
+  statement {
+    actions   = ["route53:ListHostedZones", "route53:ListHostedZonesByName"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "external_dns" {
+  count  = var.hosted_zone_id != "" ? 1 : 0
+  name   = "commons-dns"
+  role   = aws_iam_role.irsa["external-dns"].id
+  policy = data.aws_iam_policy_document.external_dns[0].json
 }
