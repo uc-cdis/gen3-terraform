@@ -548,6 +548,12 @@ variable "hosted_zone_id" {
   default     = ""
 }
 
+variable "create_certificate" {
+  description = "Request and validate the certificate here when certificate_arn is empty. The bootstrap wizard sets false: it gets the certificate after the apply (requested, imported or existing), so a zone that is missing or not yet delegated cannot fail the apply"
+  type        = bool
+  default     = true
+}
+
 variable "certificate_arn" {
   description = "Existing ACM certificate covering csoc_hostname and keycloak_hostname. When empty and hosted_zone_id is set, one is created"
   type        = string

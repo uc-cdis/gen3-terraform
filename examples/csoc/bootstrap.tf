@@ -25,7 +25,7 @@ locals {
   csoc_hostname = var.csoc_hostname != "" ? var.csoc_hostname : var.hostname
   cert_names    = compact([local.csoc_hostname, var.keycloak_hostname])
 
-  create_certificate = var.certificate_arn == "" && var.hosted_zone_id != "" && local.csoc_hostname != ""
+  create_certificate = var.create_certificate && var.certificate_arn == "" && var.hosted_zone_id != "" && local.csoc_hostname != ""
   certificate_arn    = local.create_certificate ? aws_acm_certificate_validation.csoc[0].certificate_arn : var.certificate_arn
 
   irsa = {
