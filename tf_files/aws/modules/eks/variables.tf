@@ -23,11 +23,11 @@ variable "instance_type" {
   default = "t3.large"
 }
 
-variable "jupyter_instance_type"{
+variable "jupyter_instance_type" {
   default = "t3.large"
 }
 
-variable "workflow_instance_type"{
+variable "workflow_instance_type" {
   default = "t3.2xlarge"
 }
 
@@ -75,7 +75,7 @@ variable "bootstrap_script" {
 }
 
 variable "jupyter_bootstrap_script" {
-  default =  "bootstrap.sh"
+  default = "bootstrap.sh"
 }
 
 variable "jupyter_worker_drive_size" {
@@ -83,7 +83,7 @@ variable "jupyter_worker_drive_size" {
 }
 
 variable "workflow_bootstrap_script" {
-  default =  "bootstrap.sh"
+  default = "bootstrap.sh"
 }
 
 variable "workflow_worker_drive_size" {
@@ -204,14 +204,14 @@ variable "fips_enabled_ami" {
 
 variable "use_asg" {
   default = true
-} 
+}
 
 variable "use_karpenter" {
   default = false
 }
 
 variable "deploy_karpenter_in_k8s" {
-  default = false
+  default     = false
   description = "Allows you to enable the Karpenter Helm chart and associated resources without deploying the other parts of karpenter (i.e. the roles, permissions, and SQS queue)"
 }
 
@@ -241,7 +241,7 @@ variable "enable_vpc_endpoints" {
 }
 
 variable "k8s_bootstrap_resources" {
-  default = false
+  default     = false
   description = "If set to true, creates resources for bootstrapping a kubernetes cluster (such as karpenter configs and helm releases)"
 }
 
@@ -282,6 +282,11 @@ variable "karpenter_capacity_types" {
 variable "karpenter_instance_categories" {
   description = "EC2 instance categories (the letter before the generation: c, m, r, t...) the default NodePool may use."
   default     = ["r"]
+}
+
+variable "karpenter_min_instance_generation" {
+  description = "If set, the default NodePool only uses instance generations above this (\"4\": c5/m5 and newer). Empty: any generation."
+  default     = ""
 }
 
 # IDs of what the vpc module created, so the lookups here wait for each.

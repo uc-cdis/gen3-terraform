@@ -365,6 +365,11 @@ resource "kubectl_manifest" "karpenter_node_pool" {
           - key: karpenter.k8s.aws/instance-category
             operator: In
             values: ${jsonencode(var.karpenter_instance_categories)}
+          %{ if var.karpenter_min_instance_generation != "" }
+          - key: karpenter.k8s.aws/instance-generation
+            operator: Gt
+            values: ["${var.karpenter_min_instance_generation}"]
+          %{ endif }
       disruption:
         consolidateAfter: 30s
         consolidationPolicy: WhenEmpty
