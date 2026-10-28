@@ -180,11 +180,47 @@ resource "aws_iam_role_policy_attachment" "csoc_api_extra" {
   policy_arn = each.value
 }
 
+# The add-on is created only once its controller runs. On EC2 that waited for
+# Karpenter's first node, the apply's last minutes; on Fargate it starts with
+# the cluster. Only the controller: the per-node DaemonSet runs on EC2 nodes
+# as Karpenter starts them.
+resource "aws_iam_role" "fargate_system" {
+  name = "${var.vpc_name}-fargate-system"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "eks-fargate-pods.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "fargate_system" {
+  role       = aws_iam_role.fargate_system.name
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy"
+}
+
+resource "aws_eks_fargate_profile" "ebs_csi" {
+  cluster_name           = module.eks.cluster_name
+  fargate_profile_name   = "ebs-csi-controller"
+  pod_execution_role_arn = aws_iam_role.fargate_system.arn
+  subnet_ids             = module.eks.private_subnet_ids
+  selector {
+    namespace = "kube-system"
+    labels    = { app = "ebs-csi-controller" }
+  }
+  # EKS creates one Fargate profile at a time per cluster; the provider
+  # retries while Karpenter's is being created. Not depending on the whole
+  # module is the point: that would wait for Karpenter again.
+  depends_on = [aws_iam_role_policy_attachment.fargate_system]
+}
+
 resource "aws_eks_addon" "ebs_csi" {
   cluster_name             = module.eks.cluster_name
   addon_name               = "aws-ebs-csi-driver"
   service_account_role_arn = aws_iam_role.irsa["ebs-csi"].arn
-  depends_on               = [aws_iam_role_policy_attachment.ebs_csi]
+  depends_on               = [aws_iam_role_policy_attachment.ebs_csi, aws_eks_fargate_profile.ebs_csi]
 }
 
 # Extra principals (an SSO admin role, say) that should be able to kubectl

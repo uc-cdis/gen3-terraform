@@ -31,3 +31,8 @@ output "karpenter_deployed" {
 output "cluster_oidc_provider_arn" {
   value = aws_iam_openid_connect_provider.identity_provider[0].arn
 }
+
+output "private_subnet_ids" {
+  description = "The cluster's private subnets (where Fargate pods run)"
+  value       = local.eks_priv_subnets
+}
