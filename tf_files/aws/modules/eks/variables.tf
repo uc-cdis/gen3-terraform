@@ -280,7 +280,7 @@ variable "karpenter_capacity_types" {
 }
 
 variable "karpenter_instance_categories" {
-  description = "EC2 instance categories (the letter before the generation: c, m, r, t...) the default NodePool may use."
+  description = "EC2 instance categories (the letter before the generation: c, m, r, t...) the default NodePool may use. Empty: any category."
   default     = ["r"]
 }
 

@@ -362,9 +362,11 @@ resource "kubectl_manifest" "karpenter_node_pool" {
             operator: In
             values:
             - amd64
+          %{ if length(var.karpenter_instance_categories) > 0 }
           - key: karpenter.k8s.aws/instance-category
             operator: In
             values: ${jsonencode(var.karpenter_instance_categories)}
+          %{ endif }
           %{ if var.karpenter_min_instance_generation != "" }
           - key: karpenter.k8s.aws/instance-generation
             operator: Gt

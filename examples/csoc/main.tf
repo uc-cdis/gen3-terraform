@@ -63,14 +63,14 @@ module "eks" {
   local_security_group_id          = module.vpc.security_group_local_id
   vpc_zone_id                      = module.vpc.zone_zid
   private_kube_subnet_id           = aws_subnet.private_kube.id
-  # The CSOC is a control plane: no spot interruptions, and no need for the
-  # memory-optimised r family a commons' default uses. Karpenter picks the
-  # cheapest type that fits, and for the first small pods that was a
-  # t3a.nano (0.5 GiB) or an m1.small, neither of which ever registered;
-  # Karpenter retries only after 15 minutes. So: c and m, generation 5 and
-  # newer (the smallest, c7a.medium, has 2 GiB and joins in under a minute).
-  karpenter_capacity_types         = ["on-demand"]
-  karpenter_instance_categories    = ["c", "m"]
+  # The CSOC is a control plane: no spot interruptions.
+  # Any instance family: Karpenter picks the cheapest type that fits. Only
+  # old generations are excluded: for the first small pods Karpenter chose a
+  # t3a.nano (0.5 GiB) or an m1.small, neither of which ever registered, and
+  # it retries only after 15 minutes. Generation 5 and newer joins in under
+  # a minute.
+  karpenter_capacity_types          = ["on-demand"]
+  karpenter_instance_categories     = []
   karpenter_min_instance_generation = "4"
   ec2_keyname                      = var.ec2_keyname
   instance_type                    = var.instance_type
