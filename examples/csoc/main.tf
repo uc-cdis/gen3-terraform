@@ -64,14 +64,15 @@ module "eks" {
   vpc_zone_id                      = module.vpc.zone_zid
   private_kube_subnet_id           = aws_subnet.private_kube.id
   # The CSOC is a control plane: no spot interruptions.
-  # Any instance family: Karpenter picks the cheapest type that fits. Only
-  # old generations are excluded: for the first small pods Karpenter chose a
-  # t3a.nano (0.5 GiB) or an m1.small, neither of which ever registered, and
-  # it retries only after 15 minutes. Generation 5 and newer joins in under
-  # a minute.
+  # Any instance family: Karpenter picks the cheapest type that fits. For
+  # the first small pods that was a nano or an old m1.small (t3a.nano,
+  # t8i.nano, m1.small), and none of them ever registered; Karpenter retries
+  # only after 15 minutes. So: generation 5 and newer, and more than 3000 MiB
+  # (4 GiB and up).
   karpenter_capacity_types          = ["on-demand"]
   karpenter_instance_categories     = []
   karpenter_min_instance_generation = "4"
+  karpenter_min_instance_memory_mib = "3000"
   ec2_keyname                      = var.ec2_keyname
   instance_type                    = var.instance_type
   peering_cidr                     = var.peering_cidr

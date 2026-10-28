@@ -284,6 +284,11 @@ variable "karpenter_instance_categories" {
   default     = ["r"]
 }
 
+variable "karpenter_min_instance_memory_mib" {
+  description = "If set, the default NodePool only uses instance types with more memory than this, in MiB (\"3000\": 4 GiB and up). Empty: any size."
+  default     = ""
+}
+
 variable "karpenter_min_instance_generation" {
   description = "If set, the default NodePool only uses instance generations above this (\"4\": c5/m5 and newer). Empty: any generation."
   default     = ""
