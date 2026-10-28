@@ -52,3 +52,8 @@ output "hosted_zone_id" {
 output "external_dns_role_arn" {
   value = aws_iam_role.irsa["external-dns"].arn
 }
+
+output "ebs_csi_role_arn" {
+  description = "IRSA role for the EBS CSI driver, which the CSOC install deploys with Helm."
+  value       = aws_iam_role.irsa["ebs-csi"].arn
+}

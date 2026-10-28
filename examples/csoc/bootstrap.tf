@@ -180,12 +180,10 @@ resource "aws_iam_role_policy_attachment" "csoc_api_extra" {
   policy_arn = each.value
 }
 
-resource "aws_eks_addon" "ebs_csi" {
-  cluster_name             = module.eks.cluster_name
-  addon_name               = "aws-ebs-csi-driver"
-  service_account_role_arn = aws_iam_role.irsa["ebs-csi"].arn
-  depends_on               = [aws_iam_role_policy_attachment.ebs_csi]
-}
+# The EBS CSI driver itself is not here: the CSOC install puts it in with
+# Helm (release ebs-csi-driver in kube-system, as gen3-helm's
+# cluster-level-resources does), using the role above. As an EKS add-on it
+# made the apply wait about 7 minutes for Karpenter's first node.
 
 # Extra principals (an SSO admin role, say) that should be able to kubectl
 # into the cluster. Whoever runs this Terraform is already an admin.
