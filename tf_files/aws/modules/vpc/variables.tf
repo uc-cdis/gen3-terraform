@@ -5,6 +5,16 @@ variable "ami_account_id" {
 
 variable "vpc_name" {}
 
+variable "deploy_data_bucket" {
+  description = "Create the commons data bucket, its logs bucket, CloudTrail and the fence-bot user."
+  default     = true
+}
+
+variable "data_bucket_name" {
+  description = "Name of the data bucket. Defaults to <vpc_name>-data-bucket."
+  default     = ""
+}
+
 variable "vpc_cidr_block" {
   default = "172.24.17.0/20"
 }

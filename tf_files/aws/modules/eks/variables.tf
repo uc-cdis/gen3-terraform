@@ -4,6 +4,11 @@ variable "vpc_id" {
   default = ""
 }
 
+variable "squid_asg_name" {
+  description = "The Squid autoscaling group, e.g. the vpc module's squid_auto output. Defaults to squid-auto-<vpc_name>."
+  default     = ""
+}
+
 variable "csoc_account_id" {
   default = "433568766270"
 }
@@ -18,11 +23,11 @@ variable "instance_type" {
   default = "t3.large"
 }
 
-variable "jupyter_instance_type"{
+variable "jupyter_instance_type" {
   default = "t3.large"
 }
 
-variable "workflow_instance_type"{
+variable "workflow_instance_type" {
   default = "t3.2xlarge"
 }
 
@@ -43,6 +48,11 @@ variable "private_kube_subnet_id" {
 }
 
 variable "users_policy" {}
+
+variable "attach_users_bucket_policy" {
+  description = "Attach bucket_reader_cdis-gen3-users_<vpc_name>, which the commons VPC deployment creates, to the worker role."
+  default     = true
+}
 
 variable "worker_drive_size" {
   default = 30
@@ -65,7 +75,7 @@ variable "bootstrap_script" {
 }
 
 variable "jupyter_bootstrap_script" {
-  default =  "bootstrap.sh"
+  default = "bootstrap.sh"
 }
 
 variable "jupyter_worker_drive_size" {
@@ -73,7 +83,7 @@ variable "jupyter_worker_drive_size" {
 }
 
 variable "workflow_bootstrap_script" {
-  default =  "bootstrap.sh"
+  default = "bootstrap.sh"
 }
 
 variable "workflow_worker_drive_size" {
@@ -194,14 +204,14 @@ variable "fips_enabled_ami" {
 
 variable "use_asg" {
   default = true
-} 
+}
 
 variable "use_karpenter" {
   default = false
 }
 
 variable "deploy_karpenter_in_k8s" {
-  default = false
+  default     = false
   description = "Allows you to enable the Karpenter Helm chart and associated resources without deploying the other parts of karpenter (i.e. the roles, permissions, and SQS queue)"
 }
 
@@ -231,7 +241,7 @@ variable "enable_vpc_endpoints" {
 }
 
 variable "k8s_bootstrap_resources" {
-  default = false
+  default     = false
   description = "If set to true, creates resources for bootstrapping a kubernetes cluster (such as karpenter configs and helm releases)"
 }
 
@@ -262,4 +272,43 @@ variable "karpenter_ami_owner" {
 variable "ha_squid_single_instance" {
   description = "If true, deploy a single instance of squid in an autoscaling group"
   default     = false
+}
+
+variable "karpenter_capacity_types" {
+  description = "Capacity types the default NodePool may use: on-demand and/or spot."
+  default     = ["on-demand", "spot"]
+}
+
+variable "karpenter_instance_categories" {
+  description = "EC2 instance categories (the letter before the generation: c, m, r, t...) the default NodePool may use. Empty: any category."
+  default     = ["r"]
+}
+
+variable "karpenter_min_instance_memory_mib" {
+  description = "If set, the default NodePool only uses instance types with more memory than this, in MiB (\"3000\": 4 GiB and up). Empty: any size."
+  default     = ""
+}
+
+variable "karpenter_min_instance_generation" {
+  description = "If set, the default NodePool only uses instance generations above this (\"4\": c5/m5 and newer). Empty: any generation."
+  default     = ""
+}
+
+# IDs of what the vpc module created, so the lookups here wait for each.
+# Empty: found by name and tag, as before.
+variable "nat_gateway_id" {
+  default = ""
+}
+
+variable "public_route_table_id" {
+  default = ""
+}
+
+variable "local_security_group_id" {
+  default = ""
+}
+
+variable "vpc_zone_id" {
+  description = "The VPC's private internal.io zone."
+  default     = ""
 }

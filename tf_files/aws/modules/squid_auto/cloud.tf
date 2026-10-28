@@ -112,7 +112,9 @@ Content-Type: multipart/mixed; boundary="BOUNDARY"
 Content-Type: text/x-shellscript; charset="us-ascii"
 
 #!/bin/bash
-EC2_INSTANCE_ID="`wget -q -O - http://169.254.169.254/latest/meta-data/instance-id`"
+# IMDSv2, which Amazon Linux 2023 requires; IMDSv1 images accept it too.
+IMDS_TOKEN="$(curl -s -X PUT http://169.254.169.254/latest/api/token -H 'X-aws-ec2-metadata-token-ttl-seconds: 300')"
+EC2_INSTANCE_ID="$(curl -s -H "X-aws-ec2-metadata-token: $IMDS_TOKEN" http://169.254.169.254/latest/meta-data/instance-id)"
 aws ec2 modify-instance-attribute --no-source-dest-check --instance-id $EC2_INSTANCE_ID --region ${data.aws_region.current.name}
 DISTRO=$(awk -F '[="]*' '/^NAME/ { print $2 }' < /etc/os-release)
 USER="ubuntu"

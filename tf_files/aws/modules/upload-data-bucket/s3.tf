@@ -1,11 +1,16 @@
 
+# Bucket names are global across AWS, so a deployment can pick its own.
+locals {
+  data_bucket_name = var.bucket_name != "" ? var.bucket_name : "${var.vpc_name}-data-bucket"
+}
+
 ## The actual data bucket
 resource "aws_s3_bucket" "data_bucket" {
-  bucket = "${var.vpc_name}-data-bucket"
+  bucket = local.data_bucket_name
   force_destroy = var.force_delete_bucket
 
   tags = {
-    Name        = "${var.vpc_name}-data-bucket"
+    Name        = local.data_bucket_name
     Environment = var.environment
     Purpose     = "data bucket"
   }
@@ -28,7 +33,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "data_bucket" {
 resource "aws_s3_bucket_logging" "data_bucket" {
   bucket        = aws_s3_bucket.data_bucket.id
   target_bucket = aws_s3_bucket.log_bucket.id
-  target_prefix = "log/${var.vpc_name}-data-bucket/"
+  target_prefix = "log/${local.data_bucket_name}/"
 }
 
 resource "aws_s3_bucket_public_access_block" "data_bucket_privacy" {
@@ -54,7 +59,7 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
 
 ## Log bucket, where access to the avobe bucket will be logged
 resource "aws_s3_bucket" "log_bucket" {
-  bucket = "${var.vpc_name}-data-bucket-logs"
+  bucket = "${local.data_bucket_name}-logs"
   force_destroy = var.force_delete_bucket
 
   tags = {

@@ -44,9 +44,13 @@ module "squid-auto" {
   healthcheck_script_file        = var.squid_healthcheck_script_file 
 }
 
+# The data bucket, and the fence-bot user that reads it, belong to a Gen3
+# commons. A deployment that has no use for them (a CSOC) can leave them out.
 module "data-bucket" {
+  count                  = var.deploy_data_bucket ? 1 : 0
   source                 = "../upload-data-bucket"
   vpc_name               = var.vpc_name
+  bucket_name            = var.data_bucket_name
   cloudwatchlogs_group   = aws_cloudwatch_log_group.main_log_group.arn
   environment            = var.vpc_name
   deploy_cloud_trail     = var.deploy_cloud_trail
@@ -56,9 +60,10 @@ module "data-bucket" {
 }
 
 module "fence-bot-user" {
+  count                = var.deploy_data_bucket ? 1 : 0
   source               = "../fence-bot-user"
   vpc_name             = var.vpc_name
-  bucket_name          = module.data-bucket.data-bucket_name
+  bucket_name          = module.data-bucket[0].data-bucket_name
   bucket_access_arns   = var.fence-bot_bucket_access_arns
 }
 
@@ -329,4 +334,15 @@ resource "aws_iam_user" "es_user" {
 resource "aws_iam_access_key" "es_user_key" {
   count     = var.role_arn == "" ? 1 : 0
   user = aws_iam_user.es_user[0].name
+}
+
+# Both modules took a count; existing deployments keep their resources.
+moved {
+  from = module.data-bucket
+  to   = module.data-bucket[0]
+}
+
+moved {
+  from = module.fence-bot-user
+  to   = module.fence-bot-user[0]
 }

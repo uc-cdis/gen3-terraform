@@ -445,8 +445,11 @@ resource "aws_iam_role_policy_attachment" "asg_access" {
   role       = aws_iam_role.eks_node_role.name
 }
 
-# This one must have been created when we deployed the VPC resources
+# This one must have been created when we deployed the VPC resources: the
+# commons' read access to its user.yaml in cdis-gen3-users. A deployment
+# without one (a CSOC) leaves it out.
 resource "aws_iam_role_policy_attachment" "bucket_read" {
+  count      = var.attach_users_bucket_policy ? 1 : 0
   policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/bucket_reader_cdis-gen3-users_${var.vpc_name}"
   role       = aws_iam_role.eks_node_role.name
 }
@@ -631,4 +634,9 @@ resource "aws_iam_openid_connect_provider" "identity_provider" {
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = "${var.oidc_eks_thumbprint}"
   depends_on      = [aws_eks_cluster.eks_cluster]
+}
+
+moved {
+  from = aws_iam_role_policy_attachment.bucket_read
+  to   = aws_iam_role_policy_attachment.bucket_read[0]
 }

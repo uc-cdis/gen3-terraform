@@ -71,6 +71,8 @@ data "aws_iam_policy_document" "irsa" {
       "iam:PassRole",
       "iam:*InstanceProfile",
       "iam:ListInstanceProfiles",
+      "ec2:DescribeCapacityReservations",
+      "ec2:DescribeInstanceStatus",
       "ec2:DescribeImages",
       "ec2:RunInstances",
       "ec2:DescribeSubnets",
@@ -101,7 +103,7 @@ data "aws_iam_policy_document" "irsa" {
       "sqs:ReceiveMessage",
     ]
     effect   = "Allow"
-    resources = ["arn:aws:sqs:*:${local.account_id}:karpenter-sqs-vpc_name"]
+    resources = [aws_sqs_queue.this[0].arn]
   }
 
   statement {
@@ -292,6 +294,10 @@ resource "helm_release" "karpenter" {
   # repository_password = data.aws_ecrpublic_authorization_token.token.password
   chart               = "karpenter"
   version             = var.karpenter_version
+  # On a new VPC the controller's image pull waits for the squid gw_checks
+  # lambda to give the private subnets their default route, and then for the
+  # pull back-off: five minutes (the default) is not always enough.
+  timeout             = 900
 
   set {
     name  = "settings.clusterName"
@@ -309,12 +315,9 @@ resource "helm_release" "karpenter" {
   }
 
   set {
-    name  = "settings.aws.defaultInstanceProfile"
-    value = aws_iam_instance_profile.eks_node_instance_profile.id
-  }
-
-  set {
-    name  = "settings.aws.interruptionQueueName"
+    # Karpenter v1 names: settings.aws.* was removed, and the EC2NodeClass
+    # names the node role, so there is no default instance profile.
+    name  = "settings.interruptionQueue"
     value = aws_sqs_queue.this[0].name
   }
 
@@ -354,17 +357,26 @@ resource "kubectl_manifest" "karpenter_node_pool" {
           requirements:
           - key: karpenter.sh/capacity-type
             operator: In
-            values:
-            - on-demand
-            - spot
+            values: ${jsonencode(var.karpenter_capacity_types)}
           - key: kubernetes.io/arch
             operator: In
             values:
             - amd64
+          %{ if length(var.karpenter_instance_categories) > 0 }
           - key: karpenter.k8s.aws/instance-category
             operator: In
-            values:
-            - r
+            values: ${jsonencode(var.karpenter_instance_categories)}
+          %{ endif }
+          %{ if var.karpenter_min_instance_memory_mib != "" }
+          - key: karpenter.k8s.aws/instance-memory
+            operator: Gt
+            values: ["${var.karpenter_min_instance_memory_mib}"]
+          %{ endif }
+          %{ if var.karpenter_min_instance_generation != "" }
+          - key: karpenter.k8s.aws/instance-generation
+            operator: Gt
+            values: ["${var.karpenter_min_instance_generation}"]
+          %{ endif }
       disruption:
         consolidateAfter: 30s
         consolidationPolicy: WhenEmpty
