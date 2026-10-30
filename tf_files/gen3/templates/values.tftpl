@@ -204,6 +204,14 @@ sheepdog:
 
 ssjdispatcher:
   enabled: ${ssjdispatcher_enabled}
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: "${ssjdispatcher_service_account}"
+  jobServiceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: "${ssjdispatcher_service_account}"
+  externalSecrets:
+    credsFile: "${ssjdispatcher_secret_name}"
 
 sower:
   enabled: ${sower_enabled}

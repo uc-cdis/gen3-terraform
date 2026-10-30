@@ -258,6 +258,12 @@ variable "ssjdispatcher_enabled" {
   default     = false
 }
 
+variable "ssjdispatcher_configure_bucket_notifications" {
+  description = "Configure the upload bucket's S3 event notification to publish to the ssjdispatcher SNS topic. AWS allows one notification config per bucket, so set to false if the bucket already has one"
+  type        = bool
+  default     = true
+}
+
 variable "sower_enabled" {
   description = "Enable sower"
   type        = bool

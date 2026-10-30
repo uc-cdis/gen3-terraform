@@ -894,4 +894,61 @@ resource "aws_iam_role_policy_attachment" "efs-csi-node-efs-utils-policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonElasticFileSystemsUtils"
 }
 
-# TODO Add ssjdispatcher
+resource "aws_iam_role" "ssjdispatcher-role" {
+  count = var.ssjdispatcher_enabled ? 1 : 0
+  name = "${var.vpc_name}-${var.namespace}-ssjdispatcher-sa"
+  description = "Role for ssjdispatcher service account for ${var.vpc_name}"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      },
+      {
+        Sid = ""
+        Effect = "Allow"
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.oidc_provider_arn}"
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${var.oidc_provider_arn}:sub" = [
+              "system:serviceaccount:${var.namespace}:ssjdispatcher-sa",
+              "system:serviceaccount:${var.namespace}:ssjdispatcher-job-sa"
+            ]
+            "${var.oidc_provider_arn}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+  path = "/gen3_service/"
+}
+
+resource "aws_iam_role_policy" "ssjdispatcher-role-policy" {
+  count = var.ssjdispatcher_enabled ? 1 : 0
+  name = "ssjdispatcher-role-policy"
+  role = aws_iam_role.ssjdispatcher-role[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "sqs:ReceiveMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:DeleteMessage"
+        ]
+        Effect   = "Allow"
+        Resource = [
+          local.ssjdispatcher_sqs_arn
+        ]
+      }
+    ]
+  })
+}

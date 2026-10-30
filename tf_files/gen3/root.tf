@@ -53,6 +53,8 @@ locals {
       slack_send_dbgap = var.slack_send_dbgap
       slack_webhook = var.slack_webhook
       ssjdispatcher_enabled = var.ssjdispatcher_enabled
+      ssjdispatcher_secret_name = var.ssjdispatcher_enabled ? aws_secretsmanager_secret.ssjdispatcher_creds[0].name : null
+      ssjdispatcher_service_account = var.ssjdispatcher_enabled ? aws_iam_role.ssjdispatcher-role[0].arn : null
       sower_enabled = var.sower_enabled
       tier_access_level = var.tier_access_level
       tier_access_limit = var.tier_access_limit

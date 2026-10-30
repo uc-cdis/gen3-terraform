@@ -10,3 +10,7 @@ output "sns-topic-arn" {
 output "sqs-url" {
   value = aws_sqs_queue.user_updates_queue.id
 }
+
+output "sqs-arn" {
+  value = aws_sqs_queue.user_updates_queue.arn
+}

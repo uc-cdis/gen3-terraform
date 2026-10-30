@@ -50,3 +50,40 @@ resource "aws_secretsmanager_secret_version" "fence-jwt-keys" {
   secret_id     = aws_secretsmanager_secret.fence-jwt-keys.id
   secret_string = tls_private_key.fence-jwt-keys.private_key_pem
 }
+
+resource "aws_secretsmanager_secret" "ssjdispatcher_creds" {
+  count = var.ssjdispatcher_enabled ? 1 : 0
+  name  = "${var.vpc_name}-${var.namespace}-ssjdispatcher-creds"
+}
+
+resource "aws_secretsmanager_secret_version" "ssjdispatcher_creds" {
+  count     = var.ssjdispatcher_enabled ? 1 : 0
+  secret_id = aws_secretsmanager_secret.ssjdispatcher_creds[0].id
+  secret_string = jsonencode({
+    SQS = {
+      url = local.ssjdispatcher_sqs_url
+    }
+    JOBS = [
+      {
+        name    = "indexing"
+        pattern = var.upload_bucket != "" ? "s3://${var.upload_bucket}/*" : "s3://REPLACE_WITH_UPLOAD_BUCKET/*"
+        imageConfig = {
+          url      = "http://indexd-service/index"
+          username = "ssj"
+          password = "REPLACE_WITH_INDEXD_SSJ_PASSWORD"
+          metadataService = {
+            url      = "http://revproxy-service/mds"
+            username = "gateway"
+            password = "REPLACE_WITH_METADATA_GATEWAY_PASSWORD"
+          }
+        }
+        RequestCPU = "500m"
+        RequestMem = "0.5Gi"
+      }
+    ]
+  })
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
