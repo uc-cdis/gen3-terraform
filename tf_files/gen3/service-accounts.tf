@@ -278,13 +278,16 @@ resource "aws_iam_role_policy" "hatchery-role-policy" {
         Resource = ["arn:aws:iam::*:role/hatchery-shared-*"]
       },
       {
-        # s3:HeadObject and s3:PutObject for .keep placeholder files written by
-        # ensureKeepFiles in sharedworkspace.go before mounting workspace volumes.
+        # .keep placeholder files written by ensureKeepFiles in sharedworkspace.go
+        # before mounting workspace volumes. s3:HeadObject is not an IAM action:
+        # HeadObject is authorized by s3:GetObject, and S3 only returns 404 (not
+        # 403) for a missing key when the caller also has s3:ListBucket.
         Sid    = "SharedWorkspaceKeepFiles"
         Effect = "Allow"
         Action = [
-          "s3:HeadObject",
+          "s3:GetObject",
           "s3:PutObject",
+          "s3:ListBucket",
         ]
         Resource = [
           "arn:aws:s3:::*${var.vpc_name}*",
