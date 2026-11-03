@@ -26,7 +26,7 @@ vpn_server_subnet = "10.128.15.0/25"
 csoc_vpn_subnet = "192.168.4.0/24"
 # prod: "192.168.6.0/24"
 
-# Network clients need to reach. Also the only CIDR allowed to ssh to the instances
+# Network clients need to reach
 csoc_vm_subnet = "10.128.7.0/24"
 # prod: "10.128.0.0/20"
 
@@ -35,7 +35,6 @@ env_pub_subnet_routetable_id = "rtb-1cb66860"
 
 csoc_planx_dns_zone_id = "ZG153R4AYDHHK"
 
-ssh_key_name = "qureshi@uchicago.edu"
 
 cwl_group_name = "planx_dev_openvpn_log_group"
 # prod: "planx_prod_openvpn_log_group"

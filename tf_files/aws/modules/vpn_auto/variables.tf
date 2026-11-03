@@ -19,7 +19,7 @@ variable "csoc_vpn_subnet" {
 }
 
 variable "csoc_vm_subnet" {
-  description = "Network the VPN clients need to reach. Also the only CIDR allowed to ssh in, ie 10.128.7.0/24"
+  description = "Network the VPN clients need to reach, ie 10.128.7.0/24"
 }
 
 variable "env_pub_subnet_routetable_id" {
@@ -50,10 +50,6 @@ variable "dns_record_name" {
 variable "dns_record_ttl" {
   description = "TTL on the CNAME. Keep it low around a cutover"
   default     = 300
-}
-
-variable "ssh_key_name" {
-  description = "Name of the aws_key_pair to attach to the instances"
 }
 
 variable "cwl_group_name" {

@@ -27,7 +27,8 @@ terraform apply -var-file=config.tfvars
 The module creates, per environment:
 
 - Per-AZ public subnets carved out of `vpn_server_subnet` as `/28`s
-- An internet facing NLB with listeners on 1194 (OpenVPN), 443 (TOTP QR codes) and 22 (ssh)
+- An internet facing NLB with a single listener, 1194 (OpenVPN). Nothing else is exposed:
+  no ssh, and no https (QR codes and client zips are delivered as S3 presigned URLs)
 - A launch template running AL2023, plus an ASG of one instance
 - An S3 bucket holding the PKI, versioned and encrypted
 - An IAM role granting CloudWatch Logs, that bucket, and Session Manager
@@ -64,7 +65,7 @@ Both environments live in `vpc-e2b51d99`.
 |---|---|---|
 | `vpn_server_subnet` (the instances) | `10.128.15.0/25` | `10.128.15.128/25` |
 | `csoc_vpn_subnet` (VPN clients) | `192.168.4.0/24` | `192.168.6.0/24` |
-| `csoc_vm_subnet` (reachable network, ssh source) | `10.128.7.0/24` | `10.128.0.0/20` |
+| `csoc_vm_subnet` (reachable network) | `10.128.7.0/24` | `10.128.0.0/20` |
 | `cwl_group_name` | `planx_dev_openvpn_log_group` | `planx_prod_openvpn_log_group` |
 
 `vpn_server_subnet` gets split into six `/28`s, one per AZ, via `cidrsubnet(cidr, 3, index)`.
@@ -94,10 +95,9 @@ DNS at the new NLB once the new stack is verified, then retire the old one.
 | env_vpc_id | VPC to deploy into | string |
 | vpn_server_subnet | CIDR carved into per-AZ /28s for the instances | string |
 | csoc_vpn_subnet | The OpenVPN client network | string |
-| csoc_vm_subnet | Network clients need to reach, and the only CIDR allowed to ssh in | string |
+| csoc_vm_subnet | Network clients need to reach | string |
 | env_pub_subnet_routetable_id | Route table giving the subnets public access | string |
 | csoc_planx_dns_zone_id | Route53 zone for the VPN CNAME | string |
-| ssh_key_name | EC2 key pair name | string |
 | cwl_group_name | CloudWatch Logs group for instance logs | string |
 
 ### 5.2 Optional
@@ -163,7 +163,8 @@ journalctl -u update-dnsmasq.service --since -1h
 
 ### Getting onto a VPN instance
 
-ssh is restricted to `csoc_vm_subnet`. From anywhere else use Session Manager:
+ssh is blocked: port 22 is closed in the security group and no key pair is attached.
+Use Session Manager:
 
 ```bash
 aws ssm start-session --target <instance-id>

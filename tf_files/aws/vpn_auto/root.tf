@@ -24,7 +24,6 @@ module "vpn_auto" {
   manage_dns_record            = var.manage_dns_record
   dns_record_name              = var.dns_record_name
   dns_record_ttl               = var.dns_record_ttl
-  ssh_key_name                 = var.ssh_key_name
   cwl_group_name               = var.cwl_group_name
   pushed_routes                = var.pushed_routes
   dnsmasq_overrides            = var.dnsmasq_overrides

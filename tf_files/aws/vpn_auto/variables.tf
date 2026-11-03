@@ -32,7 +32,6 @@ variable "dns_record_ttl" {
   default = 300
 }
 
-variable "ssh_key_name" {}
 
 variable "cwl_group_name" {}
 

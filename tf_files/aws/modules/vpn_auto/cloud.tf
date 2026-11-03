@@ -191,53 +191,6 @@ resource "aws_lb_listener" "vpn_tcp" {
   }
 }
 
-# Serves the QR codes used to enroll TOTP
-resource "aws_lb_target_group" "vpn_qr" {
-  name     = "${var.env_vpn_name}-qr-tg"
-  port     = 443
-  protocol = "TCP"
-  vpc_id   = var.env_vpc_id
-
-  tags = {
-    Environment  = var.env_vpn_name
-    Organization = var.organization_name
-  }
-}
-
-resource "aws_lb_listener" "vpn_qr" {
-  load_balancer_arn = aws_lb.vpn_nlb.arn
-  port              = "443"
-  protocol          = "TCP"
-
-  default_action {
-    target_group_arn = aws_lb_target_group.vpn_qr.arn
-    type             = "forward"
-  }
-}
-
-resource "aws_lb_target_group" "vpn_ssh" {
-  name     = "${var.env_vpn_name}-ssh-tg"
-  port     = 22
-  protocol = "TCP"
-  vpc_id   = var.env_vpc_id
-
-  tags = {
-    Environment  = var.env_vpn_name
-    Organization = var.organization_name
-  }
-}
-
-resource "aws_lb_listener" "vpn_ssh" {
-  load_balancer_arn = aws_lb.vpn_nlb.arn
-  port              = "22"
-  protocol          = "TCP"
-
-  default_action {
-    target_group_arn = aws_lb_target_group.vpn_ssh.arn
-    type             = "forward"
-  }
-}
-
 ## ----- Certs bucket -------
 
 # The PKI gets pushed here so a replacement instance recovers the existing certs
@@ -283,7 +236,6 @@ resource "aws_launch_template" "vpn" {
   name_prefix   = "${var.env_vpn_name}-lt"
   instance_type = var.vpn_instance_type
   image_id      = var.ssm_parameter_name != "" ? var.ssm_parameter_name : data.aws_ami.vpn_ami.id
-  key_name      = var.ssh_key_name != "" ? var.ssh_key_name : null
 
   iam_instance_profile {
     name = aws_iam_instance_profile.vpn_role_profile.name
@@ -365,7 +317,7 @@ resource "aws_autoscaling_group" "vpn" {
   min_size                = var.cluster_min_size
   max_size                = var.cluster_max_size
   vpc_zone_identifier     = aws_subnet.vpn_pub[*].id
-  target_group_arns       = [aws_lb_target_group.vpn_tcp.arn, aws_lb_target_group.vpn_qr.arn, aws_lb_target_group.vpn_ssh.arn]
+  target_group_arns       = [aws_lb_target_group.vpn_tcp.arn]
   depends_on              = [aws_route_table_association.vpn]
 
   launch_template {
@@ -407,21 +359,8 @@ resource "aws_security_group" "vpn_in" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # QR codes for TOTP enrollment
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "TCP"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # ssh stays internal. Use Session Manager to get on these boxes from elsewhere
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "TCP"
-    cidr_blocks = [var.csoc_vm_subnet]
-  }
+  # 1194 is the only port exposed. No ssh (no key pair either, use Session Manager) and
+  # no https: TOTP QR codes and client zips reach users as S3 presigned URLs.
 
   tags = {
     Environment  = var.env_vpn_name
