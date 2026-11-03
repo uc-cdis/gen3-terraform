@@ -8,7 +8,7 @@ FROM quay.io/cdis/amazonlinux-base:latest
 # AL2023 ships only its own repo, no EPEL. The previous bootstrap ran
 # "amazon-linux-extras install epel", which is an AL2 command and silently does
 # nothing here, then tried to install packages that were never present. easy-rsa is
-# installed from its upstream release below, and nginx replaces lighttpd.
+# installed from its upstream release below.
 #
 # curl is deliberately absent: the base image provides curl-minimal, which owns the
 # curl binary and conflicts with the full package.
@@ -25,7 +25,6 @@ RUN dnf update -y && dnf install -y \
       iptables-services \
       shadow-utils \
       bind-utils \
-      nginx \
       postfix \
       s-nail \
       cronie \
@@ -75,9 +74,9 @@ COPY scripts/ /opt/openvpn/bin/
 
 RUN chmod +x /opt/openvpn/bin/*.sh /opt/openvpn/bin/*.py 2>/dev/null || true
 
-# 1194 OpenVPN, 443 the QR code endpoint used for TOTP enrollment
+# 1194 is the only port. There is deliberately no webserver: QR codes and client zips
+# reach users as S3 presigned URLs, so nothing here needs to be served over https.
 EXPOSE 1194/tcp
-EXPOSE 443/tcp
 
 # The entrypoint recovers the PKI, renders the config, brings up DNS and the
 # forwarding rules, then execs openvpn

@@ -142,14 +142,12 @@ setup_directories() {
     mkdir -p "${OPENVPN_PATH}/environments"
     mkdir -p "${OPENVPN_PATH}/client-restrictions"
     mkdir -p "${EASYRSA_PATH}"
-    mkdir -p /var/www/qrcode
     touch "${OPENVPN_PATH}/user_passwd.csv"
 
     # openvpn drops privileges after start, so it needs to own what it writes
     chown -R openvpn:openvpn "${EASYRSA_PATH}" "${OPENVPN_PATH}/user_passwd.csv" \
         "${OPENVPN_PATH}/clients.d/tmp" 2>/dev/null || true
     chmod 775 "${OPENVPN_PATH}/clients.d" "${OPENVPN_PATH}/clients.d/tmp"
-    chmod 750 /var/www/qrcode
 }
 
 # The client generation scripts write into these, and they live under pki/ so they have
@@ -378,29 +376,8 @@ apply_network_rules() {
     "$nettweaks"
 }
 
-# Serves the TOTP enrollment QR codes over https. lighttpd is not packaged for
-# AL2023, so this is nginx now; it reads the same self signed pem and serves the
-# same /var/www/qrcode directory, so create_ovpn.sh did not have to change.
-configure_webserver() {
-    log "configuring the QR webserver"
-
-    mkdir -p /etc/nginx/certs
-    if [ -e /root/server.pem ]; then
-        install -m 600 /root/server.pem /etc/nginx/certs/server.pem
-    fi
-
-    cp "${TEMPLATE_PATH}/nginx.conf.template" /etc/nginx/nginx.conf
-    chown -R openvpn:openvpn /var/www/qrcode 2>/dev/null || true
-
-    if nginx -t 2>/dev/null; then
-        nginx || echo "nginx did not start, QR enrollment will be unavailable" >&2
-    else
-        echo "nginx config rejected, QR enrollment will be unavailable" >&2
-    fi
-}
-
 install_cron() {
-    # Housekeeping: expire old QR codes and zips, alert on certs nearing expiry
+    # Housekeeping: clear generated zips out of /tmp
     cp "${TEMPLATE_PATH}/cron.template" /etc/cron.d/openvpn
     chmod 0644 /etc/cron.d/openvpn
     crond 2>/dev/null || true
@@ -458,7 +435,6 @@ main() {
     apply_network_rules
 
     configure_openvpn
-    configure_webserver
     install_cron
 
     log "handing off to openvpn"

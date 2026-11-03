@@ -22,7 +22,7 @@ boot. Everything ships in the image now, and nothing is cloned at runtime.
 
 | | Owns |
 |---|---|
-| this image | OpenVPN, the PKI, the client management scripts, the iptables forwarding rules, the QR code webserver |
+| this image | OpenVPN, the PKI, the client management scripts, the iptables forwarding rules |
 | the module's userdata | docker, dnsmasq and its refresh timer, the CloudWatch agent |
 
 dnsmasq runs on the host, not in here. Clients are pushed the instance's own address as
@@ -81,10 +81,10 @@ Changes are pushed back to S3 by `push_to_s3.sh` so they survive instance replac
 Behaviour changed in a few places, deliberately. Several of these were latent breakages
 rather than choices, found by building against AL2023 instead of trusting the old script:
 
-- **nginx replaces lighttpd**, which is not packaged for AL2023. It serves the same
-  `/var/www/qrcode` over the same self signed pem, but https only and with directory
-  listing off. The old config also served those QR codes unencrypted on port 80, and a
-  QR code encodes the user's TOTP secret.
+- **No webserver.** The old hosts ran lighttpd serving `/var/www/qrcode`, including
+  unencrypted on port 80, and a QR code encodes the user's TOTP secret. Nothing wrote
+  there any more: QR codes and client zips already go out as S3 presigned URLs. So it
+  is gone, and 1194 is the only port the image listens on.
 - **`awscli` was missing from the image entirely**, which would have failed PKI recovery
   on first boot and generated a fresh CA, invalidating every client config in
   circulation.

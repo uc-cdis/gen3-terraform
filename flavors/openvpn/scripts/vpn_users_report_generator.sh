@@ -4,22 +4,20 @@
 #
 # the purpose of this script is to create a report of users and their certificate expiration dates
 # for openvpn services running in CTDS.
-# it'll just create a static html file and put it in the folder of choice, in which our defalt is
-# /var/www/qrcode/users_report.html. CTDS openvpn servers also run an http service we can use to
-# show the report.
-#
-# this script is intended to be put on /etc/cron.daily and let is run daily
+# it writes a static html file to the path given, default /tmp/users_report.html. Nothing
+# serves it: there is no webserver on these hosts, and a user list should not be public.
 #
 ##
 
-CERTS_PATH="/etc/openvpn/easy-rsa/keys/"
+# easy-rsa 3 layout. keys/ was easy-rsa 2 and no longer exists, so every lookup failed
+CERTS_PATH="/etc/openvpn/easy-rsa/pki/issued/"
 USERS_FILE="/etc/openvpn/user_passwd.csv"
 
 if ! [ -z $1 ];
 then
   REPOR_LOCA="$1"
 else
-  REPOR_LOCA="/var/www/qrcode/users_report.html"
+  REPOR_LOCA="/tmp/users_report.html"
 fi
 
 function get_active_users(){
