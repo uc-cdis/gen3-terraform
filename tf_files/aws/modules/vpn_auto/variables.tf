@@ -43,7 +43,7 @@ variable "manage_dns_record" {
 }
 
 variable "dns_record_name" {
-  description = "CNAME to point at this NLB. Defaults to env_vpn_name. Set to the hostname clients already use to cut traffic over to this stack"
+  description = "CNAME to point at this NLB, and the hostname written into the client configs this stack issues. Defaults to env_vpn_name. Set to the hostname clients already use, even before manage_dns_record is turned on"
   default     = ""
 }
 

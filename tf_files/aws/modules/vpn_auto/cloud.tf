@@ -28,6 +28,12 @@ locals {
   # matter which VPC this lands in.
   upstream_dns = "169.254.169.253"
 
+  # The hostname clients connect to, written into every client config this stack issues.
+  # It follows dns_record_name whether or not this module manages the record, so configs
+  # issued before a DNS cutover already point at the name users have, not at this stack.
+  dns_record_label   = var.dns_record_name != "" ? var.dns_record_name : var.env_vpn_name
+  client_remote_host = "${local.dns_record_label}.${trimsuffix(data.aws_route53_zone.vpn.name, ".")}"
+
   dnsmasq_conf = templatefile("${path.module}/files/dnsmasq.conf", {
     hosts_file   = local.dnsmasq_hosts_file
     upstream_dns = local.upstream_dns
@@ -274,6 +280,7 @@ resource "aws_launch_template" "vpn" {
     pushed_routes          = local.pushed_routes
     s3_prefix_override     = var.s3_prefix_override
     pki_writable           = var.adopted_pki_writable ? "1" : ""
+    client_remote_host     = local.client_remote_host
     client_ca_mode         = var.client_ca_mode
     acm_pca_ca_arn         = var.acm_pca_ca_arn
     s3_bucket              = local.pki_bucket_name
@@ -403,7 +410,7 @@ resource "aws_security_group" "vpn_out" {
 resource "aws_route53_record" "vpn" {
   count   = var.manage_dns_record ? 1 : 0
   zone_id = var.csoc_planx_dns_zone_id
-  name    = var.dns_record_name != "" ? var.dns_record_name : var.env_vpn_name
+  name    = local.dns_record_label
   type    = "CNAME"
   ttl     = var.dns_record_ttl
   records = [aws_lb.vpn_nlb.dns_name]

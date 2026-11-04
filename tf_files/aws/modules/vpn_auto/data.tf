@@ -99,6 +99,11 @@ data "aws_iam_policy_document" "vpn_policy_document" {
   }
 }
 
+# Only for its name: client configs carry the full hostname in their remote line
+data "aws_route53_zone" "vpn" {
+  zone_id = var.csoc_planx_dns_zone_id
+}
+
 data "aws_ami" "vpn_ami" {
   most_recent = true
   owners      = [var.ami_account_id]

@@ -183,6 +183,9 @@ install_settings() {
 # Written by entrypoint.sh so scripts run via docker exec see the same values
 export S3_PREFIX='${S3_PREFIX}'
 export S3BUCKET='${S3_PREFIX}'
+# Hostname in the "remote" line of every client config issued here. The module passes
+# the name users connect to; the fallback is this stack's own name.
+export EXTHOST='${CLIENT_REMOTE_HOST:-${VPN_NLB_NAME}.planx-pla.net}'
 export VPN_NLB_NAME='${VPN_NLB_NAME}'
 export AWS_DEFAULT_REGION='${AWS_DEFAULT_REGION:-us-east-1}'
 SETTINGS

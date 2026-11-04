@@ -17,8 +17,11 @@ data-ciphers-fallback AES-256-CBC
 # exactly, and the server stays on the SHA1 default so the configs already issued keep
 # working. Change both sides together, never one.
 
-# No comp-lzo. The server does not offer compression, and compressing before
-# encryption leaks plaintext length (VORACLE).
+# comp-lzo has to match the server, which keeps it on for the configs already in
+# circulation. Without it here the tunnel comes up but no data passes: the server
+# expects the compression framing byte and drops every packet. VORACLE risk, so it
+# goes from both sides together once the old configs are reissued.
+comp-lzo
 
 # remote-cert-tls replaces ns-cert-type, which is deprecated and removed in
 # newer clients. Same effect: refuse to connect to something that is not a server cert.

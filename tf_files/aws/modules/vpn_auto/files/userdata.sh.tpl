@@ -145,6 +145,7 @@ ExecStart=/usr/bin/docker run --rm --name openvpn \
   -e PUSHED_ROUTES='${pushed_routes}' \
   -e S3_PREFIX_OVERRIDE='${s3_prefix_override}' \
   -e PKI_WRITABLE='${pki_writable}' \
+  -e CLIENT_REMOTE_HOST='${client_remote_host}' \
   -e CLIENT_CA_MODE=${client_ca_mode} \
   -e ACM_PCA_CA_ARN='${acm_pca_ca_arn}' \
   -e S3_BUCKET=${s3_bucket} \
