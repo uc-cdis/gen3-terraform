@@ -78,6 +78,11 @@ variable "acm_pca_ca_arn" {
   default = ""
 }
 
+variable "adopted_pki_writable" {
+  type    = bool
+  default = false
+}
+
 variable "s3_prefix_override" {
   default = ""
 }

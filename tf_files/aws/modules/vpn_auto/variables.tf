@@ -143,6 +143,17 @@ variable "s3_prefix_override" {
   default     = ""
 }
 
+# Takes ownership of the adopted PKI: the stack may then create, revoke and reissue
+# users and push the result back to s3_prefix_override. Only turn this on once user
+# management has stopped on the VPN that prefix came from. There is no live sync
+# between servers, so two writers overwrite each other's index.txt, serial and
+# user_passwd.csv in S3.
+variable "adopted_pki_writable" {
+  description = "Let this stack write to the PKI adopted via s3_prefix_override, making it the owner. Requires user management to be frozen on the original VPN"
+  type        = bool
+  default     = false
+}
+
 variable "vpn_image_tag" {
   description = "Tag of the quay.io/cdis/openvpn image to run. CI tags images with the branch name, so this is master for released builds and the branch name while testing"
   default     = "master"

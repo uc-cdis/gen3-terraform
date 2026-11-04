@@ -61,16 +61,28 @@ data "aws_iam_policy_document" "vpn_policy_document" {
     resources = ["arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:instance/*"]
   }
 
-  # An adopted bucket belongs to another, usually live, VPN. Read only, so this stack
-  # cannot overwrite that VPN's CA, user database or ipp.txt even if something in the
-  # container tried to. The PKI_READ_ONLY guard in the entrypoint is the first line of
-  # defence; this is the one that actually holds.
+  # An adopted bucket belongs to another, usually live, VPN. Read only by default, so
+  # this stack cannot overwrite that VPN's CA, user database or ipp.txt even if
+  # something in the container tried to. The PKI_READ_ONLY guard in the entrypoint is
+  # the first line of defence; this is the one that actually holds.
   dynamic "statement" {
     for_each = local.override_pki_bucket != "" ? [1] : []
     content {
       effect    = "Allow"
       actions   = ["s3:GetObject"]
       resources = ["arn:aws:s3:::${local.override_pki_bucket}/*"]
+    }
+  }
+
+  # adopted_pki_writable hands ownership over. Write access is scoped to the adopted
+  # prefix only, not the whole bucket. Delete is needed by send_email.sh, which
+  # expires old client zips.
+  dynamic "statement" {
+    for_each = local.override_pki_bucket != "" && var.adopted_pki_writable ? [1] : []
+    content {
+      effect    = "Allow"
+      actions   = ["s3:PutObject", "s3:DeleteObject"]
+      resources = ["arn:aws:s3:::${var.s3_prefix_override}/*"]
     }
   }
 

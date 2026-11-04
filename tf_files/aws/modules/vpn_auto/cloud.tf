@@ -273,6 +273,7 @@ resource "aws_launch_template" "vpn" {
     csoc_vm_subnet         = var.csoc_vm_subnet
     pushed_routes          = local.pushed_routes
     s3_prefix_override     = var.s3_prefix_override
+    pki_writable           = var.adopted_pki_writable ? "1" : ""
     client_ca_mode         = var.client_ca_mode
     acm_pca_ca_arn         = var.acm_pca_ca_arn
     s3_bucket              = local.pki_bucket_name

@@ -398,12 +398,21 @@ main() {
 
     if pki_is_complete; then
         log "recovered an existing PKI from s3://${S3_PREFIX}"
-        # Adopting another VPN's PKI is read only. Pushing back would let this stack
-        # overwrite the live VPN's CA, user database or ipp.txt, so nothing is written
-        # to a prefix we do not own.
+        # Adopting another VPN's PKI is read only unless the stack has been made its
+        # owner (PKI_WRITABLE, from the module's adopted_pki_writable). Pushing back
+        # while the original VPN still manages users would let the two overwrite each
+        # other's CA, user database or ipp.txt.
         if [ -n "${S3_PREFIX_OVERRIDE:-}" ]; then
-            log "adopted PKI is read only, this stack will not push back to it"
-            export PKI_READ_ONLY=1
+            if [ -n "${PKI_WRITABLE:-}" ]; then
+                log "adopted PKI is writable, this stack owns s3://${S3_PREFIX} now"
+            else
+                log "adopted PKI is read only, this stack will not push back to it"
+                export PKI_READ_ONLY=1
+                # Persist it: management scripts run under docker exec, which does not
+                # inherit this process's environment, only what settings.sh exports.
+                # Without this the script guards never fired and IAM alone held.
+                echo "export PKI_READ_ONLY=1" >> "${BIN_PATH}/settings.sh"
+            fi
         fi
     else
         # Checked against every file openvpn.conf references, not just ca.crt. A

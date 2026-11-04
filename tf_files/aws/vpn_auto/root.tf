@@ -36,6 +36,7 @@ module "vpn_auto" {
   client_ca_mode               = var.client_ca_mode
   acm_pca_ca_arn               = var.acm_pca_ca_arn
   s3_prefix_override           = var.s3_prefix_override
+  adopted_pki_writable         = var.adopted_pki_writable
   vpn_image_tag                = var.vpn_image_tag
   organization_name            = var.organization_name
   cluster_desired_capacity     = var.cluster_desired_capacity
