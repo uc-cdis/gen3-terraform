@@ -410,7 +410,10 @@ resource "aws_security_group" "vpn_out" {
 resource "aws_route53_record" "vpn" {
   count   = var.manage_dns_record ? 1 : 0
   zone_id = var.csoc_planx_dns_zone_id
-  name    = local.dns_record_label
+  # Fully qualified on purpose. Route53 stores the FQDN, so a short name makes an
+  # imported record (the usual way a cutover adopts an existing hostname) plan as a
+  # replacement: delete then create, and an NXDOMAIN window clients can cache.
+  name    = local.client_remote_host
   type    = "CNAME"
   ttl     = var.dns_record_ttl
   records = [aws_lb.vpn_nlb.dns_name]
