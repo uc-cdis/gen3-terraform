@@ -213,14 +213,14 @@ resource "aws_iam_role" "hatchery-role" {
   })
 }
 
-resource "aws_iam_role_policy" "hatchery-role-policy" {
-  count = var.hatchery_enabled ? 1 : 0
-  name  = "hatchery-role-policy"
-  role  = aws_iam_role.hatchery-role[0].id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
+locals {
+  # Only granted when var.nextflow_enabled. Hatchery assumes csoc_adminvm in
+  # payModel.AWSAccountId for nextflow and for any non-local (remote account) pay model
+  # (pods.go, ecs.go, ram.go, transitgateway.go), so a commons that only runs local
+  # workspaces does not need any of this. The for/if keeps the statements out of the
+  # policy when disabled; `cond ? [...] : []` fails because the object types differ.
+  hatchery_nextflow_statements = [
+    for s in [
       {
         Sid      = "AssumeCsocAdminRole"
         Effect   = "Allow"
@@ -233,6 +233,75 @@ resource "aws_iam_role_policy" "hatchery-role-policy" {
         Action   = ["sts:AssumeRole"]
         Resource = ["arn:aws:iam::${var.nextflow_imagebuilder_account_id}:role/nextflow-imagebuilder-reader"]
       },
+      {
+        Sid    = "CreateNextflowBatchWorkspaces"
+        Effect = "Allow"
+        Action = [
+          "batch:DescribeComputeEnvironments",
+          "batch:CreateComputeEnvironment",
+          "batch:UpdateComputeEnvironment",
+          "batch:ListJobs",
+          "batch:CreateJobQueue",
+          "batch:TagResource",
+          "iam:ListPolicies",
+          "iam:CreatePolicy",
+          "iam:TagPolicy",
+          "iam:ListPolicyVersions",
+          "iam:CreatePolicyVersion",
+          "iam:DeletePolicyVersion",
+          "iam:ListRoles",
+          "iam:CreateRole",
+          "iam:TagRole",
+          "iam:AttachRolePolicy",
+          "iam:CreateUser",
+          "iam:TagUser",
+          "iam:AttachUserPolicy",
+          "iam:ListAccessKeys",
+          "iam:CreateAccessKey",
+          "iam:DeleteAccessKey",
+          "iam:GetInstanceProfile",
+          "iam:CreateInstanceProfile",
+          "iam:AddRoleToInstanceProfile",
+          "kms:CreateKey",
+          "kms:CreateAlias",
+          "kms:DescribeKey",
+          "kms:TagResource",
+          "s3:CreateBucket",
+          "s3:PutEncryptionConfiguration",
+          "s3:PutBucketPolicy",
+          "s3:PutLifecycleConfiguration",
+        ]
+        Resource = ["*"]
+      },
+      {
+        Sid    = "CreateSlrForNextflowBatchWorkspaces"
+        Effect = "Allow"
+        Action = ["iam:CreateServiceLinkedRole"]
+        Resource = ["arn:aws:iam::*:role/aws-service-role/batch.amazonaws.com/*"]
+        Condition = {
+          StringLike = {
+            "iam:AWSServiceName" = "batch.amazonaws.com"
+          }
+        }
+      },
+      {
+        Sid      = "PassRoleForNextflowBatchWorkspaces"
+        Effect   = "Allow"
+        Action   = ["iam:PassRole"]
+        Resource = ["arn:aws:iam::*:role/*ecsInstanceRole"]
+      },
+    ] : s if var.nextflow_enabled
+  ]
+}
+
+resource "aws_iam_role_policy" "hatchery-role-policy" {
+  count = var.hatchery_enabled ? 1 : 0
+  name  = "hatchery-role-policy"
+  role  = aws_iam_role.hatchery-role[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = concat([
       {
         Sid      = "CostExplorer"
         Effect   = "Allow"
@@ -294,69 +363,14 @@ resource "aws_iam_role_policy" "hatchery-role-policy" {
           "arn:aws:s3:::*${var.vpc_name}*/*",
         ]
       },
-      {
-        Sid    = "CreateNextflowBatchWorkspaces"
-        Effect = "Allow"
-        Action = [
-          "batch:DescribeComputeEnvironments",
-          "batch:CreateComputeEnvironment",
-          "batch:UpdateComputeEnvironment",
-          "batch:ListJobs",
-          "batch:CreateJobQueue",
-          "batch:TagResource",
-          "iam:ListPolicies",
-          "iam:CreatePolicy",
-          "iam:TagPolicy",
-          "iam:ListPolicyVersions",
-          "iam:CreatePolicyVersion",
-          "iam:DeletePolicyVersion",
-          "iam:ListRoles",
-          "iam:CreateRole",
-          "iam:TagRole",
-          "iam:AttachRolePolicy",
-          "iam:CreateUser",
-          "iam:TagUser",
-          "iam:AttachUserPolicy",
-          "iam:ListAccessKeys",
-          "iam:CreateAccessKey",
-          "iam:DeleteAccessKey",
-          "iam:GetInstanceProfile",
-          "iam:CreateInstanceProfile",
-          "iam:AddRoleToInstanceProfile",
-          "kms:CreateKey",
-          "kms:CreateAlias",
-          "kms:DescribeKey",
-          "kms:TagResource",
-          "s3:CreateBucket",
-          "s3:PutEncryptionConfiguration",
-          "s3:PutBucketPolicy",
-          "s3:PutLifecycleConfiguration",
-        ]
-        Resource = ["*"]
-      },
-      {
-        Sid    = "CreateSlrForNextflowBatchWorkspaces"
-        Effect = "Allow"
-        Action = ["iam:CreateServiceLinkedRole"]
-        Resource = ["arn:aws:iam::*:role/aws-service-role/batch.amazonaws.com/*"]
-        Condition = {
-          StringLike = {
-            "iam:AWSServiceName" = "batch.amazonaws.com"
-          }
-        }
-      },
-      {
-        Sid      = "PassRoleForNextflowBatchWorkspaces"
-        Effect   = "Allow"
-        Action   = ["iam:PassRole"]
-        Resource = ["arn:aws:iam::*:role/*ecsInstanceRole"]
-      },
-    ]
+    ], local.hatchery_nextflow_statements)
   })
 }
 
+# Hatchery creates the transit-gateway RAM share (ram.go shareTransitGateway) only for
+# non-local pay models, so this is not attached unless nextflow_enabled.
 resource "aws_iam_role_policy_attachment" "hatchery-role-policy-attachment" {
-  count = var.hatchery_enabled ? 1 : 0
+  count = var.hatchery_enabled && var.nextflow_enabled ? 1 : 0
   role = aws_iam_role.hatchery-role[0].name
   policy_arn = "arn:aws:iam::aws:policy/AWSResourceAccessManagerFullAccess"
 }

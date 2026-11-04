@@ -33,7 +33,7 @@ locals {
       gen3ff_tag = var.gen3ff_tag
       guppy_enabled = var.guppy_enabled
       hatchery_enabled = var.hatchery_enabled
-      hatchery_service_account = var.hatchery_enabled ? aws_iam_role.hatchery-role[0].arn : ""
+      hatchery_role = var.hatchery_enabled ? trimprefix("${aws_iam_role.hatchery-role[0].path}${aws_iam_role.hatchery-role[0].name}", "/") : ""
       hostname = var.hostname
       indexd_enabled = var.indexd_enabled
       indexd_prefix = var.indexd_prefix
