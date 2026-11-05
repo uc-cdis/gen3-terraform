@@ -202,9 +202,9 @@ resource "aws_lb_listener" "vpn_tcp" {
 # The PKI gets pushed here so a replacement instance recovers the existing certs
 # instead of generating a new CA and invalidating every client config.
 #
-# Not created when s3_prefix_override is set. In that case the stack reads another
-# VPN's PKI read only and never writes, so its own bucket would be created and then
-# sit empty forever.
+# Not created when s3_prefix_override is set. In that case the stack uses another
+# VPN's PKI (read only unless adopted_pki_writable), so its own bucket would be
+# created and then sit empty forever.
 resource "aws_s3_bucket" "vpn_certs_and_files" {
   count  = local.create_pki_bucket ? 1 : 0
   bucket = "vpn-certs-and-files-${var.env_vpn_name}"
@@ -220,10 +220,14 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "vpn_certs_and_fil
   count  = local.create_pki_bucket ? 1 : 0
   bucket = aws_s3_bucket.vpn_certs_and_files[0].id
 
+  # SSE-KMS with pki_kms_key_arn when given, otherwise S3 managed keys. The bucket key
+  # cuts KMS requests, which matters for the many small objects a PKI is made of.
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      sse_algorithm     = var.pki_kms_key_arn != "" ? "aws:kms" : "AES256"
+      kms_master_key_id = var.pki_kms_key_arn != "" ? var.pki_kms_key_arn : null
     }
+    bucket_key_enabled = var.pki_kms_key_arn != ""
   }
 }
 

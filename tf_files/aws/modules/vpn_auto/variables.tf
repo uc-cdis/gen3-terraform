@@ -154,6 +154,15 @@ variable "adopted_pki_writable" {
   default     = false
 }
 
+# The key the PKI bucket is encrypted with. For a bucket the module creates, this
+# switches it from S3 managed keys to SSE-KMS. For an adopted bucket that is already
+# SSE-KMS, set it to that bucket's key so the instance role is granted use of it.
+variable "pki_kms_key_arn" {
+  description = "KMS key ARN for the PKI bucket. Encrypts a module-created bucket with SSE-KMS and grants the instance role decrypt/generate-data-key on it. Empty means SSE-S3 (AES256)"
+  type        = string
+  default     = ""
+}
+
 variable "vpn_image_tag" {
   description = "Tag of the quay.io/cdis/openvpn image to run. CI tags images with the branch name, so this is master for released builds and the branch name while testing"
   default     = "master"

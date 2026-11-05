@@ -86,6 +86,17 @@ data "aws_iam_policy_document" "vpn_policy_document" {
     }
   }
 
+  # Objects in an SSE-KMS bucket, our own or adopted, can only be read or written
+  # with the key. Granted here rather than relying on the key policy to allow it.
+  dynamic "statement" {
+    for_each = var.pki_kms_key_arn != "" ? [1] : []
+    content {
+      effect    = "Allow"
+      actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+      resources = [var.pki_kms_key_arn]
+    }
+  }
+
   # Read only, just the CA certificate. The instance needs the trust anchor to verify
   # client certs; it has no business issuing them, so IssueCertificate is deliberately
   # not granted to a public facing box.

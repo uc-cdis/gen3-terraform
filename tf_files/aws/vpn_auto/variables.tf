@@ -83,6 +83,12 @@ variable "adopted_pki_writable" {
   default = false
 }
 
+variable "pki_kms_key_arn" {
+  description = "KMS key ARN for the PKI bucket. Empty means SSE-S3 (AES256)"
+  type        = string
+  default     = ""
+}
+
 variable "s3_prefix_override" {
   default = ""
 }
