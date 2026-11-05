@@ -4,7 +4,10 @@ terraform {
   }
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
+      source = "hashicorp/aws"
+    }
+    archive = {
+      source = "hashicorp/archive"
     }
   }
 }
@@ -17,10 +20,10 @@ resource "aws_kms_key" "central_backup_key" {
 
 resource "aws_backup_vault" "account_vaults" {
   for_each = var.account_ids
-  
+
   name        = "rds-central-backup-vault-${each.value}"
   kms_key_arn = aws_kms_key.central_backup_key.arn
-  
+
   tags = {
     Name      = "rds-central-backup-vault-${each.value}"
     AccountId = each.key
@@ -36,8 +39,8 @@ resource "aws_backup_vault_policy" "account_vaults_policies" {
 
     Statement = [
       {
-        Effect = "Allow",
-        Action = "backup:CopyIntoBackupVault",
+        Effect   = "Allow",
+        Action   = "backup:CopyIntoBackupVault",
         Resource = "*",
         Principal = {
           AWS = [

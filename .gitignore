@@ -24,3 +24,5 @@ kube/services/fluentd/dockerlogs/
 *.cache
 *pyc
 !doc/terraform
+tf_files/aws/modules/backup/lambda/*.zip
+tf_files/aws/backup-destination/lambda/*.zip
