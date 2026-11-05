@@ -1,0 +1,2 @@
+1 1 * * * root rm -rf /tmp/*vpn* &>/dev/null
+1 1 * * * root rm -rf /tmp/*.zip &>/dev/null

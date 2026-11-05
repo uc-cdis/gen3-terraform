@@ -1,0 +1,25 @@
+# EasyRSA 3 vars file
+
+# This is a user-customized vars file for EasyRSA 3.
+# Adjust these values to suit your needs.
+
+# Key Size - Increase to 2048 if you are paranoid. This affects performance.
+set_var EASYRSA_KEY_SIZE        #KEY_SIZE#
+
+# CA and Certificate Expiry - Set these to your desired expiry in days
+set_var EASYRSA_CA_EXPIRE       3650
+set_var EASYRSA_CERT_EXPIRE     #KEY_EXPIRE#
+
+# Fields for the request Distinguished Name (DN)
+# Adjust these to match your organization's information
+set_var EASYRSA_REQ_COUNTRY     "#COUNTRY#"
+set_var EASYRSA_REQ_PROVINCE    "#STATE#"
+set_var EASYRSA_REQ_CITY        "#CITY#"
+set_var EASYRSA_REQ_ORG         "#ORG#"
+set_var EASYRSA_REQ_EMAIL       "#EMAIL#"
+set_var EASYRSA_REQ_OU          "#OU#"
+
+
+set_var EASYRSA_BATCH       "1"
+
+# Note: Do not leave any of the fields blank as it may cause the script to fail.

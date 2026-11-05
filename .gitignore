@@ -24,3 +24,9 @@ kube/services/fluentd/dockerlogs/
 *.cache
 *pyc
 !doc/terraform
+
+# Local terraform state for the vpn_auto dev stack, imported from existing AWS
+# resources. Never commit state: it contains resource metadata and can contain secrets.
+.terraform-local/
+*.tfstate
+*.tfstate.*

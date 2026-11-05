@@ -1,0 +1,6 @@
+Download and unzip this file containing your OpenVPN configuration files
+and a PDF OpenVPN HowTo guide: ${SIGNED_URL}
+
+Your two factor authorization (2FA) QR Code is availble at: ${VPN_CREDS_URL}
+
+These links will only work for the next 48 hours.

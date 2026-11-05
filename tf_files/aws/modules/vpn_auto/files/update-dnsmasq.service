@@ -1,0 +1,14 @@
+[Unit]
+Description=Refresh split horizon DNS entries for the VPN
+Documentation=https://github.com/uc-cdis/openvpn
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Environment=DNSMASQ_OVERRIDES=${dnsmasq_overrides}
+Environment=DNSMASQ_HOSTS_FILE=${hosts_file}
+ExecStart=${script_path}
+# A failed lookup leaves the previous addresses in place, which is the safe outcome,
+# so one bad run should not take the timer down
+SuccessExitStatus=0 1
