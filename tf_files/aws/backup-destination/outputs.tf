@@ -17,3 +17,7 @@ output "backup_vault_arns" {
   description = "ARNs of all created backup vaults"
   value       = { for account_id, vault in aws_backup_vault.account_vaults : account_id => vault.arn }
 }
+output "alert_sns_topic_arn" {
+  description = "SNS topic receiving central backup alerts"
+  value       = local.alert_topic_arn
+}
