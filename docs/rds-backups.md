@@ -1,5 +1,7 @@
 # RDS / Aurora backups for Gen3
 
+**Setting this up for the first time? Start with the step-by-step [setup guide](rds-backups-setup.md).**
+
 This page covers the account-wide RDS backup modules in this repo: what they create, where backups
 end up, how to configure them, and how to restore. It also explains what breaks when an AWS account
 moves between AWS Organizations, and how to avoid it.
@@ -73,7 +75,7 @@ inputs = {
   excluded_dbs               = []           # cluster/instance ARNs to skip
   cross_region_destination   = "us-west-1"
   cross_account_backup       = true
-  backup_destination_account = "<central account id>"
+  backup_destination_account = "<central account id>" # required; no cross-account copy when unset
   cross_account_mode         = "aws_backup" # or "snapshot_share"
   # Only send tiers retained at least this long to the central account.
   # 0 = all tiers, 30 = weekly and up, 365 = monthly and yearly.
