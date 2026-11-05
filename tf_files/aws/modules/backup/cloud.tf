@@ -21,7 +21,7 @@ resource "aws_kms_key" "backup_key" {
 }
 
 resource "aws_kms_key_policy" "backup_key_external_account" {
-  count  = var.cross_account_backup ? 1 : 0
+  count  = local.cross_account_enabled ? 1 : 0
   key_id = aws_kms_key.backup_key.id
 
   policy = jsonencode({

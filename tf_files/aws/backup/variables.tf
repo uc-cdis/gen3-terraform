@@ -24,15 +24,19 @@ variable "cross_region_destination" {
 
 
 variable "cross_account_backup" {
-  description = "Whether or not to enable cross-account backup. Must specify an account"
+  description = "Copy backups to the central backup account given in backup_destination_account. Has no effect unless backup_destination_account is set."
   type        = bool
   default     = true
 }
 
 variable "backup_destination_account" {
-  description = "The aws account ID for the target backup account"
+  description = "AWS account ID of your central backup account (deployed with tf_files/aws/backup-destination). Required for cross-account copies; when null, no cross-account copy is configured and no other account is granted access to this account's backup KMS key."
   type        = string
-  default     = "433568766270"
+  default     = null
+  validation {
+    condition     = var.backup_destination_account == null || can(regex("^[0-9]{12}$", var.backup_destination_account))
+    error_message = "backup_destination_account must be a 12-digit AWS account ID or null."
+  }
 }
 
 variable "cross_account_mode" {
