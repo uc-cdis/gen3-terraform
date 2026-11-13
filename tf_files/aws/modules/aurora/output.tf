@@ -18,6 +18,11 @@ output "aurora_cluster_master_username" {
   value       = aws_rds_cluster.postgresql.master_username
 }
 
+output "aurora_cluster_cluster_identifier" {
+  description = "Aurora cluster's name"
+  value       = aws_rds_cluster.postgresql.cluster_identifier
+}
+
 output "aurora_cluster_master_password" {
   description = "Aurora cluster master user's password"
   value       = aws_rds_cluster.postgresql.master_password
