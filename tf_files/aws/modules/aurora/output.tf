@@ -12,15 +12,14 @@ output "aurora_cluster_reader_endpoint" {
   value       = aws_rds_cluster.postgresql.reader_endpoint
 }
 
+output "aurora_cluster_identifier" {
+  description = "Aurora cluster's name"
+  value       = aws_rds_cluster.postgresql.cluster_identifier
+}
 
 output "aurora_cluster_master_username" {
   description = "Aurora cluster master username"
   value       = aws_rds_cluster.postgresql.master_username
-}
-
-output "aurora_cluster_cluster_identifier" {
-  description = "Aurora cluster's name"
-  value       = aws_rds_cluster.postgresql.cluster_identifier
 }
 
 output "aurora_cluster_master_password" {

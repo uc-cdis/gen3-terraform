@@ -108,7 +108,7 @@ output "aurora_cluster_master_password" {
 
 output "aurora_cluster_name" {
   description = "Aurora cluster name"
-  value       = one(module.aurora[*].aurora_cluster_cluster_identifier)
+  value       = one(module.aurora[*].aurora_cluster_identifier)
 }
 
 output "es_endpoint" {
