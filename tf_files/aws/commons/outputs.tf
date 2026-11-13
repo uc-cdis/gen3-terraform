@@ -106,6 +106,11 @@ output "aurora_cluster_master_password" {
   sensitive   = true
 }
 
+output "aurora_cluster_name" {
+  description = "Aurora cluster name"
+  value       = one(module.aurora[*].aurora_cluster_cluster_identifier)
+}
+
 output "es_endpoint" {
   value       = var.deploy_es ? module.commons_vpc_es[0].es_endpoint : null
 }
