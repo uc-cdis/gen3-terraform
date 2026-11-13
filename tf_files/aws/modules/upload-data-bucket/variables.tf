@@ -24,3 +24,9 @@ variable "kms_key_id" {
   type        = string
   default     = ""
 }
+
+variable "enable_key_rotation" {
+  description = "Enable automatic rotation of the KMS key created for SNS/SQS encryption. Ignored when kms_key_id is provided."
+  type        = bool
+  default     = true
+}

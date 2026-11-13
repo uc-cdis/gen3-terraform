@@ -15,3 +15,11 @@ variable "alias_name" {
   description = "Alias name for the KMS key"
   default     = ""
 }
+
+# More info on automatic key rotation:
+# https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html
+variable "enable_key_rotation" {
+  type        = bool
+  description = "Enable automatic rotation of the KMS key material"
+  default     = true
+}

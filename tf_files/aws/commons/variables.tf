@@ -1327,6 +1327,14 @@ variable "force_delete_bucket" {
   default = false
 }
 
+# More info on automatic key rotation:
+# https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html
+variable "enable_key_rotation" {
+  description = "Enable automatic rotation of the KMS key created for the data bucket SNS/SQS encryption"
+  type        = bool
+  default     = true
+}
+
 variable "ha_squid_single_instance" {
   description = "If true, deploy a single instance of squid in an autoscaling group"
   default     = false

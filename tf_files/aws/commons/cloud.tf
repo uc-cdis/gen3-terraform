@@ -44,6 +44,7 @@ module "cdis_vpc" {
   commons_log_retention          = var.commons_log_retention
   ha_squid_single_instance       = var.ha_squid_single_instance
   force_delete_bucket            = var.force_delete_bucket
+  enable_key_rotation            = var.enable_key_rotation
   availability_zones             = var.availability_zones
   squid_ssh_keys_repo                  = var.squid_ssh_keys_repo
   squid_ssh_admin_keys_file            = var.squid_ssh_admin_keys_file
