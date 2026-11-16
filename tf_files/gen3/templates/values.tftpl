@@ -96,6 +96,13 @@ frontend-framework:
     repository: "${gen3ff_repo}"
     tag: "${gen3ff_tag}"
 
+funnel:
+  externalSecrets:
+    dbcreds: "${vpc_name}-${namespace}-funnel-creds"
+
+gen3-workflow:
+  enabled: ${gen3workflow_enabled}
+
 grafana:
   enabled: ${deploy_grafana}
 

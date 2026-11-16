@@ -142,6 +142,12 @@ variable "gen3ff_tag" {
   default     = "main"
 }
 
+variable "gen3workflow_enabled" {
+  description = "Enable gen3workflow and funnel"
+  type        = bool
+  default     = false
+}
+
 variable "guppy_enabled" {
   description = "Enable guppy"
   type        = bool
