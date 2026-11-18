@@ -111,6 +111,11 @@ output "aurora_cluster_name" {
   value       = one(module.aurora[*].aurora_cluster_identifier)
 }
 
+output "aurora_instance_name" {
+  description = "Aurora DB instance identifier (for aws_db_instance lookups such as aurora_db's database_instance_identifier; not the cluster name)"
+  value       = one(module.aurora[*].aurora_instance_identifier)
+}
+
 output "es_endpoint" {
   value       = var.deploy_es ? module.commons_vpc_es[0].es_endpoint : null
 }

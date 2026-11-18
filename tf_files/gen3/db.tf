@@ -107,6 +107,7 @@ module "ohdsi-db" {
   source                  = "../aws/aurora_db"
   vpc_name                = var.vpc_name
   service                 = "ohdsi"
+  database_instance_identifier = var.database_instance_identifier
   admin_database_username = var.aurora_username
   admin_database_password = var.aurora_password
   namespace               = var.namespace

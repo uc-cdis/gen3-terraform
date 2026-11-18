@@ -17,6 +17,11 @@ output "aurora_cluster_identifier" {
   value       = aws_rds_cluster.postgresql.cluster_identifier
 }
 
+output "aurora_instance_identifier" {
+  description = "Aurora DB instance identifier (what aws_db_instance lookups need; not the cluster identifier)"
+  value       = aws_rds_cluster_instance.postgresql.identifier
+}
+
 output "aurora_cluster_master_username" {
   description = "Aurora cluster master username"
   value       = aws_rds_cluster.postgresql.master_username
