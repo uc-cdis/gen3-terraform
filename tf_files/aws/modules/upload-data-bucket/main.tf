@@ -20,4 +20,5 @@ module "kms-key" {
   count  = var.encryption_enabled && var.kms_key_id == "" ? 1 : 0
   source = "../kms-key"
   alias_name = "${var.vpc_name}-sns-sqs-key"
+  enable_key_rotation = var.enable_key_rotation
 }

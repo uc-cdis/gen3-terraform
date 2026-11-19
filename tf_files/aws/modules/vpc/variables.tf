@@ -228,6 +228,12 @@ variable "sqs_kms_key_id" {
   default     = ""
 }
 
+variable "enable_key_rotation" {
+  description = "Enable automatic rotation of the KMS key created for the data bucket SNS/SQS encryption. Ignored when sqs_kms_key_id is provided."
+  type        = bool
+  default     = true
+}
+
 variable "role_arn" {
   description = "The ARN of the role to use for ES"
   default     = ""
