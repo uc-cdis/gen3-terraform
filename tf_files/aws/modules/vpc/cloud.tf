@@ -53,6 +53,7 @@ module "data-bucket" {
   force_delete_bucket    = var.force_delete_bucket
   encryption_enabled     = var.sqs_encryption_enabled
   kms_key_id             = var.sqs_kms_key_id
+  enable_key_rotation    = var.enable_key_rotation
 }
 
 module "fence-bot-user" {

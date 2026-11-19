@@ -7,7 +7,9 @@ locals {
   )))
 }
 
-resource "aws_kms_key" "kms_key" {}
+resource "aws_kms_key" "kms_key" {
+  enable_key_rotation = var.enable_key_rotation
+}
 
 resource "aws_kms_alias" "kms_key_alias" {
   name          = "alias/${var.alias_name}"
