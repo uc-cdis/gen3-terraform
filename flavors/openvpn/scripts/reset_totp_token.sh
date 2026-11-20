@@ -13,6 +13,14 @@ RED="\033[31m"
 
 echo -e "Entering ${BOLD}$_${CLEAR}"
 
+# Needs the container's python (pyotp, qrcode); the host's has neither. /etc/openvpn is
+# bind mounted, so this is reachable from the host too: re-run inside the container.
+if [ ! -e /.dockerenv ]
+then
+    echo -e "${YELLOW}not inside the openvpn container, re-running there${CLEAR}" >&2
+    exec docker exec -i openvpn /etc/openvpn/bin/reset_totp_token.sh "$@"
+fi
+
 if [ -e /etc/profile.d/99-proxy.sh ]
 then
     source /etc/profile.d/99-proxy.sh

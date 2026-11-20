@@ -14,6 +14,14 @@
 
 set -euo pipefail
 
+# Needs the container's python (pyotp, qrcode) for the second factor; the host's has
+# neither. /etc/openvpn is bind mounted, so this is reachable from the host too: re-run
+# inside the container.
+if [ ! -e /.dockerenv ]; then
+    echo "not inside the openvpn container, re-running there" >&2
+    exec docker exec -i openvpn /etc/openvpn/bin/reissue_user.sh "$@"
+fi
+
 if [ -e /etc/openvpn/bin/settings.sh ] && [ -z "${VPN_SETTINGS_LOADED:-}" ]; then
     source /etc/openvpn/bin/settings.sh
 fi

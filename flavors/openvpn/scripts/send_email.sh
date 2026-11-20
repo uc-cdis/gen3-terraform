@@ -24,8 +24,20 @@ fi
 FILENAME=${1}
 if [ ! -e "$1" ]
 then
-    "ERROR: ${RED}${FILENAME}${CLEAR} does not exist"
+    echo -e "ERROR: ${RED}${FILENAME}${CLEAR} does not exist" >&2
     exit 1
+fi
+
+# /etc/openvpn is bind mounted, so this script is also reachable from a shell on the
+# instance itself, where it half works: the cert and zip get made, then
+# reset_totp_token.sh dies because the host python has no pyotp, and the user is sent a
+# config with no QR code and no second factor. Re-run inside the container instead.
+# The CSV usually sits on the host (eg /root), out of the container's view, so it is
+# passed over stdin rather than by path.
+if [ ! -e /.dockerenv ]
+then
+    echo -e "${YELLOW}not inside the openvpn container, re-running there${CLEAR}" >&2
+    exec docker exec -i openvpn /etc/openvpn/bin/send_email.sh /dev/stdin < "${FILENAME}"
 fi
 
 if [ -e /etc/profile.d/99-proxy.sh ]
@@ -47,7 +59,7 @@ export S3BUCKET="${S3_PREFIX:?S3_PREFIX is not set, run this inside the openvpn 
 
 set -e
 set -u
-
+set -o pipefail
 
 
 create_vpn_user() {
@@ -57,7 +69,15 @@ create_vpn_zip() {
     $VPN_BIN_ROOT/make_zips.sh "$vpn_username"
 }
 set_vpn_totp_secret() {
-    vpn_totp_qrcode=$( $VPN_BIN_ROOT/reset_totp_token.sh "$vpn_username" | tail -n1 )
+    # Without pipefail a failed reset was masked by tail's exit status, and the letter
+    # went out with an empty QR code link.
+    vpn_totp_qrcode=$( $VPN_BIN_ROOT/reset_totp_token.sh "$vpn_username" | tail -n1 ) || true
+    if [[ "$vpn_totp_qrcode" != https://* ]]
+    then
+        echo -e "${RED}no QR code URL for ${vpn_username}${CLEAR}; the user has a cert but no second factor." >&2
+        echo "Fix with: $VPN_BIN_ROOT/reset_totp_token.sh ${vpn_username}" >&2
+        return 1
+    fi
 }
 vpn_user_exists() {
     grep -E "^$vpn_username," ${VPN_USER_CSV} &>/dev/null
