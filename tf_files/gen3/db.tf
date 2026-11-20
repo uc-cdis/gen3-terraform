@@ -76,6 +76,19 @@ module "fence-db" {
   secrets_manager_enabled          = true
 }
 
+module "funnel-db" {
+  count                            = var.gen3workflow_enabled ? 1 : 0
+  source                           = "../aws/aurora_db"
+  vpc_name                         = var.vpc_name
+  service                          = "funnel"
+  database_instance_identifier     = var.database_instance_identifier
+  admin_database_username          = var.aurora_username
+  admin_database_password          = var.aurora_password
+  namespace                        = var.namespace
+  create_db                        = var.create_dbs
+  secrets_manager_enabled          = true
+}
+
 module "indexd-db" {
   count                            = var.indexd_enabled ? 1 : 0
   source                           = "../aws/aurora_db"

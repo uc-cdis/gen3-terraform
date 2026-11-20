@@ -31,6 +31,7 @@ locals {
       gen3ff_enabled = var.gen3ff_enabled
       gen3ff_repo = var.gen3ff_repo
       gen3ff_tag = var.gen3ff_tag
+      gen3workflow_enabled = var.gen3workflow_enabled
       guppy_enabled = var.guppy_enabled
       hatchery_enabled = var.hatchery_enabled
       hatchery_service_account = aws_iam_role.hatchery-role[0].arn

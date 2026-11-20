@@ -502,6 +502,7 @@ module "gen3_deployment" {
   dictionary_url          = var.dictionary_url
   dispatcher_job_number   = var.dispatcher_job_number
   fence_enabled           = var.fence_enabled
+  gen3workflow_enabled    = var.gen3workflow_enabled
   guppy_enabled           = var.guppy_enabled
   hatchery_enabled        = var.hatchery_enabled
   hostname                = var.hostname

@@ -977,6 +977,12 @@ variable "fence_enabled" {
   default     = true
 }
 
+variable "gen3workflow_enabled" {
+  description = "Enable gen3workflow and funnel"
+  type        = bool
+  default     = false
+}
+
 variable "guppy_enabled" {
   description = "Enable guppy"
   type        = bool
