@@ -1,0 +1,70 @@
+#!/bin/bash
+# Forwarding and NAT rules that let VPN clients reach the VPC.
+#
+# This runs on every container start, not just at install time. The rules used to be
+# applied once by hand, so anything that flushed iptables (a reboot, a restart after
+# the disk filled) silently broke routing for every connected client until someone
+# noticed and reran this.
+#
+# Rendered from this template by entrypoint.sh. #VPN_SUBNET# is the OpenVPN client
+# network, #ROUTED_NETWORKS# is the space separated list of networks clients reach.
+
+set -euo pipefail
+
+VPN_SUBNET="#VPN_SUBNET#"
+ROUTED_NETWORKS="#ROUTED_NETWORKS#"
+
+# The interface holding the default route is the one facing the VPC
+vpnserver_int=$(ip route show default | awk '/default/ {print $5; exit}')
+
+if [ -z "$vpnserver_int" ]; then
+    echo "could not determine the default interface, refusing to guess" >&2
+    exit 1
+fi
+
+echo "applying rules on ${vpnserver_int} for clients in ${VPN_SUBNET}"
+
+# Idempotent: -C tests for the rule, and we only insert when it is absent, so
+# repeated runs do not stack up duplicates.
+ensure_rule() {
+    local table="$1"; shift
+    if [ "$table" = "filter" ]; then
+        iptables -C "$@" 2>/dev/null || iptables -I "$@"
+    else
+        iptables -t "$table" -C "$@" 2>/dev/null || iptables -t "$table" -A "$@"
+    fi
+}
+
+# Let established traffic back through in both directions
+ensure_rule filter FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+
+for net in $ROUTED_NETWORKS; do
+    echo "  routing ${net}"
+    # New connections initiated from the VPN toward the VPC
+    ensure_rule filter FORWARD -i tun0 -o "$vpnserver_int" \
+        -s "$VPN_SUBNET" -d "$net" -m conntrack --ctstate NEW -j ACCEPT
+    # Clients' source addresses are not routable inside the VPC, so hide them
+    ensure_rule nat POSTROUTING -s "$VPN_SUBNET" -d "$net" -o "$vpnserver_int" -j MASQUERADE
+done
+
+# The host sets this via sysctl in userdata, which is where it belongs; /proc is
+# read-only in the container unless it runs privileged. Only a problem if it is not
+# already on, so check rather than fail.
+if [ "$(cat /proc/sys/net/ipv4/ip_forward 2>/dev/null)" = "1" ]; then
+    echo "ip_forward already enabled"
+elif echo 1 > /proc/sys/net/ipv4/ip_forward 2>/dev/null; then
+    echo "enabled ip_forward"
+else
+    echo "WARNING: ip_forward is off and could not be set from here." >&2
+    echo "The host should set net.ipv4.ip_forward=1; without it nothing routes." >&2
+fi
+
+# Dump the ruleset for debugging. Not a persistence mechanism: this file is inside the
+# container and goes away with it. The rules survive because this script runs on every
+# container start, which is the fix for them being applied once by hand and lost on the
+# next restart.
+if command -v iptables-save >/dev/null 2>&1; then
+    iptables-save > /tmp/iptables.rules 2>/dev/null || true
+fi
+
+echo "network rules applied"
