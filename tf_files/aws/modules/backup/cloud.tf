@@ -21,7 +21,7 @@ resource "aws_kms_key" "backup_key" {
 }
 
 resource "aws_kms_key_policy" "backup_key_external_account" {
-  count = var.cross_account_backup ? 1: 0
+  count  = local.cross_account_enabled ? 1 : 0
   key_id = aws_kms_key.backup_key.id
 
   policy = jsonencode({
@@ -57,7 +57,7 @@ resource "aws_kms_key" "cross_region_rds_backup_key" {
 # ==============
 
 resource "aws_backup_plan" "daily" {
-  name = "rds-daily-backup-plan"
+  name  = "rds-daily-backup-plan"
   count = var.daily_backups_enabled ? 1 : 0
 
   rule {
@@ -77,7 +77,7 @@ resource "aws_backup_plan" "daily" {
     }
 
     dynamic "copy_action" {
-      for_each = var.cross_account_backup ? [1]: []
+      for_each = local.aws_backup_copy_tiers["daily"] ? [1] : []
 
       content {
         lifecycle {
@@ -91,10 +91,10 @@ resource "aws_backup_plan" "daily" {
 }
 
 resource "aws_backup_selection" "daily" {
-  name          = "rds-daily-backup-selection"
-  iam_role_arn  = aws_iam_role.backup_role.arn
-  plan_id = aws_backup_plan.daily[0].id
-  count = var.daily_backups_enabled ? 1 : 0
+  name         = "rds-daily-backup-selection"
+  iam_role_arn = aws_iam_role.backup_role.arn
+  plan_id      = aws_backup_plan.daily[0].id
+  count        = var.daily_backups_enabled ? 1 : 0
 
   resources = [
     "arn:aws:rds:*"
@@ -127,7 +127,7 @@ resource "aws_backup_plan" "weekly" {
     }
 
     dynamic "copy_action" {
-      for_each = var.cross_account_backup ? [1]: []
+      for_each = local.aws_backup_copy_tiers["weekly"] ? [1] : []
 
       content {
         lifecycle {
@@ -141,9 +141,9 @@ resource "aws_backup_plan" "weekly" {
 }
 
 resource "aws_backup_selection" "weekly" {
-  name          = "rds-weekly-backup-selection"
-  iam_role_arn  = aws_iam_role.backup_role.arn
-  plan_id = aws_backup_plan.weekly.id
+  name         = "rds-weekly-backup-selection"
+  iam_role_arn = aws_iam_role.backup_role.arn
+  plan_id      = aws_backup_plan.weekly.id
 
   resources = [
     "arn:aws:rds:*"
@@ -176,7 +176,7 @@ resource "aws_backup_plan" "monthly" {
     }
 
     dynamic "copy_action" {
-      for_each = var.cross_account_backup ? [1]: []
+      for_each = local.aws_backup_copy_tiers["monthly"] ? [1] : []
 
       content {
         lifecycle {
@@ -190,9 +190,9 @@ resource "aws_backup_plan" "monthly" {
 }
 
 resource "aws_backup_selection" "monthly" {
-  name          = "rds-monthly-backup-selection"
-  iam_role_arn  = aws_iam_role.backup_role.arn
-  plan_id       = aws_backup_plan.monthly.id
+  name         = "rds-monthly-backup-selection"
+  iam_role_arn = aws_iam_role.backup_role.arn
+  plan_id      = aws_backup_plan.monthly.id
 
   resources = [
     "arn:aws:rds:*"
@@ -218,14 +218,14 @@ resource "aws_backup_plan" "yearly" {
 
     copy_action {
       lifecycle {
-        delete_after = 2555 # Retain for 7 days
+        delete_after = 2555 # Retain for 2555 days (7 years)
       }
 
       destination_vault_arn = aws_backup_vault.cross_region_rds_backup_vault.arn
     }
 
     dynamic "copy_action" {
-      for_each = var.cross_account_backup ? [1]: []
+      for_each = local.aws_backup_copy_tiers["yearly"] ? [1] : []
 
       content {
         lifecycle {
@@ -239,9 +239,9 @@ resource "aws_backup_plan" "yearly" {
 }
 
 resource "aws_backup_selection" "yearly" {
-  name          = "rds-yearly-backup-selection"
-  iam_role_arn  = aws_iam_role.backup_role.arn
-  plan_id       = aws_backup_plan.yearly.id
+  name         = "rds-yearly-backup-selection"
+  iam_role_arn = aws_iam_role.backup_role.arn
+  plan_id      = aws_backup_plan.yearly.id
 
   resources = [
     "arn:aws:rds:*"
@@ -255,7 +255,7 @@ resource "aws_backup_selection" "yearly" {
 # ==============
 
 resource "aws_iam_role" "backup_role" {
-  name               = "rds-backup-role"
+  name = "rds-backup-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
