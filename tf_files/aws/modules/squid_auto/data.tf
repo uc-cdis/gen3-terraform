@@ -1,5 +1,15 @@
 ### DATA RESOURCES:
 
+data "aws_ssm_parameter" "ssh_admin_keys_file" {
+  count = var.ssh_admin_keys_ssm_parameter_name != "" ? 1 : 0
+  name  = var.ssh_admin_keys_ssm_parameter_name
+}
+
+data "aws_ssm_parameter" "ssh_user_keys_file" {
+  count = var.ssh_user_keys_ssm_parameter_name != "" ? 1 : 0
+  name  = var.ssh_user_keys_ssm_parameter_name
+}
+
 #Basics
 
 data "aws_caller_identity" "current" {}

@@ -94,13 +94,35 @@ variable "ssh_keys_repo" {
 }
 
 variable "ssh_admin_keys_file" {
-  description = "Repo-relative or absolute path to admin authorized_keys file. Empty keeps bootstrap default."
+  description = "Repo-relative path to admin authorized_keys file (git approach). Mutually exclusive with ssh_admin_keys_ssm_parameter_name."
   default     = ""
 }
 
-variable "ssh_user_keys_file" {
-  description = "Repo-relative or absolute path to sftp user authorized_keys file. Empty keeps bootstrap default."
+variable "ssh_admin_keys_ssm_parameter_name" {
+  description = "SSM Parameter Store parameter NAME containing the admin authorized_keys file path. Pass aws_ssm_parameter.x.name so Terraform tracks the dependency on the SSM resource. Mutually exclusive with ssh_admin_keys_file."
+  type        = string
   default     = ""
+
+  validation {
+    condition     = !(var.ssh_admin_keys_ssm_parameter_name != "" && var.ssh_admin_keys_file != "")
+    error_message = "ssh_admin_keys_ssm_parameter_name and ssh_admin_keys_file are mutually exclusive. Use the SSM parameter name to create an implicit Terraform dependency on the SSM resource in the calling module."
+  }
+}
+
+variable "ssh_user_keys_file" {
+  description = "Repo-relative path to sftp user authorized_keys file (git approach). Mutually exclusive with ssh_user_keys_ssm_parameter_name."
+  default     = ""
+}
+
+variable "ssh_user_keys_ssm_parameter_name" {
+  description = "SSM Parameter Store parameter NAME containing the user authorized_keys file path. Pass aws_ssm_parameter.x.name so Terraform tracks the dependency on the SSM resource. Mutually exclusive with ssh_user_keys_file."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = !(var.ssh_user_keys_ssm_parameter_name != "" && var.ssh_user_keys_file != "")
+    error_message = "ssh_user_keys_ssm_parameter_name and ssh_user_keys_file are mutually exclusive. Use the SSM parameter name to create an implicit Terraform dependency on the SSM resource in the calling module."
+  }
 }
 
 variable "whitelist_repo" {
