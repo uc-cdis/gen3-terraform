@@ -17,7 +17,7 @@ resource "aws_kms_key" "backup_key" {
   description             = "KMS key for encrypting RDS backups"
   deletion_window_in_days = 10
   enable_key_rotation     = true
-  region                  = "us-east-1"
+  region                  = data.aws_region.current.name
 }
 
 resource "aws_kms_key_policy" "backup_key_external_account" {
@@ -84,7 +84,7 @@ resource "aws_backup_plan" "daily" {
           delete_after = 7 # Retain for 7 days
         }
 
-        destination_vault_arn = "arn:aws:backup:us-east-1:${var.backup_destination_account}:backup-vault:rds-central-backup-vault-${data.aws_caller_identity.current.account_id}"
+        destination_vault_arn = "arn:aws:backup:${var.backup_destination_region}:${var.backup_destination_account}:backup-vault:rds-central-backup-vault-${data.aws_caller_identity.current.account_id}"
       }
     }
   }
@@ -134,7 +134,7 @@ resource "aws_backup_plan" "weekly" {
           delete_after = 30 # Retain for 30 days
         }
 
-        destination_vault_arn = "arn:aws:backup:us-east-1:${var.backup_destination_account}:backup-vault:rds-central-backup-vault-${data.aws_caller_identity.current.account_id}"
+        destination_vault_arn = "arn:aws:backup:${var.backup_destination_region}:${var.backup_destination_account}:backup-vault:rds-central-backup-vault-${data.aws_caller_identity.current.account_id}"
       }
     }
   }
@@ -183,7 +183,7 @@ resource "aws_backup_plan" "monthly" {
           delete_after = 365 # Retain for 365 days (1 year)
         }
 
-        destination_vault_arn = "arn:aws:backup:us-east-1:${var.backup_destination_account}:backup-vault:rds-central-backup-vault-${data.aws_caller_identity.current.account_id}"
+        destination_vault_arn = "arn:aws:backup:${var.backup_destination_region}:${var.backup_destination_account}:backup-vault:rds-central-backup-vault-${data.aws_caller_identity.current.account_id}"
       }
     }
   }
@@ -232,7 +232,7 @@ resource "aws_backup_plan" "yearly" {
           delete_after = 2555 # Retain for 2555 days (7 years)
         }
 
-        destination_vault_arn = "arn:aws:backup:us-east-1:${var.backup_destination_account}:backup-vault:rds-central-backup-vault-${data.aws_caller_identity.current.account_id}"
+        destination_vault_arn = "arn:aws:backup:${var.backup_destination_region}:${var.backup_destination_account}:backup-vault:rds-central-backup-vault-${data.aws_caller_identity.current.account_id}"
       }
     }
   }

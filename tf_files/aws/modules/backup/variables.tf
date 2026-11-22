@@ -16,6 +16,12 @@ variable "daily_backups_enabled" {
   default     = true
 }
 
+variable "backup_destination_region" {
+  description = "AWS region of the central cross-account backup vault"
+  type        = string
+  default     = "us-east-1"
+}
+
 variable "cross_region_destination" {
   description = "The AWS region in which backups should live"
   type        = string

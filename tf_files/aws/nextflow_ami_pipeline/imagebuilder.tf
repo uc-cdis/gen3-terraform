@@ -113,7 +113,7 @@ resource "aws_imagebuilder_distribution_configuration" "public_ami" {
       }
     }
 
-    region = "us-east-1"
+    region = var.region
   }
 }
 
@@ -140,7 +140,7 @@ resource "aws_imagebuilder_image_recipe" "recipe" {
 
   # TODO: Do we need this? ECS optimized should come with docker
   component {
-    component_arn = "arn:aws:imagebuilder:us-east-1:aws:component/docker-ce-linux/1.0.0/1"
+    component_arn = "arn:aws:imagebuilder:${var.region}:aws:component/docker-ce-linux/1.0.0/1"
   }
 
   component {

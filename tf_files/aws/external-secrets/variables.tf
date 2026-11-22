@@ -7,3 +7,9 @@ variable oidc_provider_id {}
 variable account_number {
   description = "AWS account ID to use"
 }
+
+variable "aws_region" {
+  description = "AWS region where the EKS cluster is deployed"
+  type        = string
+  default     = "us-east-1"
+}
