@@ -79,10 +79,19 @@ echo "  generating a new second factor"
 
 /etc/openvpn/bin/push_to_s3.sh
 
+# make_zips.sh only builds the bundle locally; without this the user has a new cert and
+# no way to get it. Same place and expiry as send_email.sh. No --sse: the bucket's
+# default encryption applies, which is SSE-KMS when pki_kms_key_arn is set.
+zip_s3_path="s3://${S3BUCKET}/userzips/$(date +%Y/%m)/${username}_$(date +%Y%m%d%H%M%S).zip"
+aws s3 cp "${TEMP_ROOT}/${username}.zip" "$zip_s3_path" >/dev/null
+zip_url="$(aws s3 presign "$zip_s3_path" --expires-in "$((60*60*48))")"
+
 new_serial=$(openssl x509 -in "${KEY_PATH}/issued/${username}.crt" -noout -serial | cut -d= -f2)
 echo
 echo -e "${GREEN}Reissued ${username}${CLEAR}"
 echo "  new serial: ${new_serial}"
+echo "  client bundle (link expires with the instance role's session, at most 48h):"
+echo "  ${zip_url}"
 echo
 echo -e "${YELLOW}The old certificate is only rejected once each server reloads the CRL.${CLEAR}"
 echo -e "${YELLOW}Run reload_crl.sh on every VPN using this PKI.${CLEAR}"

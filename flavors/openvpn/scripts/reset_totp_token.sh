@@ -50,7 +50,7 @@ update_password_file() {
 generate_qr_code() {
     mkdir -p /etc/openvpn/pki/qrcodes
     qrcode_out=/etc/openvpn/pki/qrcodes/${vpn_username}.png
-    string=$( python3 -c "import pyotp; print( pyotp.totp.TOTP('$totp_secret').provisioning_uri('$vpn_username', issuer_name='$CLOUD_NAME') )" )
+    string=$( python3 -c "import pyotp; print( pyotp.totp.TOTP('$totp_secret').provisioning_uri(name='$vpn_username', issuer_name='$CLOUD_NAME') )" )
     $( python3 -c "import qrcode; qrcode.make('$string').save('${qrcode_out}')" )
     # vpn_creds_url="https://${FQDN}/$uuid.svg"
     # S3BUCKET comes from settings.sh, which entrypoint.sh writes at container start.

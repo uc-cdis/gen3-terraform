@@ -21,7 +21,10 @@ fi
 
 #EasyRSA
 export EASYRSA_PATH="/etc/openvpn/easy-rsa"
-source $EASYRSA_PATH/vars &>/dev/null
+# Don't source $EASYRSA_PATH/vars here. It is written in easyrsa 3 syntax (set_var), a
+# helper that only exists inside easyrsa, which reads vars itself. Sourcing it fails
+# with 127 and kills every script that sources this file under set -e (reissue_user.sh,
+# reload_crl.sh) before they print anything.
 
 export USER_PW_FILE="/etc/openvpn/user_passwd.csv"
 export OPENVPN_CONF_DIR="/etc/openvpn"
@@ -30,6 +33,8 @@ export OPENVPN_MY_BIN="/etc/openvpn/bin"
 #CDIS OpenVPN scripts contants
 export TEMPLATE_DIR="/etc/openvpn/bin/templates"
 export KEY_PATH="/etc/openvpn/easy-rsa/pki/"
+# Before ARCHIVE_CERT_DIR, which is built from it; scripts source this under set -u
+export KEY_DIR="$EASYRSA_PATH/pki"
 export CA_PATH="$KEY_PATH/ca.crt"
 export TA_KEY_PATH="$KEY_PATH/ta.key"
 export ARCHIVE_CERT_DIR="$KEY_DIR/user_certs/"
@@ -38,7 +43,6 @@ export USER_PW_FILE="/etc/openvpn/user_passwd.csv"
 export VPN_BIN_ROOT="/etc/openvpn/bin"
 export VPN_USER_CSV="/etc/openvpn/user_passwd.csv"
 export VPN_FILE_ATTACHMENTS="-a$VPN_BIN_ROOT/OpenVPN_for_PLANX_Installation_Guide.pdf"
-export KEY_DIR="$EASYRSA_PATH/pki"
 export PATH=$PATH:$EASYRSA_PATH:$OPENVPN_MY_BIN
 # No virtualenv. The old bootstrap built one at /etc/openvpn/bin/.venv on the instance;
 # pyotp, qrcode and bcrypt are installed into the image's system python instead, so
