@@ -89,6 +89,18 @@ variable "pki_kms_key_arn" {
   default     = ""
 }
 
+variable "ssm_session_kms_key_arn" {
+  description = "KMS key Session Manager encrypts sessions with. Empty means sessions aren't KMS-encrypted"
+  type        = string
+  default     = ""
+}
+
+variable "ssm_session_log_bucket" {
+  description = "S3 bucket Session Manager logs sessions to. Empty means no S3 session logging"
+  type        = string
+  default     = ""
+}
+
 variable "s3_prefix_override" {
   default = ""
 }

@@ -163,6 +163,20 @@ variable "pki_kms_key_arn" {
   default     = ""
 }
 
+# Match the account's Session Manager preferences. Leave empty if sessions aren't
+# KMS-encrypted or logged to S3.
+variable "ssm_session_kms_key_arn" {
+  description = "KMS key Session Manager encrypts sessions with (kmsKeyId in SSM-SessionManagerRunShell). Grants the instance role decrypt/generate-data-key on it. Empty means sessions aren't KMS-encrypted"
+  type        = string
+  default     = ""
+}
+
+variable "ssm_session_log_bucket" {
+  description = "S3 bucket Session Manager logs sessions to (s3BucketName in SSM-SessionManagerRunShell). Grants the instance role put-object on it. Empty means no S3 session logging"
+  type        = string
+  default     = ""
+}
+
 variable "vpn_image_tag" {
   description = "Tag of the quay.io/cdis/openvpn image to run. CI tags images with the branch name, so this is master for released builds and the branch name while testing"
   default     = "master"

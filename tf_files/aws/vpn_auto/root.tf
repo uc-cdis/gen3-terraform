@@ -38,6 +38,8 @@ module "vpn_auto" {
   s3_prefix_override           = var.s3_prefix_override
   adopted_pki_writable         = var.adopted_pki_writable
   pki_kms_key_arn              = var.pki_kms_key_arn
+  ssm_session_kms_key_arn      = var.ssm_session_kms_key_arn
+  ssm_session_log_bucket       = var.ssm_session_log_bucket
   vpn_image_tag                = var.vpn_image_tag
   organization_name            = var.organization_name
   cluster_desired_capacity     = var.cluster_desired_capacity

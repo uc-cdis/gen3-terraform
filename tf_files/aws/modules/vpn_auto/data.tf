@@ -97,6 +97,31 @@ data "aws_iam_policy_document" "vpn_policy_document" {
     }
   }
 
+  # Session Manager preferences (SSM-SessionManagerRunShell) can require KMS session
+  # encryption and S3 session logging. When they do, the agent on the instance must use
+  # that key and write to that bucket, or every start-session fails. AmazonSSMManagedInstanceCore
+  # covers neither.
+  dynamic "statement" {
+    for_each = var.ssm_session_kms_key_arn != "" ? [1] : []
+    content {
+      effect    = "Allow"
+      actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+      resources = [var.ssm_session_kms_key_arn]
+    }
+  }
+
+  dynamic "statement" {
+    for_each = var.ssm_session_log_bucket != "" ? [1] : []
+    content {
+      effect  = "Allow"
+      actions = ["s3:PutObject", "s3:GetEncryptionConfiguration"]
+      resources = [
+        "arn:aws:s3:::${var.ssm_session_log_bucket}",
+        "arn:aws:s3:::${var.ssm_session_log_bucket}/*",
+      ]
+    }
+  }
+
   # Read only, just the CA certificate. The instance needs the trust anchor to verify
   # client certs; it has no business issuing them, so IssueCertificate is deliberately
   # not granted to a public facing box.
